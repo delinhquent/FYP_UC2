@@ -123,3 +123,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+data/base/consolidated_products.csv
+data/base/consolidated_profiles.csv
+data/raw/consolidated_products.csv
+data/raw/consolidated_profiles.csv
