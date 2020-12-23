@@ -1,5 +1,0 @@
-[core]
-    remote = remote
-['remote "remote"']
-    url = ssh://delin.ong.2017@34.126.96.192/data
-    keyfile = C:/Users/Delin/.ssh/id_rsa
