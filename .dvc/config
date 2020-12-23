@@ -1,0 +1,4 @@
+[core]
+    remote = remote
+['remote "remote"']
+    url = ssh://junronglau@34.126.96.192/data
