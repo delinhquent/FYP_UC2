@@ -1,5 +1,5 @@
-# from utils.reformat import reformat_profiles_df, reformat_reviews_df, reformat_products_df
 from utils.extract import extract_review_activity
+from utils.reformat import reformat_review_activity_df
 
 
 class Preprocessor:
@@ -9,7 +9,7 @@ class Preprocessor:
 
     def preprocess_review_activity(self):
         self.review_activity_df = extract_review_activity(self.review_activity_df)
-        # self.review_activity_df = reformat_reviews_df(self.review_activity_df,
-        #                                       self.config.preprocessing.contractions_path,
-        #                                       self.config.preprocessing.slangs_path)
+        self.review_activity_df = reformat_review_activity_df(self.review_activity_df,
+                                              self.config.preprocessing.contractions_path,
+                                              self.config.preprocessing.slangs_path)
         return self.review_activity_df
