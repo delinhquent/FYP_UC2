@@ -34,10 +34,10 @@ def generate():
     elif dataset == 'products':
         print("In development...")
     elif dataset == 'review_activity':
-        print("Extracting and preprocessing reviewer contributions into a dataset")
+        print("Extracting and preprocessing reviewer contributions into a dataset...")
         data_generator.preprocess_review_activity()
         
-        print("Saving reviewer contributions into a dataset")
+        print("Saving reviewer contributions into a dataset...")
         data_generator.save_review_activity_data()
 
     print('Generated datasets are saved...')
