@@ -11,9 +11,10 @@ def get_args():
         default='configs/config.json',
         help='The Configuration file')
     argparser.add_argument(
-        '-d', '--dataset',
-        default='all',
-        help='Which dataset to generate [all, reviews, profiles, products, review_activity]')
+        '-m', '--mode',
+        default='',
+        help='dataset - Generate Review Activity from reviewer contribution column from Profile Dataset')
+
 
     args = argparser.parse_args()
     return args
