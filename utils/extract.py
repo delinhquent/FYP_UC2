@@ -8,14 +8,8 @@ def extract_review_activity(df):
     extracted_data = []
     for index, row in df.iterrows():
         print("Extracting {} out of {}...".format(index+1,len(df)))
-        not_empty_data = True
-        try:
-            contribution_data = ast.literal_eval(row['reviewer_contributions'])
-            if contribution_data == []:
-                not_empty_data = False
-        except:
-            not_empty_data = False
-        if not_empty_data:
+        contribution_data = check_empty_data(row['reviewer_contributions'])
+        if contribution_data != []:
             count = 0
             for data in contribution_data:
                 data = dict(data)
@@ -45,6 +39,12 @@ def extract_review_activity(df):
     
     print("Starting preprocessing on Reviewer Activity Dataset soon..")
     return review_activity_df.drop_duplicates(subset='review_id')
+
+def check_empty_data(row):
+    try:
+        return ast.literal_eval(row)
+    except:
+        return []
 
 def helpfulVotes_value(data):
     if 'helpfulVotes' not in data:
