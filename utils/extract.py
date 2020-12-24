@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def extract_review_activity(df):
-    cols=['acc_num','review_id','sortTimestamp','rating','helpfulVotes','title','text','images_posted','asin','verifiedPurchase']
+    cols=['review_id','acc_num','asin','sortTimestamp','rating','helpfulVotes','reviewCount','title','text','images_posted','verifiedPurchase']
     
     extracted_data = []
     for index, row in df.iterrows():
@@ -36,6 +36,10 @@ def extract_review_activity(df):
                             helpfulVotes = None
                         else:
                             helpfulVotes = data['helpfulVotes']
+                        if 'reviewCount' not in data:
+                            reviewCount = None
+                        else:
+                            reviewCount = data['reviewCount']
                         if 'title' not in data:
                             title = ''
                         else:
@@ -45,7 +49,7 @@ def extract_review_activity(df):
                         else:
                             images_posted = len(data['images'])
 
-                        extracted_data.append([acc_num,review_id,sortTimestamp,rating,helpfulVotes,title,text,images_posted,asin,verifiedPurchase])
+                        extracted_data.append([review_id,acc_num,asin,sortTimestamp,rating,helpfulVotes,reviewCount,title,text,images_posted,verifiedPurchase])
                         count += 1
                         print("Added {} out of {} from reviewer contribution...".format(count,len(data)))
                     except:
@@ -54,4 +58,6 @@ def extract_review_activity(df):
             print("Reviewer Activity Dataset currently has {} rows...\n".format(len(extracted_data)))
 
     review_activity_df = pd.DataFrame(extracted_data,columns=cols)
+    
+    print("Starting preprocessing on Reviewer Activity Dataset soon..")
     return review_activity_df.drop_duplicates(subset='review_id')
