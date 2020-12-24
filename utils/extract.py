@@ -29,15 +29,15 @@ def extract_review_activity(df):
                         verifiedPurchase = data['verifiedPurchase']
 
                         if 'rating' not in data:
-                            rating = None
+                            rating = 0
                         else:
                             rating = data['rating']
                         if 'helpfulVotes' not in data:
-                            helpfulVotes = None
+                            helpfulVotes = 0
                         else:
                             helpfulVotes = data['helpfulVotes']
                         if 'reviewCount' not in data:
-                            reviewCount = None
+                            reviewCount = 0
                         else:
                             reviewCount = data['reviewCount']
                         if 'title' not in data:
@@ -45,7 +45,7 @@ def extract_review_activity(df):
                         else:
                             title = data['title']
                         if 'images' not in data:
-                            images_posted = None
+                            images_posted = 0
                         else:
                             images_posted = len(data['images'])
 
