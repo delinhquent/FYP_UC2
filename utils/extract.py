@@ -10,10 +10,15 @@ def extract_review_activity(df):
         print("Extracting {} out of {}...".format(index+1,len(df)))
         contribution_data = check_empty_data(row['reviewer_contributions'])
         if contribution_data != []:
+            count = 0
             for data in contribution_data:
                 new_data = extract_data(dict(data))
                 if new_data != []:
-                    extracted_data.append([review_id,acc_num,asin,sortTimestamp,rating,helpfulVotes,reviewCount,title,text,images_posted,verifiedPurchase])
+                    extracted_data.append(new_data)
+                    count += 1
+                    print("Added {} out of {} from reviewer contribution...".format(count,len(data)))
+
+            print("Reviewer Activity Dataset currently has {} rows...\n".format(len(extracted_data)))
 
     review_activity_df = pd.DataFrame(extracted_data,columns=cols)
     
