@@ -20,7 +20,3 @@ def generate(config):
     data_generator.save_review_activity_data()
     
     print('Generated datasets are saved...')
-
-
-
-
