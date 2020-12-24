@@ -1,5 +1,6 @@
-usecase2
+# Usecase 2
 ==============================
+[![Maintainability](https://api.codeclimate.com/v1/badges/8768e2ba435de0092884/maintainability)](https://codeclimate.com/github/ooade/PreactSimpleStarter/maintainability)
 
 [Final Year Project] Develop models to sift out reviews that seem unnatural, and then use a scoring algorithm to assign each review an impact score.
 
@@ -53,5 +54,3 @@ Project Organization
 
 
 --------
-
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
