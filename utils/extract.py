@@ -27,27 +27,11 @@ def extract_review_activity(df):
                         text = data['text']
                         asin = data['product']['asin']
                         verifiedPurchase = data['verifiedPurchase']
-
-                        if 'rating' not in data:
-                            rating = 0
-                        else:
-                            rating = data['rating']
-                        if 'helpfulVotes' not in data:
-                            helpfulVotes = 0
-                        else:
-                            helpfulVotes = data['helpfulVotes']
-                        if 'reviewCount' not in data:
-                            reviewCount = 0
-                        else:
-                            reviewCount = data['reviewCount']
-                        if 'title' not in data:
-                            title = ''
-                        else:
-                            title = data['title']
-                        if 'images' not in data:
-                            images_posted = 0
-                        else:
-                            images_posted = len(data['images'])
+                        rating = rating_value(data)
+                        helpfulVotes = helpfulVotes_value(data)
+                        reviewCount = reviewCount_value(data)
+                        title = title_value(data)
+                        images_posted = image_posted_value(data)
 
                         extracted_data.append([review_id,acc_num,asin,sortTimestamp,rating,helpfulVotes,reviewCount,title,text,images_posted,verifiedPurchase])
                         count += 1
@@ -61,3 +45,29 @@ def extract_review_activity(df):
     
     print("Starting preprocessing on Reviewer Activity Dataset soon..")
     return review_activity_df.drop_duplicates(subset='review_id')
+
+def helpfulVotes_value(data):
+    if 'helpfulVotes' not in data:
+        return 0
+    return data['helpfulVotes']
+
+def image_posted_value(data):
+    if 'images' not in data:
+        return 0
+    return len(data['images'])
+
+def rating_value(data):
+    if 'rating' not in data:
+        return 0
+    return data['rating']
+
+def reviewCount_value(data):
+    if 'reviewCount' not in data:
+        return 0
+    return data['reviewCount']
+
+def title_value(data):
+    if 'title' not in data:
+        return ''
+    return data['title']
+
