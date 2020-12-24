@@ -1,6 +1,6 @@
 # Usecase 2
-==============================
-[![Maintainability](https://api.codeclimate.com/v1/badges/8768e2ba435de0092884/maintainability)](https://codeclimate.com/github/ooade/PreactSimpleStarter/maintainability)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability)
 
 [Final Year Project] Develop models to sift out reviews that seem unnatural, and then use a scoring algorithm to assign each review an impact score.
 
