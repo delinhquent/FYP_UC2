@@ -23,6 +23,8 @@ class Generator:
         self.review_activity_data = self.get_review_activity_data()
 
     def load_preprocessor(self):
+        self.profiles_data = self.get_profiles_data()
+        self.review_activity_data = self.get_review_activity_data()
         self.preprocessor = Preprocessor(self.config, self.profiles_data)
 
     def preprocess_review_activity(self):
