@@ -22,33 +22,41 @@ for resource in resources:
 
 
 def reformat_review_activity_df(df, contractions_path, slangs_path):
+    print("Preprocessing title...")
     # Lowercase title text
     df['cleaned_title'] = df['title'].str.lower()
 
+    print("Preprocessing reviews...")
     # Decode & lowercase comment text
     df['decoded_comment'] = df.text.astype(str).apply(decode_comments)
     df['decoded_comment'] = df['decoded_comment'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip()
     df['cleaned_text'] = clean_text(df['decoded_comment'], contractions_path, slangs_path)
 
+    print("Preprocessing ratings...")
     # Cleaning stars
     df['cleaned_ratings'] = df.rating.astype(str).apply(normalize_ratings)
 
+    print("Preprocessing verified purchase...")
     # Data wrangling & Fill in blanks for Verified Puchase
     df['cleaned_verified'] = df.verifiedPurchase
     df.loc[df.cleaned_verified == True, 'cleaned_verified'] = 1
     df.loc[df.cleaned_verified == False, 'cleaned_verified'] = 0
 
+    print("Preprocessing helpful votes...")
     # Data wrangling for voting columns
     df['cleaned_voting'] = df.helpfulVotes.astype(int)
 
+    print("Preprocessing review count...")
     # Data wrangling for reviewCount columns
     df['cleaned_review_count'] = df.reviewCount.astype(int)
 
+    print("Preprocessing number of image posted...")
     # Data wrangling for image_posted columns
     df['cleaned_images_posted'] = df.images_posted.astype(int)
 
+    print("Preprocessing date time posted...")
     # convert integer to datetime for sortTimestamp
-    df['cleaned_datetime_posted'] = df.sortTimestamp.apply(lambda x: datetime.datetime.fromtimestamp (x / 1e12))
+    df['cleaned_datetime_posted'] = df.sortTimestamp.apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
 
     # return dataframe
     return df
