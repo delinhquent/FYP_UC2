@@ -26,12 +26,6 @@ def reformat_review_activity_df(df, contractions_path, slangs_path):
     # Lowercase title text
     df['cleaned_title'] = df['title'].str.lower()
 
-    print("Preprocessing reviews...")
-    # Decode & lowercase comment text
-    df['decoded_comment'] = df.text.astype(str).apply(decode_comments)
-    df['decoded_comment'] = df['decoded_comment'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip()
-    df['cleaned_text'] = clean_text(df['decoded_comment'], contractions_path, slangs_path)
-
     print("Preprocessing ratings...")
     # Cleaning stars
     df['cleaned_ratings'] = df.rating.astype(str).apply(normalize_ratings)
@@ -58,6 +52,12 @@ def reformat_review_activity_df(df, contractions_path, slangs_path):
     # convert integer to datetime for sortTimestamp
     df['cleaned_datetime_posted'] = df.sortTimestamp.apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
 
+    print("Preprocessing reviews...")
+    # Decode & lowercase comment text
+    df['decoded_comment'] = df.text.astype(str).apply(decode_comments)
+    df['decoded_comment'] = df['decoded_comment'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip()
+    df['cleaned_text'] = clean_text(df['decoded_comment'], contractions_path, slangs_path)
+    
     # return dataframe
     return df
 
