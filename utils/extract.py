@@ -10,14 +10,7 @@ def extract_review_activity(df):
         print("Extracting {} out of {}...".format(index+1,len(df)))
         contribution_data = check_empty_data(row['reviewer_contributions'])
         if contribution_data != []:
-            count = 0
-            for data in contribution_data:
-                new_data = extract_data(dict(data))
-                if new_data != []:
-                    extracted_data.append(new_data)
-                    count += 1
-                    print("Added {} out of {} from reviewer contribution...".format(count,len(data)))
-
+            extracted_data += process_data(contribution_data)
             print("Reviewer Activity Dataset currently has {} rows...\n".format(len(extracted_data)))
 
     review_activity_df = pd.DataFrame(extracted_data,columns=cols)
@@ -60,6 +53,14 @@ def image_posted_value(data):
     if 'images' not in data:
         return 0
     return len(data['images'])
+
+def process_data(contribution_data):
+    temp_data = []
+    for data in contribution_data:
+        new_data = extract_data(dict(data))
+        if new_data != []:
+            temp_data.append(new_data)
+    return temp_data
 
 def rating_value(data):
     if 'rating' not in data:
