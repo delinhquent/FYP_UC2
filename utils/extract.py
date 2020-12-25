@@ -8,9 +8,10 @@ def extract_review_activity(df):
     extracted_data = []
     for index, row in df.iterrows():
         print("Extracting {} out of {}...".format(index+1,len(df)))
-        contribution_data = check_empty_data(row['reviewer_contributions'])
-        if contribution_data != []:
-            extracted_data += process_data(contribution_data)
+        contribution_data = check_empty_data(row)
+        if len(contribution_data) > 0:
+            extracted_data = process_data(row['acc_num'], contribution_data,extracted_data)
+            
             print("Reviewer Activity Dataset currently has {} rows...\n".format(len(extracted_data)))
 
     review_activity_df = pd.DataFrame(extracted_data,columns=cols)
@@ -20,14 +21,13 @@ def extract_review_activity(df):
 
 def check_empty_data(row):
     try:
-        return ast.literal_eval(row)
+        return ast.literal_eval(row['reviewer_contributions'])
     except:
         return []
 
-def extract_data(data):
+def extract_data(acc_num, data):
     if 'ideas' not in data['id']:
         try:
-            acc_num = row['acc_num']
             review_id = data['externalId']
             sortTimestamp = data['sortTimestamp']
             text = data['text']
@@ -42,7 +42,8 @@ def extract_data(data):
             return [review_id,acc_num,asin,sortTimestamp,rating,helpfulVotes,reviewCount,title,text,images_posted,verifiedPurchase]
         except:
             return []
-    return []
+    else:
+        return []
 
 def helpfulVotes_value(data):
     if 'helpfulVotes' not in data:
@@ -54,13 +55,12 @@ def image_posted_value(data):
         return 0
     return len(data['images'])
 
-def process_data(contribution_data):
-    temp_data = []
+def process_data(acc_num, contribution_data,extracted_data):
     for data in contribution_data:
-        new_data = extract_data(dict(data))
+        new_data = extract_data(acc_num, data)
         if new_data != []:
-            temp_data.append(new_data)
-    return temp_data
+            extracted_data.append(new_data)
+    return extracted_data
 
 def rating_value(data):
     if 'rating' not in data:
