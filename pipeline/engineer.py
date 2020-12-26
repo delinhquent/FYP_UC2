@@ -22,7 +22,7 @@ class Engineer:
         self.review_activity_data = self.get_review_activity_data()
 
     def load_engineer(self):
-         self.engineer = FeatureEngineer(self.config, self.reviews_data, self.profiles_data,self.products_data,self.review_activity_data)
+        self.engineer = FeatureEngineer(config = self.config, reviews_df = self.reviews_data, profiles_df = self.profiles_data, products_df = self.products_data, review_activity_df = self.review_activity_data)
 
     def get_reviews_data(self):
         self.reviews_data_loader.load_data()
