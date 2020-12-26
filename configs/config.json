@@ -2,21 +2,24 @@
   "reviews" : {
     "raw_data_path" : "data/raw/consolidated_products.csv",
     "base_data_path": "data/base/consolidated_products.csv",
-    "save_data_path": "data/interim/consolidated_products.csv"
+    "save_data_path": "data/interim/consolidated_products_feature_engineering.csv"
   },
   "products": {
     "raw_data_path" : "data/raw/consolidated_product_info.csv",
     "base_data_path": "data/base/consolidated_product_info.csv",
-    "save_data_path": "data/interim/consolidated_product_info.csv"
+    "save_data_path": "data/interim/consolidated_product_info_feature_engineering.csv"
   },
   "profiles": {
     "raw_data_path" : "data/raw/consolidated_profiles.csv",
     "base_data_path": "data/base/consolidated_profiles.csv",
-    "save_data_path": "data/interim/consolidated_profiles.csv"
+    "save_data_path": "data/interim/consolidated_profiles_feature_engineering.csv"
   },
   "review_activity": {
-    "base_data_path" : "data/base/consolidated_profiles.csv",
-    "save_data_path": "data/interim/consolidated_review_activity.csv"
+    "base_data_path" : "data/interim/consolidated_review_activity.csv",
+    "save_data_path": "data/interim/consolidated_review_activity_feature_engineering.csv"
+  },
+  "merged_reviews": {
+    "save_data_path": "data/interim/merged_reviews_feature_engineering.csv"
   },
   "model": {
     "save_data_path": "data/processed/fake_framework_features.csv"
