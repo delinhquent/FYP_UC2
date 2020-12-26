@@ -10,7 +10,7 @@ def generate(config):
     # then process the json configuration file
     data_generator = Generator(config)
 
-    print("Loading data and preprocessor")
+    print("Loading data and preprocessor...")
     data_generator.load_preprocessor()
 
     print("Extracting and preprocessing reviewer contributions into a dataset...")
