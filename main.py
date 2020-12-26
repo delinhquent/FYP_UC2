@@ -5,6 +5,7 @@ from utils.config import process_config
 from utils.utils import get_args
 from src.data.make_dataset import generate
 from src.features.build_features import build_features
+import utils.common_resources
 
 if __name__ == '__main__':
     try:
