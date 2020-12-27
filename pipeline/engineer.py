@@ -43,6 +43,9 @@ class Engineer:
     def engineer_reviews(self):
         self.reviews_data = self.engineer.engineer_reviews()
 
+    def engineer_review_activity(self):
+        self.review_activity_data = self.engineer.engineer_review_activity()
+
     def save_reviews_data(self):
         self.reviews_data.to_csv(self.config.reviews.save_data_path, index=False)
     
