@@ -15,11 +15,26 @@ def build_features(config):
 
     print("Loading Engineer...")
     data_engineer.load_engineer()
+    
+    engineer_all(data_engineer)
+    
+    print('Generated datasets with features are saved...')
 
-    print("Engineering features...")
+def engineer_all(data_engineer):
+    engineer_reviews_only(data_engineer)
+    engineer_review_activity_only(data_engineer)
+
+def engineer_reviews_only(data_engineer):
+    print("Engineering features for reviews dataset...")
     data_engineer.engineer_reviews()
     
     print("Saving generated features into a dataset...")
     data_engineer.save_reviews_data()
+
+def engineer_review_activity_only(data_engineer):
+    print("Engineering features for review activity dataset...")
+    data_engineer.engineer_review_activity()
     
-    print('Generated datasets with features are saved...')
+    print("Saving generated features into a dataset...")
+    data_engineer.save_review_activity_data()
+
