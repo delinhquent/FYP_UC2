@@ -7,7 +7,7 @@ from utils.clean import clean_text
 from utils.engineer_functions import *
 
 
-def engineer_reviews(df, contractions_path, slangs_path):
+def engineer_reviews(df, sample_incentivized_list):
     # clean verified purchase column
     df.loc[df.cleaned_verified != 1, 'cleaned_verified'] = 0
     
@@ -22,13 +22,12 @@ def engineer_reviews(df, contractions_path, slangs_path):
     df['cleaned_sample_review'] = check_sample_text(temp_new_text(df['decoded_comment']))
 
     # engineer incentivized reviews
-    df['cleaned_incentivized_review'] = [0] * len(df)
-    df['cleaned_incentivized_review'] = fuzzy_check_reviews(df['cleaned_text'], contractions_path, slangs_path, df['cleaned_incentivized_review'], 'incentivized')
+    df['cleaned_incentivized_review'] = fuzzy_check_reviews(df['cleaned_text'], sample_incentivized_list, 'incentivized')
 
     # return dataframe
     return df
 
-def engineer_review_activity(df, contractions_path, slangs_path):
+def engineer_review_activity(df, loreal_brand_list, sample_incentivized_list):
     # engineer deleted reviews
     df['cleaned_deleted_review'] = check_deleted_text(list(df['decoded_comment']))
     
@@ -40,12 +39,10 @@ def engineer_review_activity(df, contractions_path, slangs_path):
     df['cleaned_sample_review'] = check_sample_text(temp_new_text(df['cleaned_text']))
 
     # engineer incentivized reviews
-    df['cleaned_incentivized_review'] = [0] * len(df)
-    df['cleaned_incentivized_review'] = fuzzy_check_reviews(temp_new_text(df['cleaned_text']), contractions_path, slangs_path, df['cleaned_incentivized_review'] ,'incentivized')
+    df['cleaned_incentivized_review'] = fuzzy_check_reviews(temp_new_text(df['cleaned_text']), sample_incentivized_list,'incentivized')
 
     # engineer loreal reviews
-    df['cleaned_loreal_review'] = [0] * len(df)
-    df['cleaned_loreal_review'] = fuzzy_check_reviews(temp_new_text(df['cleaned_text']), contractions_path, slangs_path, df['cleaned_loreal_review'], 'loreal')
+    df['cleaned_loreal_review'] = fuzzy_check_reviews(temp_new_text(df['cleaned_text']), sample_incentivized_list, 'loreal')
 
     
     # clean cleaned_text column
