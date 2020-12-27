@@ -11,3 +11,9 @@ class FeatureEngineer:
                                               self.config.preprocessing.contractions_path,
                                               self.config.preprocessing.slangs_path)
         return self.reviews_df
+    
+    def engineer_review_activity(self):
+        self.review_activity_df = engineer_review_activity(self.review_activity_df,
+                                              self.config.preprocessing.contractions_path,
+                                              self.config.preprocessing.slangs_path)
+        return self.review_activity_df
