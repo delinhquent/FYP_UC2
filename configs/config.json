@@ -27,5 +27,9 @@
   "preprocessing": {
     "contractions_path": "data/preprocessing/contractions.txt",
     "slangs_path": "data/preprocessing/slangs.txt"
+  },
+  "user_inputs": {
+    "loreal_brand_path": "data/external/loreal_brand_list.csv",
+    "sample_incentivized_path": "data/external/sample_incentivized_reviews.csv"
   }
 }
