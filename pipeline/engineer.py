@@ -51,13 +51,17 @@ class Engineer:
     def get_loreal_brand_data(self):
         self.loreal_brand_data_loader.load_data()
         temp_loreal_brand_data = list(self.loreal_brand_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
-        return list(set(temp_loreal_brand_data + clean_text(temp_loreal_brand_data, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)))
+        return add_cleaned_version(temp_loreal_brand_data)
 
     def get_sample_incentivized_data(self):
         self.sample_incentivized_data_loader.load_data()
         temp_sample_incentivized_data = list(self.sample_incentivized_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
-        return list(set(temp_sample_incentivized_data + clean_text(temp_sample_incentivized_data, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)))
+        return add_cleaned_version(temp_sample_incentivized_data)
 
+    def add_cleaned_version(text):
+        text += clean_text(text, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)))
+        return list(set(text))
+    
     def engineer_reviews(self):
         self.reviews_data = self.engineer.engineer_reviews()
 
