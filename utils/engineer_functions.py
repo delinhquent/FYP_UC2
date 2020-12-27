@@ -27,20 +27,7 @@ def check_deleted_text(text):
             new_data.append(0)
     return new_data
 
-def fuzzy_check_reviews(text, contractions_path,slangs_path, class_assignment, mode):
-    if mode == 'loreal':
-        fuzzy_match_list = ['loreal', 'garnier' 'maybelline','nyx','shu uemura','lancome', 'giorgio armani', \
-                    'armani', 'yvessaintlaurent','kiehls','ralph lauren', 'urban decay', 'it cosmetic', \
-                    'kerastase', 'vichy', 'la roche posay', 'skinceuticals']
-
-        fuzzy_match_list += clean_text(fuzzy_match_list, contractions_path,slangs_path)
-    elif mode == 'incentivized':
-        fuzzy_match_list = ['I have received this product for a discount in exchange for my honest review.',\
-                          'This product was received at no cost for review and inspection purposes.',\
-                          'Just received and am completing to receive a free bottle. Will follow up after first month.']
-                          
-        fuzzy_match_list += clean_text(fuzzy_match_list, contractions_path, slangs_path)
-    
+def fuzzy_check_reviews(text, fuzzy_match_list, mode):
     print("Fuzzy Matching...")
     match = fuzzy_match_results(fuzzy_match_list,text)
 
@@ -48,7 +35,7 @@ def fuzzy_check_reviews(text, contractions_path,slangs_path, class_assignment, m
 
     match_df = pd.DataFrame(match,columns = ['brand', 'score'])
     match_df['probability_brand'] = fuzzy_score(list((match_df['score'])))
-    match_df['class_assignment'] = class_assignment
+    match_df['class_assignment'] = 0
 
     match_df.loc[match_df.probability_brand >= 1, "class_assignment"] = 1
 
