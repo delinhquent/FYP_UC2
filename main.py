@@ -13,9 +13,12 @@ if __name__ == '__main__':
         config = process_config(args.config)
         mode = args.mode
 
+        if mode == 'all':
+            generate(config)
+            build_features(config)
         if mode == 'dataset':
             generate(config)
-        elif mode =='build_features':
+        elif mode == 'build_features':
             build_features(config)
         else:
             print("There is no such mode yet...")
