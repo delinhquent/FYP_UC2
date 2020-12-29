@@ -13,3 +13,11 @@ class FeatureEngineer:
     def engineer_review_activity(self):
         self.review_activity_df = engineer_review_activity(self.review_activity_df, self.loreal_brand_list, self.sample_incentivized_list)
         return self.review_activity_df
+    
+    def engineer_profiles(self):
+        self.profiles_df = engineer_profiles(self.profiles_df, self.review_activity_df)
+        return self.profiles_df
+
+    def engineer_products(self):
+        self.products_df = engineer_products(self.products_df, self.profiles_df, self.reviews_df)
+        return self.products_df
