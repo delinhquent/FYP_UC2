@@ -12,12 +12,12 @@ from utils.clean import clean_text
 def automatic_column_name(column):
     column_name_list = column.split("_")
     current_columns = []
-    for current in ['_total_', '_proportion']:
+    for current in ['_total_', '_proportion_']:
         current_columns.append(column_name_list[0] + current + '_'.join(column_name_list[1:]))
     return current_columns
 
 def calculate_average(df, review_activity_df, column, new_column_name):
-    temp_df = review_activity_df.groupby('acc_num').agg({'cleaned_ratings':np.mean}).reset_index()
+    temp_df = review_activity_df.groupby('acc_num').agg({column:np.mean}).reset_index()
     temp_df = temp_df.rename(columns={column:new_column_name})
 
     df = pd.merge(df,temp_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
@@ -49,14 +49,13 @@ def deleted_reviews(df, review_activity_df,column):
     df = pd.merge(df,total_deleted_reviews_df,left_on=[column], right_on = [column], how = 'left')
     df['cleaned_total_deleted_reviews'] = df['cleaned_total_deleted_reviews'].fillna(value=0)
 
-    df['cleaned_proportion_deleted_reviews_posted'] = df['cleaned_total_deleted_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_deleted_reviews_posted'] = df['cleaned_proportion_deleted_reviews_posted'].fillna(value=0)
+    df['cleaned_proportion_deleted_reviews'] = df['cleaned_total_deleted_reviews'] / df['cleaned_total_reviews_posted']
+    df['cleaned_proportion_deleted_reviews'] = df['cleaned_proportion_deleted_reviews'].fillna(value=0)
 
     return df
 
 def total_proportion_reviews(df, review_activity_df, groupby_column, column):
     current_columns = automatic_column_name(column)
-    
     temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=current_columns[0])
 
     df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
@@ -73,8 +72,8 @@ def profiles_same_day_reviews(df, review_activity_df,column):
     df = pd.merge(df,datetime_review_activity_df[[column,'cleaned_total_same_day_reviews']],left_on=[column], right_on = [column], how = 'left')
     df['cleaned_total_same_day_reviews'] = df['cleaned_total_same_day_reviews'].fillna(value=0)
 
-    df['cleaned_proportion_same_day_reviews_posted'] = df['cleaned_total_same_day_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_same_day_reviews_posted'] = df['cleaned_proportion_same_day_reviews_posted'].fillna(value=0)
+    df['cleaned_proportion_same_day_reviews'] = df['cleaned_total_same_day_reviews'] / df['cleaned_total_reviews_posted']
+    df['cleaned_proportion_same_day_reviews'] = df['cleaned_proportion_same_day_reviews'].fillna(value=0)
 
     return df
 
@@ -98,7 +97,7 @@ def profiles_brand_repeats(df):
     df['cleaned_brand_loyalist'] = 0
     df['cleaned_brand_repeater'] = 0
     
-    df.loc[(df['cleaned_total_loreal_reviews_posted'] > 1) & (df['cleaned_proportion_loreal_product'] == 1) & (df['cleaned_proportion_loreal_reviews_posted'] ==1),"cleaned_brand_monogamist"] = 1 
+    df.loc[(df['cleaned_total_loreal_product'] > 1) & (df['cleaned_proportion_loreal_product'] == 1) &  (df['cleaned_proportion_loreal_review'] == 1),"cleaned_brand_monogamist"] = 1 
     df.loc[(df['cleaned_total_reviews_posted'] > 1) & (df['cleaned_proportion_loreal_product'] >= 0.5),"cleaned_brand_loyalist"] = 1 
     df.loc[(df['cleaned_proportion_loreal_product'] == 1),"cleaned_brand_repeater"] = 1 
 
@@ -114,19 +113,18 @@ def profiles_same_day_reviewer(df, review_activity_df):
 
 def profiles_suspicious(df):
     df['cleaned_never_verified_reviewer'] = 0
-    df = existing_with_extra_condition(df, (df['cleaned_total_verified'] == 0), "cleaned_never_verified_reviewer",1)
+    existing_with_extra_condition(df, (df['cleaned_total_verified'] == 0), "cleaned_never_verified_reviewer",1)
 
     df['cleaned_one_hit_wonder'] = 0
     df.loc[(df['cleaned_total_reviews_posted'] == 1) & (df['cleaned_deleted_status'] == False),"cleaned_one_hit_wonder"] = 1
 
     df['cleaned_take_back_reviewer'] = 0
-    df = existing_with_extra_condition(df, (df['cleaned_total_deleted_reviews'] > 0), "cleaned_take_back_reviewer",1)
+    existing_with_extra_condition(df, (df['cleaned_total_deleted_reviews'] > 0), "cleaned_take_back_reviewer",1)
 
     return df
 
 def existing_with_extra_condition(df, condition, column,new_value):
     df.loc[(condition) & (df['cleaned_deleted_status'] == False), column] = new_value
-    return df
 
 def clean_badges(df):
     df['cleaned_badges'] = 0
