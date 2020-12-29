@@ -60,10 +60,10 @@ def total_proportion_reviews(df, review_activity_df, groupby_column, column):
     temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=current_columns[0])
 
     df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
-    df[current_columns[0]] = df[current_columns[0]].fillna(value=0)
+    df = fill_empty_values(df, current_columns[0],0)
 
     df = divde_by_column(df, current_columns[1], current_columns[0], 'cleaned_total_reviews_posted')
-    df[current_columns[1]] = df[current_columns[1]].fillna(value=0)
+    df = fill_empty_values(df, current_columns[1],0)
 
     return df
 
@@ -227,6 +227,10 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
 
 def divde_by_column(df, new_column, current_column, total_column):
     df[new_column] = df[current_column] / df[total_column]
+    return df
+
+def fill_empty_values(df, current_column,new_value):
+    df[current_column] = df[current_column].fillna(value=new_value)
     return df
 
 def sentiment_analysis(sid, text):
