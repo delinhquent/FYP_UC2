@@ -62,7 +62,7 @@ def total_proportion_reviews(df, review_activity_df, groupby_column, column):
     df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
     df[current_columns[0]] = df[current_columns[0]].fillna(value=0)
 
-    df[current_columns[1]] = df[current_columns[0]] / df['cleaned_total_reviews_posted']
+    df = divde_by_column(df, current_columns[1], current_columns[0], 'cleaned_total_reviews_posted')
     df[current_columns[1]] = df[current_columns[1]].fillna(value=0)
 
     return df
@@ -215,7 +215,7 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
         current_df = current_df.groupby(['asin',column]).size().reset_index(name=current_columns[0])
 
         current_df = pd.merge(current_df,total_users_posted_df,left_on=['asin'], right_on = ['asin'], how = 'left')
-        current_df[current_columns[1]] = current_df[current_columns[0]] / current_df['cleaned_total_users_posted']
+        current_df = divde_by_column(current_df, current_columns[1], current_columns[0], 'cleaned_total_users_posted')
 
         total_users_posted_df = pd.merge(total_users_posted_df,current_df[['asin',current_columns[0],current_columns[1]]],left_on=['asin'], right_on = ['asin'], how = 'left')
     for column in new_columns:
@@ -223,6 +223,10 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
     
     df = pd.merge(df,total_users_posted_df,left_on=['asin'], right_on = ['asin'], how = 'left')
 
+    return df
+
+def divde_by_column(df, new_column, current_column, total_column):
+    df[new_column] = df[current_column] / df[total_column]
     return df
 
 def sentiment_analysis(sid, text):
