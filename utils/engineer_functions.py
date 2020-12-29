@@ -9,12 +9,13 @@ import pandas as pd
 
 from utils.clean import clean_text
 
-def calculate_reviewer_ease(df, review_activity_df):
-    reviewer_ease_df = review_activity_df.groupby('acc_num').agg({'cleaned_ratings':np.mean}).reset_index()
-    reviewer_ease_df = reviewer_ease_df.rename(columns={'cleaned_ratings':'cleaned_reviewer_ease_score'})
 
-    df = pd.merge(df,reviewer_ease_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
-    df['cleaned_reviewer_ease_score'] = df['cleaned_reviewer_ease_score'].fillna(value=0)
+def calculate_average(df, review_activity_df, column, new_column_name):
+    temp_df = review_activity_df.groupby('acc_num').agg({'cleaned_ratings':np.mean}).reset_index()
+    temp_df = temp_df.rename(columns={column:new_column_name})
+
+    df = pd.merge(df,temp_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
+    df[new_column_name] = df[new_column_name].fillna(value=0)
 
     return df
 
@@ -26,32 +27,12 @@ def calculate_total_reviews(df, review_activity_df, column):
 
     return df
 
-def calculate_average_helpfulVotes(df, review_activity_df):
-    helpfulVotes_df = review_activity_df.groupby('acc_num').agg({'helpfulVotes':np.mean}).reset_index()
-    helpfulVotes_df = helpfulVotes_df.rename(columns={'helpfulVotes':'cleaned_average_helpfulVotes'})
-
-    df = pd.merge(df,helpfulVotes_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
-    df['cleaned_average_helpfulVotes'] = df['cleaned_average_helpfulVotes'].fillna(value=0)
-
-    return df
-
 def calculate_average_word_count(df, review_activity_df, column):
     review_length_df = review_activity_df.groupby(column).agg({'cleaned_word_count':np.mean}).reset_index()
     review_length_df = review_length_df.rename(columns={'cleaned_word_count':'cleaned_average_review_length'})
 
     df = pd.merge(df,review_length_df,left_on=[column], right_on = [column], how = 'left')
     df['cleaned_average_review_length'] = df['cleaned_average_review_length'].fillna(value=0)
-
-    return df
-
-def loreal_reviews(df, review_activity_df,column):
-    loreal_products_df = review_activity_df[review_activity_df['cleaned_loreal_review'] == 1].groupby(column).size().reset_index(name='cleaned_total_loreal_reviews_posted')
-
-    df = pd.merge(df,loreal_products_df,left_on=[column], right_on = [column], how = 'left')
-    df['cleaned_total_loreal_reviews_posted'] = df['cleaned_total_loreal_reviews_posted'].fillna(value=0)
-
-    df['cleaned_proportion_loreal_reviews_posted'] = df['cleaned_total_loreal_reviews_posted'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_loreal_reviews_posted'] = df['cleaned_proportion_loreal_reviews_posted'].fillna(value=0)
 
     return df
 
@@ -67,36 +48,18 @@ def deleted_reviews(df, review_activity_df,column):
 
     return df
 
-def verified_reviews(df, review_activity_df,column):
-    verified_purchase_df = review_activity_df[review_activity_df['cleaned_verified'] == 1].groupby(column).size().reset_index(name='cleaned_total_verified_reviews')
+def total_proportion_reviews(df, review_activity_df, groupby_column, column):
+    column_name_list = column.split("_")
+    total_column_name = column_name_list[0] + "_total_" + '_'.join(column_name_list[1:])
+    proportion_column_name = column_name_list[0] + "_proportion_" + '_'.join(column_name_list[1:])
+    
+    temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=total_column_name)
 
-    df = pd.merge(df,verified_purchase_df,left_on=[column], right_on = [column], how = 'left')
-    df['cleaned_total_verified_reviews'] = df['cleaned_total_verified_reviews'].fillna(value=0)
+    df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
+    df[total_column_name] = df[total_column_name].fillna(value=0)
 
-    df['cleaned_proportion_verified_reviews_posted'] = df['cleaned_total_verified_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_verified_reviews_posted'] = df['cleaned_proportion_verified_reviews_posted'].fillna(value=0)
-
-    return df
-
-def incentivized_reviews(df, review_activity_df,column):
-    incentivized_df = review_activity_df[review_activity_df['cleaned_incentivized_review'] == 1].groupby(column).size().reset_index(name='cleaned_total_incentivized_reviews')
-
-    df = pd.merge(df,incentivized_df,left_on=[column], right_on = [column], how = 'left')
-    df['cleaned_total_incentivized_reviews'] = df['cleaned_total_incentivized_reviews'].fillna(value=0)
-
-    df['cleaned_proportion_incentivized_reviews_posted'] = df['cleaned_total_incentivized_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_incentivized_reviews_posted'] = df['cleaned_proportion_incentivized_reviews_posted'].fillna(value=0)
-
-    return df
-
-def sample_reviews(df, review_activity_df,column):
-    sample_df = review_activity_df[review_activity_df['cleaned_sample_review'] == 1].groupby(column).size().reset_index(name='cleaned_total_sample_reviews')
-
-    df = pd.merge(df,sample_df,left_on=[column], right_on = [column], how = 'left')
-    df['cleaned_total_sample_reviews'] = df['cleaned_total_sample_reviews'].fillna(value=0)
-
-    df['cleaned_proportion_sample_reviews_posted'] = df['cleaned_total_sample_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_sample_reviews_posted'] = df['cleaned_proportion_sample_reviews_posted'].fillna(value=0)
+    df[proportion_column_name] = df[total_column_name] / df['cleaned_total_reviews_posted']
+    df[proportion_column_name] = df[proportion_column_name].fillna(value=0)
 
     return df
 
@@ -127,25 +90,14 @@ def profiles_products_reviewed(df, review_activity_df):
     return df
 
 def profiles_brand_repeats(df):
-    brand_monogamist = []
-    brand_loyalist = []
-    brand_repeater = []
-    for index,row in df.iterrows():
-        if row['cleaned_total_loreal_reviews_posted'] > 1 and row['cleaned_proportion_loreal_product'] == 1 and row['cleaned_proportion_loreal_reviews_posted'] == 1:
-            brand_monogamist.append(1)
-        else:
-            brand_monogamist.append(0)
-        if row['cleaned_total_reviews_posted'] > 1 and row['cleaned_proportion_loreal_product'] >= 0.5:
-            brand_loyalist.append(1)
-        else:
-            brand_loyalist.append(0)
-        if row['cleaned_proportion_loreal_product'] == 1:
-            brand_repeater.append(1)
-        else:
-            brand_repeater.append(0)
-    df['cleaned_brand_monogamist'] = brand_monogamist
-    df['cleaned_brand_loyalist'] = brand_loyalist
-    df['cleaned_brand_repeater'] = brand_repeater
+    df['cleaned_brand_monogamist'] = 0
+    df['cleaned_brand_loyalist'] = 0
+    df['cleaned_brand_repeater'] = 0
+    
+    df.loc[(df['cleaned_total_loreal_reviews_posted'] > 1) & (df['cleaned_proportion_loreal_product'] == 1) & (df['cleaned_proportion_loreal_reviews_posted'] ==1),"cleaned_brand_monogamist"] = 1 
+    df.loc[(df['cleaned_total_reviews_posted'] > 1) & (df['cleaned_proportion_loreal_product'] >= 0.5),"cleaned_brand_loyalist"] = 1 
+    df.loc[(df['cleaned_proportion_loreal_product'] == 1),"cleaned_brand_repeater"] = 1 
+
     return df
 
 def profiles_same_day_reviewer(df, review_activity_df):
@@ -158,7 +110,7 @@ def profiles_same_day_reviewer(df, review_activity_df):
 
 def profiles_suspicious(df):
     df['cleaned_never_verified_reviewer'] = 0
-    df.loc[(df['cleaned_total_verified_reviews'] == 0) & (df['cleaned_deleted_status'] == False),"cleaned_never_verified_reviewer"] = 1   
+    df.loc[(df['cleaned_total_verified'] == 0) & (df['cleaned_deleted_status'] == False),"cleaned_never_verified_reviewer"] = 1   
 
     df['cleaned_one_hit_wonder'] = 0
     df.loc[(df['cleaned_total_reviews_posted'] == 1) & (df['cleaned_deleted_status'] == False),"cleaned_one_hit_wonder"] = 1
@@ -253,17 +205,18 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
     new_columns = []
     for column in interested_columns:
         column_name_list = column.split("_")
-        total_column_name = column_name_list[0] + "_total_" + '_'.join(column_name_list[1:])
-        proportion_column_name = column_name_list[0] + "_proportion_" + '_'.join(column_name_list[1:])
-        new_columns += [total_column_name, proportion_column_name]
+        current_columns = []
+        for current in ['_total_', '_proportion']:
+            current_columns.append(column_name_list[0] + current + '_'.join(column_name_list[1:]))
+        new_columns += current_columns
 
         current_df = temp_df[temp_df[column] == 1]
-        current_df = current_df.groupby(['asin',column]).size().reset_index(name=total_column_name)
+        current_df = current_df.groupby(['asin',column]).size().reset_index(name=current_columns[0])
 
         current_df = pd.merge(current_df,total_users_posted_df,left_on=['asin'], right_on = ['asin'], how = 'left')
-        current_df[proportion_column_name] = current_df[total_column_name] / current_df['cleaned_total_users_posted']
+        current_df[current_columns[1]] = current_df[current_columns[0]] / current_df['cleaned_total_users_posted']
 
-        total_users_posted_df = pd.merge(total_users_posted_df,current_df[['asin',total_column_name,proportion_column_name]],left_on=['asin'], right_on = ['asin'], how = 'left')
+        total_users_posted_df = pd.merge(total_users_posted_df,current_df[['asin',current_columns[0],current_columns[1]]],left_on=['asin'], right_on = ['asin'], how = 'left')
     for column in new_columns:
         total_users_posted_df[column] = total_users_posted_df[column].fillna(value=0)
     
