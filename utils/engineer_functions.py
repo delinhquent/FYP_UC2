@@ -114,14 +114,18 @@ def profiles_same_day_reviewer(df, review_activity_df):
 
 def profiles_suspicious(df):
     df['cleaned_never_verified_reviewer'] = 0
-    df.loc[(df['cleaned_total_verified'] == 0) & (df['cleaned_deleted_status'] == False),"cleaned_never_verified_reviewer"] = 1   
+    df = existing_with_extra_condition(df, (df['cleaned_total_verified'] == 0), "cleaned_never_verified_reviewer",1)
 
     df['cleaned_one_hit_wonder'] = 0
     df.loc[(df['cleaned_total_reviews_posted'] == 1) & (df['cleaned_deleted_status'] == False),"cleaned_one_hit_wonder"] = 1
 
     df['cleaned_take_back_reviewer'] = 0
-    df.loc[(df['cleaned_total_deleted_reviews'] > 0) & (df['cleaned_deleted_status'] == False),"cleaned_take_back_reviewer"] = 1
+    df = existing_with_extra_condition(df, (df['cleaned_total_deleted_reviews'] > 0), "cleaned_take_back_reviewer",1)
 
+    return df
+
+def existing_with_extra_condition(df, condition, column,new_value):
+    df.loc[(condition) & (df['cleaned_deleted_status'] == False), column] = new_value
     return df
 
 def clean_badges(df):
