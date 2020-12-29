@@ -28,17 +28,13 @@ def engineer_reviews(df, sample_incentivized_list):
     # engineer deleted reviews
     df['cleaned_deleted_review'] = check_deleted_text(list(df['decoded_comment']))
 
-    # engineer sample reviews
-    df['cleaned_sample_review'] = check_sample_text(temp_new_text(df['cleaned_text']))
-
     # engineer word count feature
     df['cleaned_word_count'] = df['decoded_comment'].str.split().str.len()
     df['cleaned_word_count'] = df['cleaned_word_count'].fillna(value=0)
 
     # engineer sentiment analysis for decoded and cleaned text
     sid = SentimentIntensityAnalyzer()
-    df['cleaned_sentiment_decoded'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
-    df['cleaned_sentiment_cleaned'] = sentiment_analysis(sid, list(df['cleaned_text'].astype(str)))
+    df['cleaned_sentiment'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
 
     # return dataframe
     return df
@@ -52,7 +48,7 @@ def engineer_review_activity(df, loreal_brand_list, sample_incentivized_list):
     df['cleaned_word_count'] = df['cleaned_word_count'].fillna(value=0)
     
     # engineer sample reviews
-    df['cleaned_sample_review'] = check_sample_text(temp_new_text(df['cleaned_text']))
+    df['cleaned_sample_review'] = check_sample_text(temp_new_text(df['decoded_comment']))
 
     # engineer incentivized reviews
     df['cleaned_incentivized_review'] = fuzzy_check_reviews(temp_new_text(df['cleaned_text']), sample_incentivized_list,'incentivized')
@@ -75,25 +71,21 @@ def engineer_review_activity(df, loreal_brand_list, sample_incentivized_list):
     return df
 
 def engineer_profiles(df, review_activity_df):
-    # engineer reviewer ease feature
-    df = calculate_reviewer_ease(df, review_activity_df)
+    # engineer reviewer ease and helpful Votes feature
+    df = calculate_average(df, review_activity_df, 'cleaned_ratings', 'cleaned_reviewer_ease_score')
+    df = calculate_average(df, review_activity_df, 'helpfulVotes', 'cleaned_average_helpfulVotes')
 
     # engineer total reviews posted
     df = calculate_total_reviews(df, review_activity_df, 'acc_num')
 
     # engineer total and proportion of reviews posted for loreal, deleted, verified, incentivized, sample, same day
-    df = loreal_reviews(df, review_activity_df, 'acc_num')
+    for column in ['cleaned_loreal_review','cleaned_incentivized_review','cleaned_verified','cleaned_sample_review']:
+        df = total_proportion_reviews(df, review_activity_df, 'acc_num', column)
     df = deleted_reviews(df, review_activity_df, 'acc_num')
-    df = verified_reviews(df, review_activity_df, 'acc_num')
-    df = incentivized_reviews(df, review_activity_df, 'acc_num')
-    df = sample_reviews(df, review_activity_df, 'acc_num')
     df = profiles_same_day_reviews(df, review_activity_df, 'acc_num')
 
     # engineer average word length
     df = calculate_average_word_count(df, review_activity_df, 'acc_num')
-
-    # engineer average helpful votes
-    df = calculate_average_helpfulVotes(df, review_activity_df)
 
     # engineer brand repeats class
     df = profiles_products_reviewed(df, review_activity_df)
@@ -124,10 +116,9 @@ def engineer_products(df,profiles_df,reviews_df):
     df = calculate_total_reviews(df, reviews_df, 'asin')
 
     # engineer total and proportion of reviews posted for loreal, deleted, verified, incentivized, sample
+    for column in ['cleaned_incentivized_review','cleaned_verified','cleaned_sample_review']:
+        df = total_proportion_reviews(df, review_activity_df, 'acc_num', column)
     df = deleted_reviews(df, reviews_df, 'asin')
-    df = verified_reviews(df, reviews_df, 'asin')
-    df = incentivized_reviews(df, reviews_df, 'asin')
-    df = sample_reviews(df, reviews_df, 'asin')
 
     # clean ratings column
     df = fill_empty_ratings(df, reviews_df)
