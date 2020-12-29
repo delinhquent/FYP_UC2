@@ -26,8 +26,8 @@ class Engineer:
         self.profiles_data = self.get_profiles_data()
         self.products_data = self.get_products_data()
         self.review_activity_data = self.get_review_activity_data()
-        self.loreal_brand_data = self.add_cleaned_version(self.get_loreal_data())
-        self.sample_incentivized_data = self.add_cleaned_version(self.get_sample_incentivized_data())
+        self.loreal_brand_data = self.add_cleaned_version(self.get_external_data(self.loreal_brand_data_loader))
+        self.sample_incentivized_data = self.add_cleaned_version(self.get_external_data(self.sample_incentivized_data_loader))
 
     def load_engineer(self):
         self.engineer = FeatureEngineer(config = self.config, reviews_df = self.reviews_data, profiles_df = self.profiles_data, products_df = self.products_data, review_activity_df = self.review_activity_data, loreal_brand_list = self.loreal_brand_data, sample_incentivized_list = self.sample_incentivized_data)
@@ -48,13 +48,9 @@ class Engineer:
         self.review_activity_data_loader.load_data()
         return self.review_activity_data_loader.get_data()
 
-    def get_loreal_data(self):
-        self.loreal_brand_data_loader.load_data()
-        return list(self.loreal_brand_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
-
-    def get_sample_incentivized_data(self):
-        self.sample_incentivized_data_loader.load_data()
-        return list(self.sample_incentivized_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
+    def get_external_data(self, dataloader):
+        dataloader.load_data()
+        return list(dataloader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
 
     def add_cleaned_version(self, text):
         text += clean_text(text, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)
