@@ -9,6 +9,12 @@ import pandas as pd
 
 from utils.clean import clean_text
 
+def automatic_column_name(column):
+    column_name_list = column.split("_")
+    current_columns = []
+    for current in ['_total_', '_proportion']:
+        current_columns.append(column_name_list[0] + current + '_'.join(column_name_list[1:]))
+    return current_columns
 
 def calculate_average(df, review_activity_df, column, new_column_name):
     temp_df = review_activity_df.groupby('acc_num').agg({'cleaned_ratings':np.mean}).reset_index()
@@ -49,17 +55,15 @@ def deleted_reviews(df, review_activity_df,column):
     return df
 
 def total_proportion_reviews(df, review_activity_df, groupby_column, column):
-    column_name_list = column.split("_")
-    total_column_name = column_name_list[0] + "_total_" + '_'.join(column_name_list[1:])
-    proportion_column_name = column_name_list[0] + "_proportion_" + '_'.join(column_name_list[1:])
+    current_columns = automatic_column_name(column)
     
-    temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=total_column_name)
+    temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=current_columns[0])
 
     df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
-    df[total_column_name] = df[total_column_name].fillna(value=0)
+    df[current_columns[0]] = df[current_columns[0]].fillna(value=0)
 
-    df[proportion_column_name] = df[total_column_name] / df['cleaned_total_reviews_posted']
-    df[proportion_column_name] = df[proportion_column_name].fillna(value=0)
+    df[current_columns[1]] = df[current_columns[0]] / df['cleaned_total_reviews_posted']
+    df[current_columns[1]] = df[current_columns[1]].fillna(value=0)
 
     return df
 
@@ -204,10 +208,7 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
 
     new_columns = []
     for column in interested_columns:
-        column_name_list = column.split("_")
-        current_columns = []
-        for current in ['_total_', '_proportion']:
-            current_columns.append(column_name_list[0] + current + '_'.join(column_name_list[1:]))
+        current_columns = automatic_column_name(column)
         new_columns += current_columns
 
         current_df = temp_df[temp_df[column] == 1]
