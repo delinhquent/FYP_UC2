@@ -26,8 +26,8 @@ class Engineer:
         self.profiles_data = self.get_profiles_data()
         self.products_data = self.get_products_data()
         self.review_activity_data = self.get_review_activity_data()
-        self.loreal_brand_data = self.get_loreal_brand_data()
-        self.sample_incentivized_data = self.get_sample_incentivized_data()
+        self.loreal_brand_data = self.add_cleaned_version('loreal')
+        self.sample_incentivized_data = self.add_cleaned_version('incentivized')
 
     def load_engineer(self):
         self.engineer = FeatureEngineer(config = self.config, reviews_df = self.reviews_data, profiles_df = self.profiles_data, products_df = self.products_data, review_activity_df = self.review_activity_data, loreal_brand_list = self.loreal_brand_data, sample_incentivized_list = self.sample_incentivized_data)
@@ -48,25 +48,27 @@ class Engineer:
         self.review_activity_data_loader.load_data()
         return self.review_activity_data_loader.get_data()
 
-    def get_loreal_brand_data(self):
-        self.loreal_brand_data_loader.load_data()
-        temp_loreal_brand_data = list(self.loreal_brand_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
-        return add_cleaned_version(temp_loreal_brand_data)
-
-    def get_sample_incentivized_data(self):
-        self.sample_incentivized_data_loader.load_data()
-        temp_sample_incentivized_data = list(self.sample_incentivized_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
-        return add_cleaned_version(temp_sample_incentivized_data)
-
-    def add_cleaned_version(text):
-        text += clean_text(text, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)))
-        return list(set(text))
+    def add_cleaned_version(self, mode):
+        if mode == 'incentivized':
+            self.sample_incentivized_data_loader.load_data()
+            sample_data = list(self.sample_incentivized_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
+        elif mode == 'loreal':
+            self.loreal_brand_data_loader.load_data()
+            sample_data = list(self.loreal_brand_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
+        sample_data += clean_text(sample_data, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)
+        return list(set(sample_data))
     
     def engineer_reviews(self):
         self.reviews_data = self.engineer.engineer_reviews()
 
     def engineer_review_activity(self):
         self.review_activity_data = self.engineer.engineer_review_activity()
+
+    def engineer_profiles(self):
+        self.profiles_data = self.engineer.engineer_profiles()
+
+    def engineer_products(self):
+        self.products_data = self.engineer.engineer_products()
 
     def save_reviews_data(self):
         self.reviews_data.to_csv(self.config.reviews.save_data_path, index=False)
