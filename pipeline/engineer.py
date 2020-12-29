@@ -26,8 +26,12 @@ class Engineer:
         self.profiles_data = self.get_profiles_data()
         self.products_data = self.get_products_data()
         self.review_activity_data = self.get_review_activity_data()
-        self.loreal_brand_data = self.add_cleaned_version('loreal')
-        self.sample_incentivized_data = self.add_cleaned_version('incentivized')
+        self.loreal_brand_data_loader.load_data()
+        loreal_text = self.loreal_brand_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip()
+        self.loreal_brand_data = self.add_cleaned_version(list(loreal_text))
+        self.sample_incentivized_data_loader.load_data()
+        sample_incentivized_text = self.sample_incentivized_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip()
+        self.sample_incentivized_data = self.add_cleaned_version(list(sample_incentivized_text))
 
     def load_engineer(self):
         self.engineer = FeatureEngineer(config = self.config, reviews_df = self.reviews_data, profiles_df = self.profiles_data, products_df = self.products_data, review_activity_df = self.review_activity_data, loreal_brand_list = self.loreal_brand_data, sample_incentivized_list = self.sample_incentivized_data)
@@ -48,13 +52,8 @@ class Engineer:
         self.review_activity_data_loader.load_data()
         return self.review_activity_data_loader.get_data()
 
-    def add_cleaned_version(self, mode):
-        if mode == 'incentivized':
-            self.sample_incentivized_data_loader.load_data()
-            sample_data = list(self.sample_incentivized_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
-        elif mode == 'loreal':
-            self.loreal_brand_data_loader.load_data()
-            sample_data = list(self.loreal_brand_data_loader.get_data()['text'].str.replace('\n', ' ').str.replace('\t', ' ').str.lower().str.strip())
+    def add_cleaned_version(self, text):
+        sample_data = list(text)
         sample_data += clean_text(sample_data, self.config.preprocessing.contractions_path, self.config.preprocessing.slangs_path)
         return list(set(sample_data))
     
