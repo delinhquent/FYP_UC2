@@ -4,9 +4,6 @@ import numpy as np
 
 import pandas as pd
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import pairwise_kernels
-
 from utils.clean import clean_text
 from utils.engineer_functions import *
 
@@ -41,37 +38,7 @@ def engineer_reviews(df, sample_incentivized_list, products_df, tfidf_save_path)
     df['cleaned_sentiment'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
 
     # tfidf
-    print("Conducting TFIDF...")
-    vec = TfidfVectorizer (ngram_range = (1,2), max_features = 100)
-    vec.fit(df['cleaned_text'])
-
-    print("Saving TFIDF vector")
-    tfidf = vec.transform(df['cleaned_text'])
-    tfidf_df = pd.DataFrame(tfidf.toarray(), columns=vec.get_feature_names())
-    tfidf_df.to_csv(tfidf_save_path, index=False)
-
-    temp_df = df[['ASIN','cleaned_text']]
-    temp_df = temp_df.rename(columns={'ASIN':'asin','cleaned_text':'cleaned_reviews_text'})
-    temp_df = pd.merge(temp_df,products_df[['asin','cleaned_text']],left_on=['asin'], right_on = ['asin'], how = 'left')
-    temp_df = temp_df.rename(columns={'cleaned_text':'cleaned_product_text'})
-    
-    review_text = temp_df['cleaned_reviews_text']
-
-    print("Conducting Cosine Similarity...")
-    review_results = []
-    product_detail_results = []
-    for index, row in temp_df.iterrows():
-        candidate_list = review_text
-        target = review_text[index]
-        candidate_list.pop(index)
-        if target == '':
-            review_results.append(0)
-            product_detail_results.append(0)
-        else:
-            review_results.append(max(pairwise_kernels(vec.transform([target]),vec.transform(candidate_list), metric='cosine')))
-            product_detail_results.append(max(pairwise_kernels(vec.transform([row['cleaned_reviews_text']]),vec.transform([row['cleaned_product_text']]), metric='cosine')))
-    df['cleaned_cosine_sim_reviews'] = review_results
-    df['cleaned_cosine_sim_product_detail'] = product_detail_results
+    df = cosine_similarity(df, products_df, tfidf_save_path)
 
     return df
 
