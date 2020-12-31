@@ -24,6 +24,9 @@
   "model": {
     "save_data_path": "data/processed/fake_framework_features.csv"
   },
+  "tfidf_vector": {
+    "save_data_path": "data/processed/reviews_tfidf.csv"
+  },
   "preprocessing": {
     "contractions_path": "data/preprocessing/contractions.txt",
     "slangs_path": "data/preprocessing/slangs.txt"
