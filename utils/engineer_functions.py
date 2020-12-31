@@ -42,90 +42,6 @@ def calculate_average_word_count(df, review_activity_df, column):
 
     return df
 
-def deleted_reviews(df, review_activity_df,column):
-    total_deleted_reviews_df = review_activity_df.groupby([column]).agg({'cleaned_deleted_review':np.sum}).reset_index()
-    total_deleted_reviews_df = total_deleted_reviews_df.rename(columns={'cleaned_deleted_review':'cleaned_total_deleted_reviews'})
-
-    df = pd.merge(df,total_deleted_reviews_df,left_on=[column], right_on = [column], how = 'left')
-    df['cleaned_total_deleted_reviews'] = df['cleaned_total_deleted_reviews'].fillna(value=0)
-
-    df['cleaned_proportion_deleted_reviews'] = df['cleaned_total_deleted_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_deleted_reviews'] = df['cleaned_proportion_deleted_reviews'].fillna(value=0)
-
-    return df
-
-def total_proportion_reviews(df, review_activity_df, groupby_column, column):
-    current_columns = automatic_column_name(column)
-    temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=current_columns[0])
-
-    df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
-    df = fill_empty_values(df, current_columns[0],0)
-
-    df = divde_by_column(df, current_columns[1], current_columns[0], 'cleaned_total_reviews_posted')
-    df = fill_empty_values(df, current_columns[1],0)
-
-    return df
-
-def profiles_same_day_reviews(df, review_activity_df,column):
-    datetime_review_activity_df = review_activity_df.groupby(['cleaned_datetime_posted',column]).size().reset_index(name='cleaned_total_same_day_reviews')
-
-    df = pd.merge(df,datetime_review_activity_df[[column,'cleaned_total_same_day_reviews']],left_on=[column], right_on = [column], how = 'left')
-    df['cleaned_total_same_day_reviews'] = df['cleaned_total_same_day_reviews'].fillna(value=0)
-
-    df['cleaned_proportion_same_day_reviews'] = df['cleaned_total_same_day_reviews'] / df['cleaned_total_reviews_posted']
-    df['cleaned_proportion_same_day_reviews'] = df['cleaned_proportion_same_day_reviews'].fillna(value=0)
-
-    return df
-
-def profiles_products_reviewed(df, review_activity_df):
-    total_products_df = review_activity_df.groupby(['acc_num']).agg({"asin":"nunique"}).reset_index()
-    total_products_df = total_products_df.rename(columns={"asin":"cleaned_total_product"})
-
-    loreal_products_df = review_activity_df[review_activity_df['cleaned_loreal_review'] == 1].groupby(['acc_num']).agg({"asin":"nunique"}).reset_index()
-    loreal_products_df = loreal_products_df.rename(columns={"asin":"cleaned_total_loreal_product"})
-
-    final_products_df = pd.merge(total_products_df,loreal_products_df,left_on=['acc_num'],right_on=['acc_num'],how='left')
-    df = pd.merge(df,final_products_df,left_on=['acc_num'],right_on=['acc_num'],how='left')
-    for column in ['cleaned_total_product','cleaned_total_loreal_product']:
-        df[column] = df[column].fillna(value=0)
-    df['cleaned_proportion_loreal_product'] = df['cleaned_total_loreal_product'] / df['cleaned_total_product']
-    df['cleaned_proportion_loreal_product'] = df['cleaned_proportion_loreal_product'].fillna(value=0)
-    return df
-
-def profiles_brand_repeats(df):
-    df['cleaned_brand_monogamist'] = 0
-    df['cleaned_brand_loyalist'] = 0
-    df['cleaned_brand_repeater'] = 0
-    
-    df.loc[(df['cleaned_total_loreal_product'] > 1) & (df['cleaned_proportion_loreal_product'] == 1) &  (df['cleaned_proportion_loreal_review'] == 1),"cleaned_brand_monogamist"] = 1 
-    df.loc[(df['cleaned_total_reviews_posted'] > 1) & (df['cleaned_proportion_loreal_product'] >= 0.5),"cleaned_brand_loyalist"] = 1 
-    df.loc[(df['cleaned_proportion_loreal_product'] == 1),"cleaned_brand_repeater"] = 1 
-
-    return df
-
-def profiles_same_day_reviewer(df, review_activity_df):
-    datetime_review_activity_df = review_activity_df.groupby([review_activity_df['cleaned_datetime_posted'],'acc_num']).size().reset_index(name='count')
-    single_day_reviewers = list(set(datetime_review_activity_df[datetime_review_activity_df['count'] > 1]['acc_num']))
-    df['cleaned_single_day_reviewer'] = 0
-
-    df.loc[df['acc_num'].isin(single_day_reviewers), 'cleaned_single_day_reviewer'] = 1
-    return df
-
-def profiles_suspicious(df):
-    df['cleaned_never_verified_reviewer'] = 0
-    existing_with_extra_condition(df, (df['cleaned_total_verified'] == 0), "cleaned_never_verified_reviewer",1)
-
-    df['cleaned_one_hit_wonder'] = 0
-    df.loc[(df['cleaned_total_reviews_posted'] == 1) & (df['cleaned_deleted_status'] == False),"cleaned_one_hit_wonder"] = 1
-
-    df['cleaned_take_back_reviewer'] = 0
-    existing_with_extra_condition(df, (df['cleaned_total_deleted_reviews'] > 0), "cleaned_take_back_reviewer",1)
-
-    return df
-
-def existing_with_extra_condition(df, condition, column,new_value):
-    df.loc[(condition) & (df['cleaned_deleted_status'] == False), column] = new_value
-
 def clean_badges(df):
     df['cleaned_badges'] = 0
     df.loc[df['badges'].notnull(),"cleaned_badges"] = 1
@@ -163,6 +79,42 @@ def check_null_text(text):
 def check_sample_text(text):
     return [1 if 'sample' in data else 0 for data in text]
 
+def deleted_reviews(df, review_activity_df,column):
+    total_deleted_reviews_df = review_activity_df.groupby([column]).agg({'cleaned_deleted_review':np.sum}).reset_index()
+    total_deleted_reviews_df = total_deleted_reviews_df.rename(columns={'cleaned_deleted_review':'cleaned_total_deleted_reviews'})
+
+    df = pd.merge(df,total_deleted_reviews_df,left_on=[column], right_on = [column], how = 'left')
+    df['cleaned_total_deleted_reviews'] = df['cleaned_total_deleted_reviews'].fillna(value=0)
+
+    df['cleaned_proportion_deleted_reviews'] = df['cleaned_total_deleted_reviews'] / df['cleaned_total_reviews_posted']
+    df['cleaned_proportion_deleted_reviews'] = df['cleaned_proportion_deleted_reviews'].fillna(value=0)
+
+    return df
+
+def divde_by_column(df, new_column, current_column, total_column):
+    df[new_column] = df[current_column] / df[total_column]
+    return df
+
+def existing_with_extra_condition(df, condition, column,new_value):
+    df.loc[(condition) & (df['cleaned_deleted_status'] == False), column] = new_value
+
+def fill_empty_ratings(df, reviews_df):
+    products_without_rating = list(set(df[df['cleaned_rating'].isnull()]['asin']))
+    average_rating_df = reviews_df[reviews_df['asin'].isin(products_without_rating)].groupby('asin').agg({"cleaned_ratings": np.mean}).reset_index()
+
+    temp_df = df[['asin','cleaned_rating']].set_index("asin").cleaned_rating.fillna(average_rating_df.set_index("asin").cleaned_ratings).reset_index()
+    temp_df['cleaned_rating'] = temp_df['cleaned_rating'].fillna(value=0)
+
+    df = df.drop(columns=['cleaned_rating'])
+    df = pd.merge(df,temp_df,left_on=['asin'], right_on = ['asin'], how = 'left')
+    df['cleaned_rating'] = df['cleaned_rating'].fillna(value=0)
+
+    return df
+
+def fill_empty_values(df, current_column,new_value):
+    df[current_column] = df[current_column].fillna(value=new_value)
+    return df
+
 def fuzzy_check_reviews(text, fuzzy_match_list, mode):
     print("Fuzzy Matching...")
     match = fuzzy_match_results(fuzzy_match_list,text)
@@ -183,22 +135,84 @@ def fuzzy_match_results(matching_list, text_list):
 def fuzzy_score(score_list):
     return [(score / (102-score)) for score in score_list]
 
+def profiles_brand_repeats(df):
+    df['cleaned_brand_monogamist'] = 0
+    df['cleaned_brand_loyalist'] = 0
+    df['cleaned_brand_repeater'] = 0
+    
+    df.loc[(df['cleaned_total_loreal_product'] > 1) & (df['cleaned_proportion_loreal_product'] == 1) &  (df['cleaned_proportion_loreal_review'] == 1),"cleaned_brand_monogamist"] = 1 
+    df.loc[(df['cleaned_total_reviews_posted'] > 1) & (df['cleaned_proportion_loreal_product'] >= 0.5),"cleaned_brand_loyalist"] = 1 
+    df.loc[(df['cleaned_proportion_loreal_product'] == 1),"cleaned_brand_repeater"] = 1 
+
+    return df
+
+def profiles_products_reviewed(df, review_activity_df):
+    total_products_df = review_activity_df.groupby(['acc_num']).agg({"asin":"nunique"}).reset_index()
+    total_products_df = total_products_df.rename(columns={"asin":"cleaned_total_product"})
+
+    loreal_products_df = review_activity_df[review_activity_df['cleaned_loreal_review'] == 1].groupby(['acc_num']).agg({"asin":"nunique"}).reset_index()
+    loreal_products_df = loreal_products_df.rename(columns={"asin":"cleaned_total_loreal_product"})
+
+    final_products_df = pd.merge(total_products_df,loreal_products_df,left_on=['acc_num'],right_on=['acc_num'],how='left')
+    df = pd.merge(df,final_products_df,left_on=['acc_num'],right_on=['acc_num'],how='left')
+    for column in ['cleaned_total_product','cleaned_total_loreal_product']:
+        df[column] = df[column].fillna(value=0)
+    df['cleaned_proportion_loreal_product'] = df['cleaned_total_loreal_product'] / df['cleaned_total_product']
+    df['cleaned_proportion_loreal_product'] = df['cleaned_proportion_loreal_product'].fillna(value=0)
+    return df
+
+def profiles_same_day_reviews(df, review_activity_df,column):
+    datetime_review_activity_df = review_activity_df.groupby(['cleaned_datetime_posted',column]).size().reset_index(name='cleaned_total_same_day_reviews')
+
+    df = pd.merge(df,datetime_review_activity_df[[column,'cleaned_total_same_day_reviews']],left_on=[column], right_on = [column], how = 'left')
+    df['cleaned_total_same_day_reviews'] = df['cleaned_total_same_day_reviews'].fillna(value=0)
+
+    df['cleaned_proportion_same_day_reviews'] = df['cleaned_total_same_day_reviews'] / df['cleaned_total_reviews_posted']
+    df['cleaned_proportion_same_day_reviews'] = df['cleaned_proportion_same_day_reviews'].fillna(value=0)
+
+    return df
+
+def profiles_same_day_reviewer(df, review_activity_df):
+    datetime_review_activity_df = review_activity_df.groupby([review_activity_df['cleaned_datetime_posted'],'acc_num']).size().reset_index(name='count')
+    single_day_reviewers = list(set(datetime_review_activity_df[datetime_review_activity_df['count'] > 1]['acc_num']))
+    df['cleaned_single_day_reviewer'] = 0
+
+    df.loc[df['acc_num'].isin(single_day_reviewers), 'cleaned_single_day_reviewer'] = 1
+    return df
+
+def profiles_suspicious(df):
+    df['cleaned_never_verified_reviewer'] = 0
+    existing_with_extra_condition(df, (df['cleaned_total_verified'] == 0), "cleaned_never_verified_reviewer",1)
+
+    df['cleaned_one_hit_wonder'] = 0
+    df.loc[(df['cleaned_total_reviews_posted'] == 1) & (df['cleaned_deleted_status'] == False),"cleaned_one_hit_wonder"] = 1
+
+    df['cleaned_take_back_reviewer'] = 0
+    existing_with_extra_condition(df, (df['cleaned_total_deleted_reviews'] > 0), "cleaned_take_back_reviewer",1)
+
+    return df
+
+def sentiment_analysis(sid, text):
+    results = []
+    for data in text:
+        results.append(sid.polarity_scores(str(data))["compound"])
+    return results
+
 def temp_new_text(text):
     new_text = []
     for data in text:
         new_text.append(check_null_text(data))
     return new_text
 
-def fill_empty_ratings(df, reviews_df):
-    products_without_rating = list(set(df[df['cleaned_rating'].isnull()]['asin']))
-    average_rating_df = reviews_df[reviews_df['asin'].isin(products_without_rating)].groupby('asin').agg({"cleaned_ratings": np.mean}).reset_index()
+def total_proportion_reviews(df, review_activity_df, groupby_column, column):
+    current_columns = automatic_column_name(column)
+    temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=current_columns[0])
 
-    temp_df = df[['asin','cleaned_rating']].set_index("asin").cleaned_rating.fillna(average_rating_df.set_index("asin").cleaned_ratings).reset_index()
-    temp_df['cleaned_rating'] = temp_df['cleaned_rating'].fillna(value=0)
+    df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
+    df = fill_empty_values(df, current_columns[0],0)
 
-    df = df.drop(columns=['cleaned_rating'])
-    df = pd.merge(df,temp_df,left_on=['asin'], right_on = ['asin'], how = 'left')
-    df['cleaned_rating'] = df['cleaned_rating'].fillna(value=0)
+    df = divde_by_column(df, current_columns[1], current_columns[0], 'cleaned_total_reviews_posted')
+    df = fill_empty_values(df, current_columns[1],0)
 
     return df
 
@@ -226,17 +240,3 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
     df = pd.merge(df,total_users_posted_df,left_on=['asin'], right_on = ['asin'], how = 'left')
 
     return df
-
-def divde_by_column(df, new_column, current_column, total_column):
-    df[new_column] = df[current_column] / df[total_column]
-    return df
-
-def fill_empty_values(df, current_column,new_value):
-    df[current_column] = df[current_column].fillna(value=new_value)
-    return df
-
-def sentiment_analysis(sid, text):
-    results = []
-    for data in text:
-        results.append(sid.polarity_scores(str(data))["compound"])
-    return results
