@@ -6,7 +6,6 @@ class Generator:
     def __init__(self, config):
         self.config = config
         self.profiles_data_loader = DataLoader(config.profiles.base_data_path)
-        self.review_activity_data_loader = DataLoader(config.review_activity.base_data_path)
         self.profiles_data = None
         self.review_activity_data = None
         self.preprocessor = None
@@ -14,7 +13,6 @@ class Generator:
 
     def load_preprocessor(self):
         self.profiles_data = self.get_profiles_data()
-        self.review_activity_data = self.get_review_activity_data()
         self.preprocessor = Preprocessor(self.config, self.profiles_data)
 
     def preprocess_review_activity(self):
