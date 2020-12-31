@@ -4,16 +4,20 @@ import numpy as np
 
 import pandas as pd
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import pairwise_kernels
+
 from utils.clean import clean_text
 from utils.engineer_functions import *
 
 
-def engineer_reviews(df, sample_incentivized_list):
+def engineer_reviews(df, sample_incentivized_list, products_df, tfidf_save_path):
     # clean verified purchase column
     df.loc[df.cleaned_verified != 1, 'cleaned_verified'] = 0
     
     # clean cleaned_text column
     df['cleaned_text'] = temp_new_text(list(df['cleaned_text']))
+    products_df['cleaned_text'] = temp_new_text(list(products_df['cleaned_text']))
     
     # engineer word count feature
     df['cleaned_word_count'] = df['decoded_comment'].str.split().str.len()
@@ -36,7 +40,39 @@ def engineer_reviews(df, sample_incentivized_list):
     sid = SentimentIntensityAnalyzer()
     df['cleaned_sentiment'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
 
-    # return dataframe
+    # tfidf
+    print("Conducting TFIDF...")
+    vec = TfidfVectorizer (ngram_range = (1,2), max_features = 100)
+    vec.fit(df['cleaned_text'])
+
+    print("Saving TFIDF vector")
+    tfidf = vec.transform(df['cleaned_text'])
+    tfidf_df = pd.DataFrame(tfidf.toarray(), columns=vec.get_feature_names())
+    tfidf_df.to_csv(tfidf_save_path, index=False)
+
+    temp_df = df[['ASIN','cleaned_text']]
+    temp_df = temp_df.rename(columns={'ASIN':'asin','cleaned_text':'cleaned_reviews_text'})
+    temp_df = pd.merge(temp_df,products_df[['asin','cleaned_text']],left_on=['asin'], right_on = ['asin'], how = 'left')
+    temp_df = temp_df.rename(columns={'cleaned_text':'cleaned_product_text'})
+    
+    review_text = temp_df['cleaned_reviews_text']
+
+    print("Conducting Cosine Similarity...")
+    review_results = []
+    product_detail_results = []
+    for index, row in temp_df.iterrows():
+        candidate_list = review_text
+        target = review_text[index]
+        candidate_list.pop(index)
+        if target == '':
+            review_results.append(0)
+            product_detail_results.append(0)
+        else:
+            review_results.append(max(pairwise_kernels(vec.transform([target]),vec.transform(candidate_list), metric='cosine')))
+            product_detail_results.append(max(pairwise_kernels(vec.transform([row['cleaned_reviews_text']]),vec.transform([row['cleaned_product_text']]), metric='cosine')))
+    df['cleaned_cosine_sim_reviews'] = review_results
+    df['cleaned_cosine_sim_product_detail'] = product_detail_results
+
     return df
 
 def engineer_review_activity(df, loreal_brand_list, sample_incentivized_list):
@@ -67,7 +103,6 @@ def engineer_review_activity(df, loreal_brand_list, sample_incentivized_list):
     df['cleaned_datetime_posted'] = pd.to_datetime(df['cleaned_datetime_posted'], errors='coerce')
     df['cleaned_datetime_posted'] = df['cleaned_datetime_posted'].dt.date
 
-    # return dataframe
     return df
 
 def engineer_profiles(df, review_activity_df):
@@ -117,7 +152,7 @@ def engineer_products(df,profiles_df,reviews_df):
 
     # engineer total and proportion of reviews posted for loreal, deleted, verified, incentivized, sample
     for column in ['cleaned_incentivized_review','cleaned_verified','cleaned_sample_review']:
-        df = total_proportion_reviews(df, review_activity_df, 'acc_num', column)
+        df = total_proportion_reviews(df, reviews_df, 'asin', column)
     df = deleted_reviews(df, reviews_df, 'asin')
 
     # clean ratings column
@@ -128,4 +163,6 @@ def engineer_products(df,profiles_df,reviews_df):
 
     # return dataframe
     return df
+
+
 
