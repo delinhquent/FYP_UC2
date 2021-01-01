@@ -12,10 +12,10 @@ from sklearn.metrics import pairwise_kernels
 
 from utils.clean import clean_text
 
-def automatic_column_name(column):
+def automatic_column_name(column,add_list):
     column_name_list = column.split("_")
     current_columns = []
-    for current in ['_total_', '_proportion_']:
+    for current in add_list:
         current_columns.append(column_name_list[0] + current + '_'.join(column_name_list[1:]))
     return current_columns
 
@@ -96,22 +96,22 @@ def cosine_similarity(df, products_df, tfidf_save_path):
     temp_df = temp_df.rename(columns={'ASIN':'asin','cleaned_text':'cleaned_reviews_text'})
     temp_df = pd.merge(temp_df,products_df[['asin','cleaned_text']],left_on=['asin'], right_on = ['asin'], how = 'left')
     temp_df = temp_df.rename(columns={'cleaned_text':'cleaned_product_text'})
-    
-    review_text = temp_df['cleaned_reviews_text']
 
     print("Conducting Cosine Similarity...")
+    review_text = temp_df['cleaned_reviews_text']
     review_results = []
     product_detail_results = []
     for index, row in temp_df.iterrows():
+        print("Cosine Similarity at {} out of {}...".format(index+1,len(temp_df)))
         candidate_list = review_text
         target = review_text[index]
         candidate_list.pop(index)
-        if target == '':
-            review_results.append(0)
-            product_detail_results.append(0)
-        else:
+        try:
             review_results.append(max(pairwise_kernels(vec.transform([target]),vec.transform(candidate_list), metric='cosine')))
             product_detail_results.append(max(pairwise_kernels(vec.transform([row['cleaned_reviews_text']]),vec.transform([row['cleaned_product_text']]), metric='cosine')))
+        except:
+            review_results.append(0)
+            product_detail_results.append(0)
     df['cleaned_cosine_sim_reviews'] = review_results
     df['cleaned_cosine_sim_product_detail'] = product_detail_results
 
@@ -243,7 +243,7 @@ def temp_new_text(text):
     return new_text
 
 def total_proportion_reviews(df, review_activity_df, groupby_column, column):
-    current_columns = automatic_column_name(column)
+    current_columns = automatic_column_name(column,['_total_', '_proportion_'])
     temp_df = review_activity_df[review_activity_df[column] == 1].groupby(groupby_column).size().reset_index(name=current_columns[0])
 
     df = pd.merge(df,temp_df,left_on=[groupby_column], right_on = [groupby_column], how = 'left')
@@ -262,7 +262,7 @@ def total_proportion_suspicious_brand_repeats(df, reviews_df, profiles_df):
 
     new_columns = []
     for column in interested_columns:
-        current_columns = automatic_column_name(column)
+        current_columns = automatic_column_name(column,['_total_', '_proportion_'])
         new_columns += current_columns
 
         current_df = temp_df[temp_df[column] == 1]
