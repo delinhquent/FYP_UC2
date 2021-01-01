@@ -19,6 +19,7 @@ class Engineer:
         self.review_activity_data = None
         self.loreal_brand_data = None
         self.sample_incentivized_data = None
+        self.model_data = None
         self.engineer = None
 
     def load_data(self):
@@ -68,6 +69,9 @@ class Engineer:
     def engineer_products(self):
         self.products_data = self.engineer.engineer_products()
 
+    def generate_modelling_dataset(self):
+        self.model_data = self.engineer.generate_modelling_dataset()
+
     def save_reviews_data(self):
         self.reviews_data.to_csv(self.config.reviews.save_data_path, index=False)
     
@@ -79,3 +83,6 @@ class Engineer:
     
     def save_review_activity_data(self):
         self.review_activity_data.to_csv(self.config.review_activity.save_data_path, index=False)
+
+    def save_modelling_data(self):
+        self.model_data.to_csv(self.config.model.save_data_path, index=False)
