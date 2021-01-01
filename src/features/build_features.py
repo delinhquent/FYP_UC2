@@ -25,6 +25,7 @@ def engineer_all(data_engineer):
     engineer_review_activity_only(data_engineer)
     engineer_profiles_only(data_engineer)
     engineer_products_only(data_engineer)
+    generate_modelling_dataset(data_engineer)
 
 def engineer_reviews_only(data_engineer):
     print("Engineering features for reviews dataset...")
@@ -53,3 +54,11 @@ def engineer_products_only(data_engineer):
     
     print("Saving generated features into a dataset...\n")
     data_engineer.save_products_data()
+
+
+def generate_modelling_dataset(data_engineer):
+    print("Combining features to generate dataset for modelling...")
+    data_engineer.generate_modelling_dataset()
+    
+    print("Saving modelling dataset...\n")
+    data_engineer.save_modelling_data()
