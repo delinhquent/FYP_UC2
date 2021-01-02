@@ -133,18 +133,19 @@ def engineer_products(df,profiles_df,reviews_df):
 
 def generate_modelling_dataset(reviews_df, profiles_df, products_df):
     reviews_interested_columns = [column for column in reviews_df.columns if 'cleaned' in column]
-    reviews_interested_columns.remove('cleaned_location')
+    reviews_interested_columns.remove(['cleaned_location','cleaned_date_posted'])
     reviews_df = reviews_df[['ASIN','acc_num'] + reviews_interested_columns]
     reviews_df = reviews_df.rename(columns={'ASIN':"asin"})
     reviews_df = rename_columns(reviews_df, reviews_interested_columns, '_reviews_')
 
     products_interested_columns = [column for column in products_df.columns if 'cleaned' in column]
+    products_interested_columns.remove(['cleaned_text','cleaned_date_posted'])
     products_df = products_df[['asin'] + products_interested_columns]
     products_df = rename_columns(products_df, products_interested_columns, '_products_')
 
     profiles_interested_columns = [column for column in profiles_df.columns if 'cleaned' in column]
-    profiles_interested_columns = profiles_df[['acc_num'] + profiles_interested_columns]
-    profiles_df = rename_columns(products_df, profiles_interested_columns, '_profiles_')
+    profiles_df = profiles_df[['acc_num'] + profiles_interested_columns]
+    profiles_df = rename_columns(profiles_df, profiles_interested_columns, '_profiles_')
 
     df = pd.merge(reviews_df,products_df,left_on=['asin'], right_on = ['asin'], how = 'left')
     df = pd.merge(df,profiles_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
