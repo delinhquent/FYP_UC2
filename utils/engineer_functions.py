@@ -236,6 +236,11 @@ def sentiment_analysis(sid, text):
         results.append(sid.polarity_scores(str(data))["compound"])
     return results
 
+def rename_columns(df, columns, additional_word):
+    for column in columns:
+        df = df.rename(columns={column: automatic_column_name(column,[additional_word])[0]})
+    return df
+
 def temp_new_text(text):
     new_text = []
     for data in text:
