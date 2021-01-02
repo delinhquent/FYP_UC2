@@ -99,20 +99,14 @@ def cosine_similarity(df, products_df, tfidf_save_path):
 
     print("Conducting Cosine Similarity...")
     review_text = temp_df['cleaned_reviews_text']
-    review_results = []
     product_detail_results = []
     for index, row in temp_df.iterrows():
-        print("Cosine Similarity at {} out of {}...".format(index+1,len(temp_df)))
-        candidate_list = review_text
-        target = review_text[index]
-        candidate_list.pop(index)
+        print("Cosine Similarity at {} of {}...".format(index+1, len(temp_df)))
         try:
-            review_results.append(max(pairwise_kernels(vec.transform([target]),vec.transform(candidate_list), metric='cosine')))
-            product_detail_results.append(max(pairwise_kernels(vec.transform([row['cleaned_reviews_text']]),vec.transform([row['cleaned_product_text']]), metric='cosine')))
+            score = float(list(pairwise_kernels(vec.transform([row['cleaned_reviews_text']]),vec.transform([row['cleaned_product_text']]), metric='cosine'))[0])
+            product_detail_results.append(score)
         except:
-            review_results.append(0)
             product_detail_results.append(0)
-    df['cleaned_cosine_sim_reviews'] = review_results
     df['cleaned_cosine_sim_product_detail'] = product_detail_results
 
     return df
