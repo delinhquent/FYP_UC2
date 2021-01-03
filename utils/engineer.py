@@ -104,6 +104,10 @@ def engineer_profiles(df, review_activity_df):
     df['cleaned_ranking'] = df['ranking'].fillna(value=0)
     df['cleaned_ranking'] = df['cleaned_ranking'].astype(str).apply(lambda x: x.replace(',','')).astype(int)
 
+    # clean deleted status column
+    df.loc[df.cleaned_deleted_status == True, 'cleaned_deleted_status'] = 1
+    df.loc[df.cleaned_deleted_status == False, 'cleaned_deleted_status'] = 0
+
     # return dataframe
     return df
 
@@ -132,21 +136,25 @@ def engineer_products(df,profiles_df,reviews_df):
     return df
 
 def generate_modelling_dataset(reviews_df, profiles_df, products_df):
-    reviews_interested_columns = [column for column in reviews_df.columns if 'cleaned' in column]
-    reviews_interested_columns.remove(['cleaned_location','cleaned_date_posted'])
+    print("Extracting columns from Reviews Dataset...")
+    reviews_uninterested_columns = ['cleaned_location','cleaned_date_posted','cleaned_title']
+    reviews_interested_columns = [column for column in reviews_df.columns if 'cleaned' in column and column not in reviews_uninterested_columns]
     reviews_df = reviews_df[['ASIN','acc_num'] + reviews_interested_columns]
     reviews_df = reviews_df.rename(columns={'ASIN':"asin"})
     reviews_df = rename_columns(reviews_df, reviews_interested_columns, '_reviews_')
 
-    products_interested_columns = [column for column in products_df.columns if 'cleaned' in column]
-    products_interested_columns.remove(['cleaned_text','cleaned_date_posted'])
+    print("Extracting columns from Products Dataset...")
+    products_uninterested_columns = ['cleaned_text']
+    products_interested_columns = [column for column in products_df.columns if 'cleaned' in column and column not in products_uninterested_columns]
     products_df = products_df[['asin'] + products_interested_columns]
     products_df = rename_columns(products_df, products_interested_columns, '_products_')
 
+    print("Extracting columns from Profiles Dataset...")
     profiles_interested_columns = [column for column in profiles_df.columns if 'cleaned' in column]
     profiles_df = profiles_df[['acc_num'] + profiles_interested_columns]
     profiles_df = rename_columns(profiles_df, profiles_interested_columns, '_profiles_')
 
+    print("Combining all columns into a single Dataset for modelling...")
     df = pd.merge(reviews_df,products_df,left_on=['asin'], right_on = ['asin'], how = 'left')
     df = pd.merge(df,profiles_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
 
