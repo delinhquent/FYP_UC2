@@ -1,56 +1,85 @@
-# Usecase 2
+# Usecase 2 - Fake Reviews Detector
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability)
 
 [Final Year Project] Develop models to sift out reviews that seem unnatural, and then use a scoring algorithm to assign each review an impact score.
 
-Project Organization
+## Project Organization
 ------------
 
-    ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+    ├── README.md                                   <- A simple walkthrough on how to use this application
+    ├── data/
+    │   ├── base/                                   <- Data is retrieved via DVC. 
+    │   |   ├─ consolidated_profiles.csv            <- Profiles Dataset
+    │   |   ├─ consolidated_products.csv            <- Reviews Dataset
+    │   |   └─ consolidated_product_info.csv        <- Products Dataset
+    |   |
+    │   ├── preprocessing/                          <- Files used for doing preprocessing text.
+    │   |   ├── contractions.txt                
+    │   |   └── slangs.txt
+    |   |
+    │   ├── raw/                                                        <- Data is retrieved via DVC. 
+    │   |   ├─ consolidated_profiles.csv                                <- Profiles Dataset
+    │   |   ├─ consolidated_products.csv                                <- Reviews Dataset
+    │   |   └─ consolidated_product_info.csv                            <- Products Dataset
+    |   |
+    │   └── uc2/                                                        <- Workspace folder in remote server for this
+    |       |                                                              application.
+    │       ├─ external/                                                <- Data from third party sources or user inputs.
+    │       |   ├─ consolidated_profiles.csv                            <- Profiles Dataset
+    │       |   ├─ consolidated_products.csv                            <- Reviews Dataset
+    │       |   └─ consolidated_product_info.csv                        <- Products Dataset
+    │       |
+    │       ├─ interim/                                                 <- Intermediate data that has been transformed.
+    │       |   ├─ consolidated_review_activity.csv                     <- Review Activity Dataset
+    │       |   ├─ consolidated_products_feature_engineering.csv        <- Reviews Dataset with Feature Engineering
+    │       |   ├─ consolidated_review_activity_feature_engineering.csv <- Review Activity Dataset with Feature Engineering
+    │       |   ├─ consolidated_profiles_feature_engineering.csv        <- Profiles Dataset with Feature Engineering
+    │       |   └─ consolidated_product_info_feature_engineering.csv    <- Products Dataset with Feature Engineering
+    │       |
+    │       └─ processed/                                               <- The final, canonical data sets for modeling. 
+    │           ├─ fake_framework_features.csv                          <- Modelling Dataset using Fake Features Framework
+    │           └─ reviews_tfidf.csv                                    <- Top 100 Features for TFIDF Vectors from Reviews
     │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+    ├── models                                                          <- Trained and serialized models, model predictions, 
+    |                                                                       or model summaries
     │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
+    ├── notebooks                                                       <- Jupyter notebooks for workings and visualizations.
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
+    ├── requirements.txt                                                <- The requirements file for reproducing the analysis 
+    |                                                                      environment, e.g. generated with `pip freeze >
+    |                                                                      requirements.txt`
     │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
+    ├── src                                                             <- Source code for use in this project.
     │   │
-    │   ├── data           <- Scripts to download or generate data
+    │   ├── data                                                        <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
+    │   ├── features                                                    <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
+    │   └── models                                                      <- Scripts to train models and then use trained 
+    │       │                                                              models to make predictions
+    │       ├── predict_model.py
+    │       └── train_model.py
     │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
-
+    ├── pipeline/                                                       <- Scripts to load all methods and classes required 
+    │   ├── generator.py   
+    │   └── engineer.py
+    |
+    ├── preprocess/                                                     <- Preprocessor class for preprocessing and cleaning 
+    |   └── preprocessor.py                                                steps
+    │   
+    |
+    ├── engineer/                                                       <- Engineer class for feature engineering 
+    │   └── engineer.py
+    |
+    └── utils/                                                          <- Functions for each classes 
 --------
+
+## Installation
+
+Simply run the following after using a virtual environment.
+```
+pip install -r requirements.txt
+```
