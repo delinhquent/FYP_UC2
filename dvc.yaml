@@ -1,0 +1,24 @@
+stages:
+  generate_review_activity_dataset:
+    cmd: python main.py -m dataset
+    deps:
+    - data/base/consolidated_profiles.csv
+    - pipeline/generator.py
+    - preprocess/preprocessor.py
+    - utils/clean.py
+    - utils/extract.py
+    - utils/reformat.py
+    outs:
+    - data/uc2/interim/consolidated_review_activity.csv
+  feature_engineering:
+    cmd: python main.py -m build_features
+    deps:
+    - data/base/consolidated_profiles.csv
+    - engineer/engineer.py
+    - pipeline/engineer.py
+    - utils/clean.py
+    - utils/engineer.py
+    - utils/engineer_functions.py
+    outs:
+    - data/uc2/processed/fake_framework_features.csv
+    - data/uc2/processed/reviews_tfidf.csv
