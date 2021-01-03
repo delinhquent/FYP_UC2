@@ -18,63 +18,59 @@
     │   |   ├── contractions.txt                
     │   |   └── slangs.txt
     |   |
-    │   ├── raw/                                                        <- Data is retrieved via DVC. 
-    │   |   ├─ consolidated_profiles.csv                                <- Profiles Dataset
-    │   |   ├─ consolidated_products.csv                                <- Reviews Dataset
-    │   |   └─ consolidated_product_info.csv                            <- Products Dataset
+│   ├── raw/                                         <- Data is retrieved via DVC. 
+    │   |   ├─ consolidated_profiles.csv
+    │   |   ├─ consolidated_products.csv
+    │   |   └─ consolidated_product_info.csv
     |   |
-    │   └── uc2/                                                        <- Workspace folder in remote server for this
-    |       |                                                              application.
-    │       ├─ external/                                                <- Data from third party sources or user inputs.
-    │       |   ├─ consolidated_profiles.csv                            <- Profiles Dataset
-    │       |   ├─ consolidated_products.csv                            <- Reviews Dataset
-    │       |   └─ consolidated_product_info.csv                        <- Products Dataset
+    │   └── uc2/                                     <- Workspace folder in remote server for this application.
+    │       ├─ external/                             <- Data from third party sources or user inputs.
+    │       |   ├─ consolidated_profiles.csv
+    │       |   ├─ consolidated_products.csv
+    │       |   └─ consolidated_product_info.csv
     │       |
-    │       ├─ interim/                                                 <- Intermediate data that has been transformed.
-    │       |   ├─ consolidated_review_activity.csv                     <- Review Activity Dataset
-    │       |   ├─ consolidated_products_feature_engineering.csv        <- Reviews Dataset with Feature Engineering
-    │       |   ├─ consolidated_review_activity_feature_engineering.csv <- Review Activity Dataset with Feature Engineering
-    │       |   ├─ consolidated_profiles_feature_engineering.csv        <- Profiles Dataset with Feature Engineering
-    │       |   └─ consolidated_product_info_feature_engineering.csv    <- Products Dataset with Feature Engineering
+    │       ├─ interim/                              <- Intermediate data that has been transformed.
+    │       |   ├─ consolidated_review_activity.csv  <- Review Activity Dataset
+    │       |   ├─ consolidated_products_feature_engineering.csv 
+    │       |   ├─ consolidated_review_activity_feature_engineering.csv
+    │       |   ├─ consolidated_profiles_feature_engineering.csv
+    │       |   └─ consolidated_product_info_feature_engineering.csv
     │       |
-    │       └─ processed/                                               <- The final, canonical data sets for modeling. 
-    │           ├─ fake_framework_features.csv                          <- Modelling Dataset using Fake Features Framework
-    │           └─ reviews_tfidf.csv                                    <- Top 100 Features for TFIDF Vectors from Reviews
+    │       └─ processed/                            <- The final, canonical data sets for modeling. 
+    │           ├─ fake_framework_features.csv       <- Modelling Dataset using Fake Features Framework
+    │           └─ reviews_tfidf.csv                 <- Top 100 Features for TFIDF Vectors from Reviews
     │
-    ├── models                                                          <- Trained and serialized models, model predictions, 
-    |                                                                       or model summaries
+    ├── models                                       <- Trained and serialized models, model predictions, or model summaries
     │
-    ├── notebooks                                                       <- Jupyter notebooks for workings and visualizations.
+    ├── notebooks                                    <- Jupyter notebooks for workings and visualizations.
     │
-    ├── requirements.txt                                                <- The requirements file for reproducing the analysis 
-    |                                                                      environment, e.g. generated with `pip freeze >
-    |                                                                      requirements.txt`
+    ├── requirements.txt                             <- The requirements file for reproducing the analysis 
+    |                                                environment, e.g. generated with `pip freeze > requirements.txt`
     │
-    ├── src                                                             <- Source code for use in this project.
+    ├── src                                          <- Source code for use in this project.
     │   │
-    │   ├── data                                                        <- Scripts to download or generate data
+    │   ├── data                                     <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
-    │   ├── features                                                    <- Scripts to turn raw data into features for modeling
+    │   ├── features                                 <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │
-    │   └── models                                                      <- Scripts to train models and then use trained 
-    │       │                                                              models to make predictions
+    │   └── models                                   <- Scripts to train models and then use trained 
+    │       │                                            models to make predictions
     │       ├── predict_model.py
     │       └── train_model.py
     │
-    ├── pipeline/                                                       <- Scripts to load all methods and classes required 
+    ├── pipeline/                                    <- Scripts to load all methods and classes required 
     │   ├── generator.py   
     │   └── engineer.py
     |
-    ├── preprocess/                                                     <- Preprocessor class for preprocessing and cleaning 
-    |   └── preprocessor.py                                                steps
-    │   
+    ├── preprocess/                                  <- Preprocessor class for preprocessing and cleaning steps
+    |   └── preprocessor.py                                            
     |
-    ├── engineer/                                                       <- Engineer class for feature engineering 
+    ├── engineer/                                    <- Engineer class for feature engineering 
     │   └── engineer.py
     |
-    └── utils/                                                          <- Functions for each classes 
+    └── utils/                                       <- Functions for each classes 
 --------
 
 ## Installation
