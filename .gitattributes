@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Classify notebook files as python scripts
+*.ipynb linguist-language=Python
