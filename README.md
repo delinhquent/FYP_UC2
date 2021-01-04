@@ -18,7 +18,7 @@
     │   |   ├── contractions.txt                
     │   |   └── slangs.txt
     |   |
-│   ├── raw/                                         <- Data is retrieved via DVC. 
+    │   ├── raw/                                    <- Data is retrieved via DVC. 
     │   |   ├─ consolidated_profiles.csv
     │   |   ├─ consolidated_products.csv
     │   |   └─ consolidated_product_info.csv
@@ -45,7 +45,7 @@
     ├── notebooks                                    <- Jupyter notebooks for workings and visualizations.
     │
     ├── requirements.txt                             <- The requirements file for reproducing the analysis 
-    |                                                environment, e.g. generated with pip freeze > requirements.txt
+    |                                                environment, e.g. generated with `pip freeze > requirements.txt`
     │
     ├── src                                          <- Source code for use in this project.
     │   │
