@@ -1,31 +1,21 @@
 {
   "reviews" : {
     "raw_data_path" : "data/raw/consolidated_products.csv",
-    "base_data_path": "data/base/consolidated_products.csv",
-    "save_data_path": "data/uc2/interim/consolidated_products_feature_engineering.csv"
+    "base_data_path": "data/base/consolidated_products.csv"
   },
   "products": {
     "raw_data_path" : "data/raw/consolidated_product_info.csv",
-    "base_data_path": "data/base/consolidated_product_info.csv",
-    "save_data_path": "data/uc2/interim/consolidated_product_info_feature_engineering.csv"
+    "base_data_path": "data/base/consolidated_product_info.csv"
   },
   "profiles": {
     "raw_data_path" : "data/raw/consolidated_profiles.csv",
-    "base_data_path": "data/base/consolidated_profiles.csv",
-    "save_data_path": "data/uc2/interim/consolidated_profiles_feature_engineering.csv"
+    "base_data_path": "data/base/consolidated_profiles.csv"
   },
   "review_activity": {
-    "base_data_path" : "data/uc2/interim/consolidated_review_activity.csv",
-    "save_data_path": "data/uc2/interim/consolidated_review_activity_feature_engineering.csv"
-  },
-  "merged_reviews": {
-    "save_data_path": "data/uc2/interim/merged_reviews_feature_engineering.csv"
+    "base_data_path" : "data/uc2/interim/consolidated_review_activity.csv"
   },
   "model": {
     "save_data_path": "data/uc2/processed/fake_framework_features.csv"
-  },
-  "tfidf_vector": {
-    "save_data_path": "data/uc2/processed/reviews_tfidf.csv"
   },
   "preprocessing": {
     "contractions_path": "data/preprocessing/contractions.txt",
