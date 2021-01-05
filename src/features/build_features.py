@@ -30,31 +30,18 @@ def engineer_all(data_engineer):
 def engineer_reviews_only(data_engineer):
     print("Engineering features for reviews dataset...")
     data_engineer.engineer_reviews()
-    
-    print("Saving generated features into a dataset...\n")
-    data_engineer.save_reviews_data()
 
 def engineer_review_activity_only(data_engineer):
     print("Engineering features for review activity dataset...")
     data_engineer.engineer_review_activity()
-    
-    print("Saving generated features into a dataset...\n")
-    data_engineer.save_review_activity_data()
 
 def engineer_profiles_only(data_engineer):
     print("Engineering features for profiles dataset...")
     data_engineer.engineer_profiles()
-    
-    print("Saving generated features into a dataset...\n")
-    data_engineer.save_profiles_data()
 
 def engineer_products_only(data_engineer):
     print("Engineering features for products dataset...")
     data_engineer.engineer_products()
-    
-    print("Saving generated features into a dataset...\n")
-    data_engineer.save_products_data()
-
 
 def generate_modelling_dataset(data_engineer):
     print("Combining features to generate dataset for modelling...")
