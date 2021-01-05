@@ -82,7 +82,7 @@ def check_null_text(text):
 def check_sample_text(text):
     return [1 if 'sample' in data else 0 for data in text]
 
-def cosine_similarity(df, products_df, tfidf_save_path):
+def cosine_similarity(df, products_df):
     print("Conducting TFIDF...")
     vec = TfidfVectorizer (ngram_range = (1,2), max_features = 100)
     vec.fit(df['cleaned_text'])
@@ -90,7 +90,6 @@ def cosine_similarity(df, products_df, tfidf_save_path):
     print("Saving TFIDF vector")
     tfidf = vec.transform(df['cleaned_text'])
     tfidf_df = pd.DataFrame(tfidf.toarray(), columns=vec.get_feature_names())
-    tfidf_df.to_csv(tfidf_save_path, index=False)
 
     temp_df = df[['ASIN','cleaned_text']]
     temp_df = temp_df.rename(columns={'ASIN':'asin','cleaned_text':'cleaned_reviews_text'})
