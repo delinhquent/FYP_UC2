@@ -8,7 +8,7 @@ from utils.clean import clean_text
 from utils.engineer_functions import *
 
 
-def engineer_reviews(df, sample_incentivized_list, products_df, tfidf_save_path):
+def engineer_reviews(df, sample_incentivized_list, products_df):
     # clean verified purchase column
     df.loc[df.cleaned_verified != 1, 'cleaned_verified'] = 0
     
@@ -38,7 +38,7 @@ def engineer_reviews(df, sample_incentivized_list, products_df, tfidf_save_path)
     df['cleaned_sentiment'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
 
     # tfidf
-    df = cosine_similarity(df, products_df, tfidf_save_path)
+    df = cosine_similarity(df, products_df)
 
     return df
 
@@ -155,9 +155,15 @@ def generate_modelling_dataset(reviews_df, profiles_df, products_df):
     profiles_df = rename_columns(profiles_df, profiles_interested_columns, '_profiles_')
 
     print("Combining all columns into a single Dataset for modelling...")
-    df = pd.merge(reviews_df,products_df,left_on=['asin'], right_on = ['asin'], how = 'left')
-    df = pd.merge(df,profiles_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
-
+    try:
+        df = pd.merge(reviews_df,products_df,left_on=['asin'], right_on = ['asin'], how = 'left', validate='m:1')
+        df = pd.merge(df,profiles_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left', validate='m:1')
+    except Exception as e:
+        print(e)
+    
+    print("Size of Dataset before merging: {}...".format(len(reviews_df)))
+    print("Size of Dataset after merging: {}...".format(len(df)))
+    
     return df
 
     
