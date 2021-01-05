@@ -14,6 +14,10 @@ stages:
     cmd: python main.py -m build_features
     deps:
     - data/base/consolidated_profiles.csv
+    - data/base/consolidated_products.csv
+    - data/base/consolidated_product_info.csv
+    - data/uc2/interim/consolidated_review_activity.csv
+    - src/features/build_features.py
     - engineer/engineer.py
     - pipeline/engineer.py
     - utils/clean.py
@@ -21,4 +25,3 @@ stages:
     - utils/engineer_functions.py
     outs:
     - data/uc2/processed/fake_framework_features.csv
-    - data/uc2/processed/reviews_tfidf.csv

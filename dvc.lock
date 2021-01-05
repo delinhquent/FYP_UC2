@@ -26,28 +26,37 @@ generate_review_activity_dataset:
 feature_engineering:
   cmd: python main.py -m build_features
   deps:
+  - path: data/base/consolidated_product_info.csv
+    md5: a1a131e3274424f81927a76aeb22cb8b
+    size: 87831
+  - path: data/base/consolidated_products.csv
+    md5: 5b3d820ee2da231c8bdf9a2632ad34f7
+    size: 109549672
   - path: data/base/consolidated_profiles.csv
     md5: b8eafe5ddb1e825f768aebd706a53e60
     size: 1609255550
+  - path: data/uc2/interim/consolidated_review_activity.csv
+    md5: 91c3841ebf9c61efa6aa69b4db458cf5
+    size: 360603185
   - path: engineer/engineer.py
-    md5: 36bd1fafa750e203c47d90c760f8acb8
-    size: 1290
+    md5: 09434526e333274a2370ade2d42b9062
+    size: 1249
   - path: pipeline/engineer.py
-    md5: 1bed35f35dec7483e35cd4f8dc8714f8
-    size: 4019
+    md5: bacc29c06f945005cbca1683f56aa973
+    size: 3501
+  - path: src/features/build_features.py
+    md5: 8d5066f9d33c2cdcc17ef4988e6ef0c7
+    size: 1725
   - path: utils/clean.py
     md5: b6e0812677d5a22d054209532e05f58e
     size: 5248
   - path: utils/engineer.py
-    md5: 31b610c6e643e81cf0b2e0848a4f9e6c
-    size: 7347
+    md5: b1cf319041f0709cc96fbcc35f9e0ffd
+    size: 7562
   - path: utils/engineer_functions.py
-    md5: 50517fe770201aa3554e7067a8ef51ec
-    size: 12866
+    md5: 4f1b2b7384a61d3d2a34da621fa027e2
+    size: 12798
   outs:
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: 12ac19918a17c390e35d8fd1bf5f3c33
-    size: 250891056
-  - path: data/uc2/processed/reviews_tfidf.csv
-    md5: b688b360f5f6d76d34c33252f630b385
-    size: 43495157
+    md5: b28c0bb90e6e8c5031e539b6a3ee533b
+    size: 43961796
