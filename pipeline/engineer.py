@@ -72,17 +72,5 @@ class Engineer:
     def generate_modelling_dataset(self):
         self.model_data = self.engineer.generate_modelling_dataset()
 
-    def save_reviews_data(self):
-        self.reviews_data.to_csv(self.config.reviews.save_data_path, index=False)
-    
-    def save_profiles_data(self):
-        self.profiles_data.to_csv(self.config.profiles.save_data_path, index=False)
-    
-    def save_products_data(self):
-        self.products_data.to_csv(self.config.products.save_data_path, index=False)
-    
-    def save_review_activity_data(self):
-        self.review_activity_data.to_csv(self.config.review_activity.save_data_path, index=False)
-
     def save_modelling_data(self):
         self.model_data.to_csv(self.config.model.save_data_path, index=False)
