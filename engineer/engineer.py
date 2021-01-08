@@ -7,7 +7,7 @@ class FeatureEngineer:
             setattr(self, key, kwargs.get(key))
 
     def engineer_reviews(self):
-        self.reviews_df = engineer_reviews(self.reviews_df, self.sample_incentivized_list, self.products_df, self.config.tfidf_vector.save_data_path)
+        self.reviews_df = engineer_reviews(self.reviews_df, self.sample_incentivized_list, self.products_df)
         return self.reviews_df
     
     def engineer_review_activity(self):
