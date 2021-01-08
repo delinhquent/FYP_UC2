@@ -56,3 +56,5 @@ var/
 .mypy_cache/
 /.gitattributes
 /.idea
+configs/comet_config.json
+models/dbscan_results.csv
