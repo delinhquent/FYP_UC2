@@ -1,0 +1,11 @@
+{
+    "dbscan_hyperparam_test": {
+        "range_n_clusters" : 10,
+        "random_state" : 42,
+        "eps_range": 25,
+        "max_min_sample_increment": 50
+    },
+    "dbscan_results": {
+        "save_data_path" : "models/dbscan_results.csv"
+    }
+}
