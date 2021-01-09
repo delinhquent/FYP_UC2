@@ -12,7 +12,7 @@ from utils.engineer_functions import temp_new_text
 
 class Trainer:
     def __init__(self, **kwargs):
-        valid_keys = ["config", "comet_config", "model_config", "experiment", "model_name", "tfidf"]
+        valid_keys = ["config", "comet_config", "model_config", "experiment", "model", "tfidf"]
         for key in valid_keys:
             setattr(self, key, kwargs.get(key))
         self.model_data_loader = DataLoader(self.config.model.save_data_path)
@@ -89,11 +89,11 @@ class Trainer:
 
         if self.tfidf == 'y':
             self.modelling_data.to_csv(self.model_config.dbscan_results.tfidf_save_data_path, index=False)
-            self.experiment.log_model(name=self.model_name,
+            self.experiment.log_model(name=self.model,
                          file_or_folder=self.model_config.dbscan_results.tfidf_save_data_path)
         else:
             self.modelling_data.to_csv(self.model_config.dbscan_results.no_tfidf_save_data_path, index=False)
-            self.experiment.log_model(name=self.model_name,
+            self.experiment.log_model(name=self.model,
                          file_or_folder=self.model_config.dbscan_results.no_tfidf_save_data_path)
         
 
