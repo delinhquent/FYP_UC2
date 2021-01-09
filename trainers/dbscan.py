@@ -24,7 +24,7 @@ class DBScan:
         eps = self.find_optimized_eps(cluster)
 
         print("Finding optimzied min_sample value...")
-        min_sample = self.find_optimized_min_sample(eps,cluster)
+        min_sample = 2*len(self.model_df.columns)
 
         params = {"eps":eps,"min_samples":min_sample}
 
@@ -72,24 +72,3 @@ class DBScan:
 
         print("Chosen eps is {}.\n".format(chosen_eps))
         return chosen_eps
-
-    def find_optimized_min_sample(self, eps, kmeans_cluster):
-        min_sample_value = 1
-        clusters = 0
-
-        while clusters != kmeans_cluster:
-            dbscan_model = DBSCAN(eps=eps,min_samples=min_sample_value).fit(self.model_df)
-            core_samples_mask = np.zeros_like(dbscan_model.labels_,dtype=bool)
-            core_samples_mask[dbscan_model.core_sample_indices_] = True
-            labels = set([label for label in dbscan_model.labels_ if label >=0])
-            clusters = len(set(labels))
-            print("For min_samples value = {}, total no. of clusters are : {}".format(min_sample_value, clusters))
-
-            if clusters//kmeans_cluster >= 1.1:
-                min_sample_value += max(math.floor(0.2*min_sample_value),self.model_config.dbscan_hyperparam_test.max_min_sample_increment)
-            elif clusters//kmeans_cluster == 0:
-                min_sample_value -= 1
-            else:
-                min_sample_value += 1
-
-        return min_sample_value
