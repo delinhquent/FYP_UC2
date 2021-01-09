@@ -223,6 +223,9 @@ def profiles_suspicious(df):
 
     return df
 
+def retrieve_interested_columns(df, uninterested_columns):
+    return [column for column in df.columns if 'cleaned' in column and column not in uninterested_columns]
+
 def sentiment_analysis(sid, text):
     results = []
     for data in text:
