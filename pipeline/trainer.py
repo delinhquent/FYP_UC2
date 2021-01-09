@@ -60,9 +60,7 @@ class Trainer:
         self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
         params = self.trainer.hypertune_dbscan_params()
 
-        print("Testing parameters: {}".format(params))
-
-        print("Parsing parameters to Experiment...")
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
         results = self.trainer.dbscan_cluster(params)
@@ -71,32 +69,31 @@ class Trainer:
         silhouette_avg = silhouette_score(self.modelling_data, results)
 
         self.modelling_data['dbscan_clusters'] = results
-        self.modelling_data['fake_reviews'] = results
-        self.modelling_data.loc[self.modelling_data.fake_reviews == -1, 'fake_reviews'] = 1
-        self.modelling_data.loc[self.modelling_data.fake_reviews >= 0, 'fake_reviews'] = 0
+        self.modelling_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
         self.modelling_data = self.remerge_data()
 
         total_reviews = len(list(results))
         total_fake_reviews = list(results).count(-1)
         total_non_fake_reviews = total_reviews - total_fake_reviews
-        percentage_fake_reviews = total_fake_reviews/total_reviews
-        percentage_non_fake_reviews = total_non_fake_reviews/total_reviews
-        
-        print("Estimated number of fake reviews: {} ({}%)...".format(total_fake_reviews, percentage_fake_reviews))
-        print("Estimated number of non-fake reviews: {} ({}%)...".format(total_non_fake_reviews, percentage_non_fake_reviews))
 
-        metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": percentage_fake_reviews,"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":percentage_non_fake_reviews}
+        metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
         print("Saving results...")
-        self.modelling_data.to_csv(self.model_config.dbscan_results.save_data_path, index=False)
-        self.track_metrics(metrics)
+        self.save_results(metrics)
 
     def experiment_params(self,params):
         self.experiment.log_parameters(params)
 
-    def track_metrics(self,metrics):
+    def save_results(self,metrics):
         self.experiment.log_metrics(metrics)
 
-        self.experiment.log_model(name=self.model_name,
-                         file_or_folder=self.model_config.dbscan_results.save_data_path)
+        if self.tfidf == 'y':
+            self.modelling_data.to_csv(self.model_config.dbscan_results.tfidf_save_data_path, index=False)
+            self.experiment.log_model(name=self.model_name,
+                         file_or_folder=self.model_config.dbscan_results.tfidf_save_data_path)
+        else:
+            self.modelling_data.to_csv(self.model_config.dbscan_results.no_tfidf_save_data_path, index=False)
+            self.experiment.log_model(name=self.model_name,
+                         file_or_folder=self.model_config.dbscan_results.no_tfidf_save_data_path)
+        
 
