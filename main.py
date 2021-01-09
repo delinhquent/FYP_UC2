@@ -38,7 +38,7 @@ if __name__ == '__main__':
                 if tfidf in ['y','n','Y','N']:
                     model_config = process_config(args.model_config)
                     comet_config = process_config(args.comet_config)
-                    
+
                     print("Logging experiment name: {name}".format(name=experiment_name))
                     experiment = Experiment(
                         api_key=comet_config.experiment.api_key,
@@ -47,9 +47,8 @@ if __name__ == '__main__':
                     )
                     experiment.set_name(experiment_name)
 
-                    
-
-                    train_model(config, comet_config, model_config, experiment, model_name,tfidf)
+                    configs = [config, comet_config, model_config]
+                    train_model(configs, experiment, model_name, tfidf)
                 else:
                     print("Please input y or n for -tfidf...")                  
         else:
