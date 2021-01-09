@@ -25,14 +25,18 @@ if __name__ == '__main__':
             build_features(config)
         elif mode == 'train_model':
             experiment_name = args.experiment_name
-            model_name = args.model_name
+            model = args.model
+            
+            valid_models = ['dbscan']
 
-            if experiment_name == None and model_name == None:
+            if experiment_name == None and model == None:
                 print("Please parse the experiment's and model's names using -exp_n and -model_n respectively...")
             elif experiment_name == None:
                 print("Please parse the experiment's name using -exp_n...")
-            elif model_name == None:
+            elif model == None:
                 print("Please parse the model's names using -model_n respectively...")
+            elif model not in valid_models:
+                print("Unable to find such models...")
             else:
                 tfidf = str(args.tfidf).lower()
                 if tfidf in ['y','n','Y','N']:
@@ -48,7 +52,7 @@ if __name__ == '__main__':
                     experiment.set_name(experiment_name)
 
                     configs = [config, comet_config, model_config]
-                    train_model(configs, experiment, model_name, tfidf)
+                    train_model(configs, experiment, model, tfidf)
                 else:
                     print("Please input y or n for -tfidf...")                  
         else:
