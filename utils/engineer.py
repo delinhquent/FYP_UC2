@@ -138,14 +138,14 @@ def engineer_products(df,profiles_df,reviews_df):
 def generate_modelling_dataset(reviews_df, profiles_df, products_df):
     print("Extracting columns from Reviews Dataset...")
     reviews_uninterested_columns = ['cleaned_location','cleaned_date_posted','cleaned_title']
-    reviews_interested_columns = [column for column in reviews_df.columns if 'cleaned' in column and column not in reviews_uninterested_columns]
+    reviews_interested_columns = retrieve_interested_columns(reviews_df, reviews_uninterested_columns)
     reviews_df = reviews_df[['ASIN','acc_num'] + reviews_interested_columns]
     reviews_df = reviews_df.rename(columns={'ASIN':"asin"})
     reviews_df = rename_columns(reviews_df, reviews_interested_columns, '_reviews_')
 
     print("Extracting columns from Products Dataset...")
     products_uninterested_columns = ['cleaned_text']
-    products_interested_columns = [column for column in products_df.columns if 'cleaned' in column and column not in products_uninterested_columns]
+    products_interested_columns = retrieve_interested_columns(products_df, products_uninterested_columns)
     products_df = products_df[['asin'] + products_interested_columns]
     products_df = rename_columns(products_df, products_interested_columns, '_products_')
 
@@ -165,6 +165,4 @@ def generate_modelling_dataset(reviews_df, profiles_df, products_df):
     print("Size of Dataset after merging: {}...".format(len(df)))
     
     return df
-
-    
 
