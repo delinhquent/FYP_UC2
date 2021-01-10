@@ -19,6 +19,7 @@ class DBScan:
 
         print("Finding no. clusters by KMeans...")
         cluster = self.find_optimized_cluster()
+        # cluster = 3
 
         print("Finding optimzied epsilon value...")
         eps = self.find_optimized_eps(cluster)
@@ -68,7 +69,7 @@ class DBScan:
         i = np.arange(len(distances))
         knee = KneeLocator(i, distances, S=1, curve='convex', direction='increasing', interp_method='polynomial')
 
-        chosen_eps = distances[knee.knee]
+        chosen_eps = max(0.1,distances[knee.knee])
 
         print("Chosen eps is {}.\n".format(chosen_eps))
         return chosen_eps
