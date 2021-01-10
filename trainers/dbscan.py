@@ -41,8 +41,8 @@ class DBScan:
         return labels
 
     def find_optimized_cluster(self):
-        max_range = self.model_config.dbscan_hyperparam_test.range_n_clusters + 1
-        selected_random_state = self.model_config.dbscan_hyperparam_test.random_state
+        max_range = self.model_config.dbscan.hyperparam_test.range_n_clusters + 1
+        selected_random_state = self.model_config.dbscan.hyperparam_test.random_state
 
         range_n_clusters = range(3,max_range)
         kmeans_silhouette_results = {}
