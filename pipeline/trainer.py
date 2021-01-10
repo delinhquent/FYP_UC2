@@ -9,6 +9,7 @@ from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import normalize, StandardScaler 
 
 from trainers.dbscan import DBScan
+from trainers.isolationforest import IsoForest
 
 from utils.engineer_functions import temp_new_text
 
@@ -80,6 +81,8 @@ class Trainer:
 
         if self.model == "dbscan":
             metrics  = self.experiment_dbscan()
+        elif self.model =="isolation_forest":
+            metrics = self.experiment_isolation_forest()
             
         print("Saving results...")
         self.save_results(metrics)
@@ -89,15 +92,25 @@ class Trainer:
 
     def save_results(self,metrics):
         self.experiment.log_metrics(metrics)
-
-        if self.tfidf == 'y':
-            self.model_data.to_csv(self.model_config.dbscan_results.tfidf_save_data_path, index=False)
-            self.experiment.log_model(name=self.model,
-                         file_or_folder=self.model_config.dbscan_results.tfidf_save_data_path)
-        else:
-            self.model_data.to_csv(self.model_config.dbscan_results.no_tfidf_save_data_path, index=False)
-            self.experiment.log_model(name=self.model,
-                         file_or_folder=self.model_config.dbscan_results.no_tfidf_save_data_path)
+        
+        if self.model == "dbscan":
+            if self.tfidf == 'y':
+                self.model_data.to_csv(self.model_config.dbscan.results.tfidf_save_data_path, index=False)
+                self.experiment.log_model(name=self.model,
+                            file_or_folder=self.model_config.dbscan.results.tfidf_save_data_path)
+            else:
+                self.model_data.to_csv(self.model_config.dbscan.results.no_tfidf_save_data_path, index=False)
+                self.experiment.log_model(name=self.model,
+                            file_or_folder=self.model_config.dbscan.results.no_tfidf_save_data_path)
+        elif self.model == "isolation_forest":
+            if self.tfidf == 'y':
+                self.model_data.to_csv(self.model_config.isolation_forest.results.tfidf_save_data_path, index=False)
+                self.experiment.log_model(name=self.model,
+                            file_or_folder=self.model_config.isolation_forest.results.tfidf_save_data_path)
+            else:
+                self.model_data.to_csv(self.model_config.isolation_forest.results.no_tfidf_save_data_path, index=False)
+                self.experiment.log_model(name=self.model,
+                            file_or_folder=self.model_config.isolation_forest.results.no_tfidf_save_data_path)
         
     def experiment_dbscan(self):
         print("Loading DBScan...")
@@ -120,5 +133,28 @@ class Trainer:
         total_non_fake_reviews = total_reviews - total_fake_reviews
 
         metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
+        
+        return metrics
+
+    def experiment_isolation_forest(self):
+        print("Loading Isolation Forest...")
+        self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
+        params = self.trainer.make_isolation_forest()
+
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
+
+        results = self.trainer.predict_anomalies()
+
+        print("Evaluating Isolation Forest...")
+
+        self.model_data['isolation_forest'] = results
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+        total_reviews = len(list(results))
+        total_fake_reviews = list(results).count(-1)
+        total_non_fake_reviews = total_reviews - total_fake_reviews
+
+        metrics = {"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
         return metrics
