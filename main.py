@@ -27,7 +27,7 @@ if __name__ == '__main__':
             experiment_name = args.experiment_name
             model = args.model
             
-            valid_models = ['dbscan']
+            valid_models = ['dbscan','isolation_forest']
 
             if experiment_name == None and model == None:
                 print("Please parse the experiment's and model's names using -exp_n and -model_n respectively...")
