@@ -22,9 +22,6 @@ def train_model(configs, experiment, model, tfidf):
     train_model.load_data()
 
     print("Loading trainer...")
-    if model == "dbscan":
-        train_model.experiment_dbscan()
-    else:
-        print("Unable to find such models...")
+    train_model.train_model()
 
     
