@@ -1,11 +1,22 @@
 {
-    "dbscan_hyperparam_test": {
-        "range_n_clusters" : 10,
-        "random_state" : 42,
-        "max_min_sample_increment": 50
+    "dbscan": {
+        "hyperparam_test": {
+            "range_n_clusters" : 10,
+            "random_state" : 42,
+            "max_min_sample_increment": 50
+        },
+        "results": {
+            "tfidf_save_data_path" : "models/tfidf_dbscan_results.csv",
+            "no_tfidf_save_data_path" : "models/no_tfidf_dbscan_results.csv"
+        }
     },
-    "dbscan_results": {
-        "tfidf_save_data_path" : "models/tfidf_dbscan_results.csv",
-        "no_tfidf_save_data_path" : "models/no_tfidf_dbscan_results.csv"
+    "isolation_forest": {
+        "hyperparam_test": {
+            "random_state": 42
+        },
+        "results": {
+            "tfidf_save_data_path" : "models/tfidf_isolation_forest_results.csv",
+            "no_tfidf_save_data_path" : "models/no_tfidf_isolation_forest_results.csv"
+        }
     }
 }
