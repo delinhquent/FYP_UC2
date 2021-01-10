@@ -1,9 +1,12 @@
 from data_loader.data_loader import DataLoader
 
+from featureselector.featureselector import FeatureSelector
+
 import pandas as pd
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import normalize, StandardScaler 
 
 from trainers.dbscan import DBScan
 
@@ -42,6 +45,10 @@ class Trainer:
         modelling_df = self.model_data
         modelling_df = modelling_df.drop(columns=unnessary_columns)
         modelling_df = modelling_df.fillna(value=0)
+        print("Proceeding with Feature Selection...")
+        feature_selector = FeatureSelector(modelling_df)
+        important_features = feature_selector.select_features()
+        modelling_df = modelling_df[important_features]
         if self.tfidf == 'y':
             self.tfidf_data = self.get_tfidf_vector()
             print("Combining vectors with dataset...")
@@ -49,13 +56,50 @@ class Trainer:
         else:
             return modelling_df
 
-    def remerge_data(self):
-        return pd.concat([self.model_data[['asin','acc_num','cleaned_reviews_profile_link']],self.modelling_data],axis=1)
+    def normalize_data(self):
+        scaler = StandardScaler() 
+        X_scaled = scaler.fit_transform(self.modelling_data) 
 
-    def experiment_dbscan(self):
+        # Normalizing the data so that the data, approximately follows a Gaussian distribution 
+        X_normalized = normalize(X_scaled) 
+
+        # Converting the numpy array into a pandas DataFrame 
+        X_normalized = pd.DataFrame(X_normalized) 
+        
+        # Renaming the columns 
+        X_normalized.columns = self.modelling_data.columns 
+        
+        return X_normalized
+
+    def train_model(self):
         print("Retrieving necessary columns for modelling...")
         self.modelling_data = self.get_modelling_data()
 
+        print("Normalizing Data...")
+        self.modelling_data = self.normalize_data()
+
+        if self.model == "dbscan":
+            metrics  = self.experiment_dbscan()
+            
+        print("Saving results...")
+        self.save_results(metrics)
+
+    def experiment_params(self,params):
+        self.experiment.log_parameters(params)
+
+    def save_results(self,metrics):
+        self.experiment.log_metrics(metrics)
+
+        if self.tfidf == 'y':
+            self.model_data.to_csv(self.model_config.dbscan_results.tfidf_save_data_path, index=False)
+            self.experiment.log_model(name=self.model,
+                         file_or_folder=self.model_config.dbscan_results.tfidf_save_data_path)
+        else:
+            self.model_data.to_csv(self.model_config.dbscan_results.no_tfidf_save_data_path, index=False)
+            self.experiment.log_model(name=self.model,
+                         file_or_folder=self.model_config.dbscan_results.no_tfidf_save_data_path)
+        
+    def experiment_dbscan(self):
         print("Loading DBScan...")
         self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
         params = self.trainer.hypertune_dbscan_params()
@@ -68,9 +112,8 @@ class Trainer:
         print("Evaluating DBScan...")
         silhouette_avg = silhouette_score(self.modelling_data, results)
 
-        self.modelling_data['dbscan_clusters'] = results
-        self.modelling_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-        self.modelling_data = self.remerge_data()
+        self.model_data['dbscan_clusters'] = results
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
 
         total_reviews = len(list(results))
         total_fake_reviews = list(results).count(-1)
@@ -78,22 +121,4 @@ class Trainer:
 
         metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
-        print("Saving results...")
-        self.save_results(metrics)
-
-    def experiment_params(self,params):
-        self.experiment.log_parameters(params)
-
-    def save_results(self,metrics):
-        self.experiment.log_metrics(metrics)
-
-        if self.tfidf == 'y':
-            self.modelling_data.to_csv(self.model_config.dbscan_results.tfidf_save_data_path, index=False)
-            self.experiment.log_model(name=self.model,
-                         file_or_folder=self.model_config.dbscan_results.tfidf_save_data_path)
-        else:
-            self.modelling_data.to_csv(self.model_config.dbscan_results.no_tfidf_save_data_path, index=False)
-            self.experiment.log_model(name=self.model,
-                         file_or_folder=self.model_config.dbscan_results.no_tfidf_save_data_path)
-        
-
+        return metrics
