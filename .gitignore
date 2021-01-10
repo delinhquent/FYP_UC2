@@ -60,3 +60,5 @@ configs/comet_config.json
 models/dbscan_results.csv
 models/tfidf_dbscan_results.csv
 models/no_tfidf_dbscan_results.csv
+models/no_tfidf_isolation_forest_results.csv
+models/tfidf_isolation_forest_results.csv
