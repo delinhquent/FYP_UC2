@@ -35,7 +35,7 @@ if __name__ == '__main__':
                 print("Please parse the experiment's name using -exp_n...")
             elif model == None:
                 print("Please parse the model's names using -model_n respectively...")
-            elif model not in valid_models:
+            elif str(model).lower() not in valid_models:
                 print("Unable to find such models...")
             else:
                 tfidf = str(args.tfidf).lower()
