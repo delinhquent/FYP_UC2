@@ -22,18 +22,20 @@ def get_args():
         default='configs/comet_config.json',
         help='The Configuration file for comet')
     argparser.add_argument(
-        '-tfidf', '--tfidf',
-        help='Train model with TFIDF. Default is y. Set n if you do not want to train model with TFIDF')
-    argparser.add_argument(
         '-m', '--mode',
         help="1. dataset - Generate Review Activity from reviewer contribution column from Profile Dataset.\n2. build_features - Generate dataset for modelling with feature engineering pipeline.\n3. train_model - Train Model with modelling dataset.\n10. all - Does all the modes mentioned above.")
     argparser.add_argument(
-        '-exp_n', '--experiment_name',
-        help='The name for the experiment. To be used with -m train_model.')
-    argparser.add_argument(
         '-model', '--model',
-        help="The model which you will be using. To be used with -m train_model.")
-
+        help="The model which you will be using. To be used with -m train_model.\nModel Name | Parse Value:\n1. DBSCAN | dbscan \n2. Isolation Forest | isolation_forest\n3. Extended Isolation Forest | eif")
+    argparser.add_argument(
+        '-tfidf', '--tfidf',
+        help='Train model with TFIDF. Accepted values are "y" and "n".')
+    argparser.add_argument(
+        '-feature_select', '--feature_select',
+        help='Train model with Feature Selection. Accepted values are "y" and "n".')
+    argparser.add_argument(
+        '-normalize', '--normalize',
+        help='Train model with Normalization. Accepted values are "y" and "n".')
 
     args = argparser.parse_args()
     return args
