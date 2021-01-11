@@ -30,7 +30,19 @@ class DBScan:
         params = {"eps":eps,"min_samples":min_sample}
 
         return params
-    
+
+    def evaluate_dbscan(self, results):
+        print("Evaluating DBScan...")
+        silhouette_avg = silhouette_score(self.model_df, results)
+
+        total_reviews = len(list(results))
+        total_fake_reviews = list(results).count(-1)
+        total_non_fake_reviews = total_reviews - total_fake_reviews
+
+        metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
+        
+        return metrics
+        
     def dbscan_cluster(self,params):
         print("Performing DBScan...")
         dbscan_model = DBSCAN(eps=params['eps'],min_samples=params['min_samples']).fit(self.model_df)
@@ -73,3 +85,4 @@ class DBScan:
 
         print("Chosen eps is {}.\n".format(chosen_eps))
         return chosen_eps
+
