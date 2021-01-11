@@ -64,7 +64,9 @@ The scope of the use case is to develop a model to sift out reviews that see
     │   └── engineer.py
     |
     ├── trainers/                                    <- Trainer class for modelling 
-    │   └── dbscan.py
+    │   ├── dbscan.py
+    │   ├── isolationforest.py
+    │   └── extendedisolationforest.py
     |
     └── utils/                                       <- Functions for each classes 
 --------
@@ -75,3 +77,6 @@ Simply run the following after using a virtual environment.
 ```
 pip install -r requirements.txt
 ```
+
+## TODO
+1. Re-visit Extended Isolation Forest and investigate whether there is something wrong with the implementation
