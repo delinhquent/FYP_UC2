@@ -47,7 +47,7 @@ class FeatureSelector:
         current_features = []
         for i in range(len(R)):
             dispersion_value = R[i]
-            if dispersion_value >= 1:
+            if dispersion_value >= 0.5:
                 current_features.append(self.df.columns[i])
         
         print("Number of important features by dispersion ratio: {}".format(len(current_features)))
