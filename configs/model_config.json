@@ -18,5 +18,14 @@
             "tfidf_save_data_path" : "models/tfidf_isolation_forest_results.csv",
             "no_tfidf_save_data_path" : "models/no_tfidf_isolation_forest_results.csv"
         }
+    },
+    "eif": {
+        "hyperparam_test": {
+            "expected_anomaly_ratio" : 0.35
+        },
+        "results": {
+            "tfidf_save_data_path" : "models/tfidf_eif_results.csv",
+            "no_tfidf_save_data_path" : "models/no_tfidf_eif_results.csv"
+        }
     }
 }
