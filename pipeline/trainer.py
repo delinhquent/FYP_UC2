@@ -80,9 +80,48 @@ class Trainer:
         self.modelling_data = self.normalize_data()
 
         if self.model == "dbscan":
-            metrics  = self.experiment_dbscan()
-        elif self.model =="isolation_forest":
-            metrics = self.experiment_isolation_forest()
+            print("Loading DBScan...")
+            self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
+            params = self.trainer.hypertune_dbscan_params()
+
+            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+            self.experiment_params(params)
+
+            results = self.trainer.dbscan_cluster(params)
+            
+            self.model_data['dbscan_clusters'] = results
+            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+            metrics = self.trainer.evaluate_dbscan(results)
+        elif self.model == "isolation_forest":
+            print("Loading Isolation Forest...")
+            self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
+
+            params = self.trainer.make_isolation_forest()
+
+            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+            self.experiment_params(params)
+
+            results = self.trainer.predict_anomalies()
+
+            self.model_data['isolation_forest'] = results
+            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+            metrics = self.trainer.evaluate_isolation_forest(results)
+        elif self.model == "eif":
+            print("Loading Extended Isolation Forest...")
+            self.trainer = ExtendedIsoForest(model_config = self.model_config, model_df = self.modelling_data)
+            params = self.trainer.make_eif()
+
+            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+            self.experiment_params(params)
+
+            results = self.trainer.predict_anomalies()
+
+            self.model_data['eif'] = results
+            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+            metrics = self.trainer.evaluate_eif(results)
             
         print("Saving results...")
         self.save_results(metrics)
@@ -111,50 +150,14 @@ class Trainer:
                 self.model_data.to_csv(self.model_config.isolation_forest.results.no_tfidf_save_data_path, index=False)
                 self.experiment.log_model(name=self.model,
                             file_or_folder=self.model_config.isolation_forest.results.no_tfidf_save_data_path)
-        
-    def experiment_dbscan(self):
-        print("Loading DBScan...")
-        self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
-        params = self.trainer.hypertune_dbscan_params()
+        elif self.model == "eif":
+            if self.tfidf == 'y':
+                self.model_data.to_csv(self.model_config.eif.results.tfidf_save_data_path, index=False)
+                self.experiment.log_model(name=self.model,
+                            file_or_folder=self.model_config.eif.results.tfidf_save_data_path)
+            else:
+                self.model_data.to_csv(self.model_config.eif.results.no_tfidf_save_data_path, index=False)
+                self.experiment.log_model(name=self.model,
+                            file_or_folder=self.model_config.eif.results.no_tfidf_save_data_path)
 
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.dbscan_cluster(params)
-
-        print("Evaluating DBScan...")
-        silhouette_avg = silhouette_score(self.modelling_data, results)
-
-        self.model_data['dbscan_clusters'] = results
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-        total_reviews = len(list(results))
-        total_fake_reviews = list(results).count(-1)
-        total_non_fake_reviews = total_reviews - total_fake_reviews
-
-        metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
-        
-        return metrics
-
-    def experiment_isolation_forest(self):
-        print("Loading Isolation Forest...")
-        self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
-        params = self.trainer.make_isolation_forest()
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.predict_anomalies()
-
-        print("Evaluating Isolation Forest...")
-
-        self.model_data['isolation_forest'] = results
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-        total_reviews = len(list(results))
-        total_fake_reviews = list(results).count(-1)
-        total_non_fake_reviews = total_reviews - total_fake_reviews
-
-        metrics = {"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
-        
-        return metrics
+    
