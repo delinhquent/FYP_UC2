@@ -10,13 +10,14 @@ from sklearn.preprocessing import normalize, StandardScaler
 
 from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
+from trainers.extendedisolationforest import ExtendedIsoForest
 
 from utils.engineer_functions import temp_new_text
 
 
 class Trainer:
     def __init__(self, **kwargs):
-        valid_keys = ["config", "comet_config", "model_config", "experiment", "model", "tfidf"]
+        valid_keys = ["config", "comet_config", "model_config", "experiment", "model", "tfidf", "feature_select","normalize"]
         for key in valid_keys:
             setattr(self, key, kwargs.get(key))
         self.model_data_loader = DataLoader(self.config.model.save_data_path)
@@ -46,10 +47,11 @@ class Trainer:
         modelling_df = self.model_data
         modelling_df = modelling_df.drop(columns=unnessary_columns)
         modelling_df = modelling_df.fillna(value=0)
-        print("Proceeding with Feature Selection...")
-        feature_selector = FeatureSelector(modelling_df)
-        important_features = feature_selector.select_features()
-        modelling_df = modelling_df[important_features]
+        if self.feature_select == 'y':
+            print("Proceeding with Feature Selection...")
+            feature_selector = FeatureSelector(modelling_df)
+            important_features = feature_selector.select_features()
+            modelling_df = modelling_df[important_features]
         if self.tfidf == 'y':
             self.tfidf_data = self.get_tfidf_vector()
             print("Combining vectors with dataset...")
@@ -76,8 +78,9 @@ class Trainer:
         print("Retrieving necessary columns for modelling...")
         self.modelling_data = self.get_modelling_data()
 
-        print("Normalizing Data...")
-        self.modelling_data = self.normalize_data()
+        if self.normalize == 'y':
+            print("Normalizing Data...")
+            self.modelling_data = self.normalize_data()
 
         if self.model == "dbscan":
             print("Loading DBScan...")
