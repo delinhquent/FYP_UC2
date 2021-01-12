@@ -83,48 +83,11 @@ class Trainer:
             self.modelling_data = self.normalize_data()
 
         if self.model == "dbscan":
-            print("Loading DBScan...")
-            self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
-            params = self.trainer.hypertune_dbscan_params()
-
-            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-            self.experiment_params(params)
-
-            results = self.trainer.dbscan_cluster(params)
-            
-            self.model_data['dbscan_clusters'] = results
-            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-            metrics = self.trainer.evaluate_dbscan(results)
+            metrics = self.dbscan_pipeline()
         elif self.model == "isolation_forest":
-            print("Loading Isolation Forest...")
-            self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
-
-            params = self.trainer.make_isolation_forest()
-
-            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-            self.experiment_params(params)
-
-            results = self.trainer.predict_anomalies()
-
-            self.model_data['isolation_forest'] = results
-            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-            metrics = self.trainer.evaluate_isolation_forest(results)
+            metrics = self.isolation_forest_pipeline()
         elif self.model == "eif":
-            print("Loading Extended Isolation Forest...")
-            self.trainer = ExtendedIsoForest(model_config = self.model_config, model_df = self.modelling_data)
-            params = self.trainer.make_eif()
-
-            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-            self.experiment_params(params)
-
-            results = self.trainer.predict_anomalies()
-
-            self.model_data['eif'] = results
-            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-            metrics = self.trainer.evaluate_eif(results)
+            metrics = self.eif_pipeline()
             
         print("Saving results...")
         self.save_results(metrics)
@@ -145,4 +108,54 @@ class Trainer:
         self.experiment.log_model(name=self.model,
                         file_or_folder=results_path[self.model])
 
+    def dbscan_pipeline(self):
+        print("Loading DBScan...")
+        self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
+        params = self.trainer.hypertune_dbscan_params()
+
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
+
+        results = self.trainer.dbscan_cluster(params)
+        
+        self.model_data['dbscan_clusters'] = results
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+        metrics = self.trainer.evaluate_dbscan(results)
+        
+        return metrics
     
+    def isolation_forest_pipeline(self):
+        print("Loading Isolation Forest...")
+        self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
+
+        params = self.trainer.make_isolation_forest()
+
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
+
+        results = self.trainer.predict_anomalies()
+
+        self.model_data['isolation_forest'] = results
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+        metrics = self.trainer.evaluate_isolation_forest(results)
+    
+        return metrics
+
+    def eif_pipeline(self):
+        print("Loading Extended Isolation Forest...")
+        self.trainer = ExtendedIsoForest(model_config = self.model_config, model_df = self.modelling_data)
+        params = self.trainer.make_eif()
+
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
+
+        results = self.trainer.predict_anomalies()
+
+        self.model_data['eif'] = results
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+        metrics = self.trainer.evaluate_eif(results)
+
+        return metrics
