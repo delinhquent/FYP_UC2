@@ -10,7 +10,7 @@ from sklearn.preprocessing import normalize, StandardScaler
 
 from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
-from trainers.extendedisolationforest import ExtendedIsoForest
+from trainers.extendedisolationforest import EIF
 
 from utils.engineer_functions import temp_new_text
 
@@ -145,7 +145,8 @@ class Trainer:
 
     def eif_pipeline(self):
         print("Loading Extended Isolation Forest...")
-        self.trainer = ExtendedIsoForest(model_config = self.model_config, model_df = self.modelling_data)
+        self.trainer = EIF(model_config = self.model_config, model_df = self.modelling_data)
+        
         params = self.trainer.make_eif()
 
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
