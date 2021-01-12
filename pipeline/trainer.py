@@ -135,32 +135,14 @@ class Trainer:
     def save_results(self,metrics):
         self.experiment.log_metrics(metrics)
         
-        if self.model == "dbscan":
-            if self.tfidf == 'y':
-                self.model_data.to_csv(self.model_config.dbscan.results.tfidf_save_data_path, index=False)
-                self.experiment.log_model(name=self.model,
-                            file_or_folder=self.model_config.dbscan.results.tfidf_save_data_path)
-            else:
-                self.model_data.to_csv(self.model_config.dbscan.results.no_tfidf_save_data_path, index=False)
-                self.experiment.log_model(name=self.model,
-                            file_or_folder=self.model_config.dbscan.results.no_tfidf_save_data_path)
-        elif self.model == "isolation_forest":
-            if self.tfidf == 'y':
-                self.model_data.to_csv(self.model_config.isolation_forest.results.tfidf_save_data_path, index=False)
-                self.experiment.log_model(name=self.model,
-                            file_or_folder=self.model_config.isolation_forest.results.tfidf_save_data_path)
-            else:
-                self.model_data.to_csv(self.model_config.isolation_forest.results.no_tfidf_save_data_path, index=False)
-                self.experiment.log_model(name=self.model,
-                            file_or_folder=self.model_config.isolation_forest.results.no_tfidf_save_data_path)
-        elif self.model == "eif":
-            if self.tfidf == 'y':
-                self.model_data.to_csv(self.model_config.eif.results.tfidf_save_data_path, index=False)
-                self.experiment.log_model(name=self.model,
-                            file_or_folder=self.model_config.eif.results.tfidf_save_data_path)
-            else:
-                self.model_data.to_csv(self.model_config.eif.results.no_tfidf_save_data_path, index=False)
-                self.experiment.log_model(name=self.model,
-                            file_or_folder=self.model_config.eif.results.no_tfidf_save_data_path)
+        results_path = {
+            "dbscan" : self.model_config.dbscan.results.save_data_path,
+            "isolation_forest": self.model_config.isolation_forest.results.save_data_path,
+            "eif" : self.model_config.eif.results.save_data_path
+            }
+
+        self.model_data.to_csv(results_path[self.model],index=False)
+        self.experiment.log_model(name=self.model,
+                        file_or_folder=results_path[self.model])
 
     
