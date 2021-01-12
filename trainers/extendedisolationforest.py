@@ -5,7 +5,7 @@ import numpy as np
 import eif
 
 
-class ExtendedIsoForest:
+class EIF:
     def __init__(self, model_config, model_df):
         self.model_config = model_config
         self.model_df = model_df
