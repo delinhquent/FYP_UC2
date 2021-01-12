@@ -10,7 +10,6 @@ from sklearn.preprocessing import normalize, StandardScaler
 
 from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
-from trainers.extendedisolationforest import ExtendedIsoForest
 
 from utils.engineer_functions import temp_new_text
 
@@ -83,12 +82,14 @@ class Trainer:
             self.modelling_data = self.normalize_data()
 
         if self.model == "dbscan":
-            metrics = self.dbscan_pipeline()
+            metrics, results = self.dbscan_pipeline()
         elif self.model == "isolation_forest":
-            metrics = self.isolation_forest_pipeline(False)
+            metrics, results = self.isolation_forest_pipeline(False)
         elif self.model == "eif":
-            metrics = self.isolation_forest_pipeline(True)
+            metrics, results = self.isolation_forest_pipeline(True)
             
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
         print("Saving results...")
         self.save_results(metrics)
 
@@ -119,11 +120,10 @@ class Trainer:
         results = self.trainer.dbscan_cluster(params)
         
         self.model_data['dbscan_clusters'] = results
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
 
         metrics = self.trainer.evaluate_dbscan(results)
         
-        return metrics
+        return metrics, results
     
     def isolation_forest_pipeline(self, extended):
         if extended:
@@ -143,8 +143,7 @@ class Trainer:
             self.model_data['eif'] = results
         else:
             self.model_data['isolation_forest'] = results
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
 
         metrics = self.trainer.evaluate_isolation_forest(results,extended)
     
-        return metrics
+        return metrics, results
