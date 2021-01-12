@@ -10,6 +10,23 @@ from src.features.build_features import build_features
 from src.models.train_model import train_model
 import utils.common_resources
 
+def automate_experiment_name(tfidf, feature_select, normalize, valid_models):
+    experiment_name = valid_models[str(model.lower())] + " - "
+
+    feature_name = "All Features "
+    if feature_select in ['y','Y']:
+        feature_name = 'Important Features '
+
+    tfidf_name = "without TFIDF"
+    if tfidf in ['y','Y']:
+        tfidf_name = "with TFIDF"
+
+    if normalize in ['y','Y']:
+        return experiment_name + feature_name + 'Normalized ' + tfidf_name
+    
+    return experiment_name + feature_name + tfidf_name
+
+
 if __name__ == '__main__':
     try:
         args = get_args()
@@ -46,24 +63,15 @@ if __name__ == '__main__':
                     comet_config = process_config(args.comet_config)
 
                     # Automatically create experiment name
-                    experiment_name = valid_models[str(model.lower())] + " - "
-                    if feature_select == 'y' or feature_select == 'Y':
-                        experiment_name += 'Important Features '
-                    else:
-                        experiment_name += 'All Features '
-                    if normalize == 'y' or normalize == 'Y':
-                        experiment_name += 'Normalized '
-                    if tfidf == 'y' or tfidf == 'Y':
-                        experiment_name += 'with TFIDF'
-                    else:
-                        experiment_name += 'without TFIDF'
-                    
+                    experiment_name = automate_experiment_name(tfidf,feature_select,normalize, valid_models)
+
                     print("Logging experiment name: {name}".format(name=experiment_name))
                     experiment = Experiment(
                         api_key=comet_config.experiment.api_key,
                         project_name=comet_config.experiment.project_name,
                         workspace=comet_config.experiment.workspace
                     )
+                    
                     experiment.set_name(experiment_name)
 
                     configs = [config, comet_config, model_config]
@@ -76,6 +84,7 @@ if __name__ == '__main__':
     except ValueError:
         print("Missing or invalid arguments")
         exit(0)
+
 
 
 
