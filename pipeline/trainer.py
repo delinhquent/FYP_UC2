@@ -10,7 +10,7 @@ from sklearn.preprocessing import normalize, StandardScaler
 
 from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
-from trainers.extendedisolationforest import EIF
+from trainers.extendedisolationforest import ExtendedIsoForest
 
 from utils.engineer_functions import temp_new_text
 
@@ -85,9 +85,9 @@ class Trainer:
         if self.model == "dbscan":
             metrics = self.dbscan_pipeline()
         elif self.model == "isolation_forest":
-            metrics = self.isolation_forest_pipeline()
+            metrics = self.isolation_forest_pipeline(False)
         elif self.model == "eif":
-            metrics = self.eif_pipeline()
+            metrics = self.isolation_forest_pipeline(True)
             
         print("Saving results...")
         self.save_results(metrics)
@@ -125,38 +125,26 @@ class Trainer:
         
         return metrics
     
-    def isolation_forest_pipeline(self):
-        print("Loading Isolation Forest...")
+    def isolation_forest_pipeline(self, extended):
+        if extended:
+            print("Loading Extended Isolation Forest...")
+        else:
+            print("Loading Isolation Forest...")
         self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
 
-        params = self.trainer.make_isolation_forest()
+        params = self.trainer.make_isolation_forest(extended)
 
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
-        results = self.trainer.predict_anomalies()
+        results = self.trainer.predict_anomalies(extended)
 
-        self.model_data['isolation_forest'] = results
+        if extended:
+            self.model_data['eif'] = results
+        else:
+            self.model_data['isolation_forest'] = results
         self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
 
-        metrics = self.trainer.evaluate_isolation_forest(results)
+        metrics = self.trainer.evaluate_isolation_forest(results,extended)
     
-        return metrics
-
-    def eif_pipeline(self):
-        print("Loading Extended Isolation Forest...")
-        self.trainer = EIF(model_config = self.model_config, model_df = self.modelling_data)
-        
-        params = self.trainer.make_eif()
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.predict_anomalies()
-
-        self.model_data['eif'] = results
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-        metrics = self.trainer.evaluate_eif(results)
-
         return metrics
