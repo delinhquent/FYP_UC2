@@ -10,6 +10,7 @@ from sklearn.preprocessing import normalize, StandardScaler
 
 from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
+from trainers.lof import LOF
 
 from utils.engineer_functions import temp_new_text
 
@@ -87,6 +88,8 @@ class Trainer:
             metrics, results = self.isolation_forest_pipeline(False)
         elif self.model == "eif":
             metrics, results = self.isolation_forest_pipeline(True)
+        elif self.model == "lof":
+            metrics, results = self.lof_pipeline()
             
         self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
 
@@ -102,7 +105,8 @@ class Trainer:
         results_path = {
             "dbscan" : self.model_config.dbscan.results.save_data_path,
             "isolation_forest": self.model_config.isolation_forest.results.save_data_path,
-            "eif" : self.model_config.eif.results.save_data_path
+            "eif" : self.model_config.eif.results.save_data_path,
+            "lof" : self.model_config.lof.results.save_data_path
             }
 
         self.model_data.to_csv(results_path[self.model],index=False)
@@ -145,5 +149,22 @@ class Trainer:
             self.model_data['isolation_forest'] = results
 
         metrics = self.trainer.evaluate_isolation_forest(results,extended)
+    
+        return metrics, results
+    
+    def lof_pipeline(self):
+        print("Loading Local Outlier Factor...")
+        self.trainer = LOF(model_config = self.model_config, model_df = self.modelling_data)
+
+        params = self.trainer.make_lof()
+
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
+
+        results = self.trainer.predict_anomalies()
+
+        self.model_data['lof'] = results
+
+        metrics = self.trainer.evaluate_lof(results)
     
         return metrics, results
