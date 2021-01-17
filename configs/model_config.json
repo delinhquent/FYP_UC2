@@ -6,7 +6,7 @@
             "max_min_sample_increment": 50
         },
         "results": {
-            "save_data_path" : "models/dbscan_results.csv"
+            "save_data_path" : "models/results/dbscan_results.csv"
         }
     },
     "isolation_forest": {
@@ -14,7 +14,7 @@
             "random_state": 42
         },
         "results": {
-            "save_data_path" : "models/isolation_forest_results.csv"
+            "save_data_path" : "models/results/isolation_forest_results.csv"
         }
     },
     "eif": {
@@ -22,7 +22,12 @@
             "expected_anomaly_ratio" : 0.35
         },
         "results": {
-            "save_data_path" : "models/eif_results.csv"
+            "save_data_path" : "models/results/eif_results.csv"
+        }
+    },
+    "lof": {
+        "results" : {
+            "save_data_path" : "models/results/lof_results.csv"
         }
     }
 }
