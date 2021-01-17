@@ -61,9 +61,4 @@ var/
 configs/comet_config.json
 
 # exclude results from models
-models/tfidf_dbscan_results.csv
-models/no_tfidf_dbscan_results.csv
-models/no_tfidf_isolation_forest_results.csv
-models/tfidf_isolation_forest_results.csv
-models/tfidf_eif_results.csv
-models/no_tfidf_eif_results.csv
+models/results/
