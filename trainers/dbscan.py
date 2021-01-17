@@ -8,6 +8,8 @@ from sklearn.cluster import DBSCAN, KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.neighbors import NearestNeighbors
 
+import tqdm
+
 
 class DBScan:
     def __init__(self, model_config, model_df):
@@ -59,7 +61,7 @@ class DBScan:
         range_n_clusters = range(3,max_range)
         kmeans_silhouette_results = {}
 
-        for n_clusters in range_n_clusters:
+        for n_clusters in tqdm.tqdm(range_n_clusters):
             clusterer = KMeans(n_clusters=n_clusters, random_state = selected_random_state)
             cluster_labels = clusterer.fit_predict(self.model_df)
 
