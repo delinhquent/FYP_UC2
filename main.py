@@ -43,7 +43,7 @@ if __name__ == '__main__':
         elif mode == 'train_model':
             model = args.model
             
-            valid_models = {'dbscan': "DBSCAN",'isolation_forest': "Isolation Forest",'eif':"EIF"}
+            valid_models = {'dbscan': "DBSCAN",'isolation_forest': "Isolation Forest",'eif':"EIF", "lof": "LOF"}
 
             if model == None:
                 print("Please parse the model's names using -model respectively...")
