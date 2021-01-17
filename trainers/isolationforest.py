@@ -45,7 +45,7 @@ class IsoForest:
 
             results = y_pred
         else:
-            results = self.model.predict(self.model_df)
+            results = self.model.fit_predict(self.model_df)
         return results 
 
     def evaluate_isolation_forest(self,results, extended):
