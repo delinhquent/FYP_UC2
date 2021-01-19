@@ -52,6 +52,11 @@ class Trainer:
             feature_selector = FeatureSelector(modelling_df)
             important_features = feature_selector.select_features()
             modelling_df = modelling_df[important_features]
+        
+        if self.normalize == 'y':
+            print("Normalizing Data...")
+            self.modelling_data = self.normalize_data()
+
         if self.tfidf == 'y':
             self.tfidf_data = self.get_tfidf_vector()
             print("Combining vectors with dataset...")
@@ -77,10 +82,6 @@ class Trainer:
     def train_model(self):
         print("Retrieving necessary columns for modelling...")
         self.modelling_data = self.get_modelling_data()
-
-        if self.normalize == 'y':
-            print("Normalizing Data...")
-            self.modelling_data = self.normalize_data()
 
         if self.model == "dbscan":
             metrics, results = self.dbscan_pipeline()
