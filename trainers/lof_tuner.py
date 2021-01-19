@@ -69,8 +69,6 @@ class LOFAutoTuner(object):
         #main op
         for contamination in tqdm.tqdm(self.c_grid):
             samps = int(contamination * self.n_samples)
-            if samps < 2:
-                continue
 
             #init running metrics
             running_metrics = defaultdict(list)
