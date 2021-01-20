@@ -20,9 +20,7 @@ from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
 from trainers.lof import LOF
 from trainers.rrcf import RRCF
-from trainers.ocsvm import OneClassSVM
-from trainers.copod import CopulaPOD
-from trainers.hbos import HistoBOS
+from trainers.pyodmodel import PyodModel
 
 from utils.engineer_functions import temp_new_text
 
@@ -166,16 +164,12 @@ class Trainer:
             metrics, results = self.isolation_forest_pipeline(False)
         elif self.model == "eif":
             metrics, results = self.isolation_forest_pipeline(True)
-        elif self.model == "lof":
-            metrics, results = self.lof_pipeline()
         elif self.model == "rrcf":
             metrics, results = self.rrcf_pipeline()
-        elif self.model == "ocsvm":
-            metrics, results = self.ocsvm_pipeline()
-        elif self.model == "copad":
-            metrics, results = self.copad_pipeline()
-        elif self.model == "hbos":
-            metrics, results = self.hbos_pipeline()
+        elif self.model == "lof":
+            metrics, results = self.lof_pipeline()
+        elif self.model in ["ocsvm","copod", "hbos"]:
+            metrics, results = self.generic_pyod_model_pipeline()
             
         self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
 
@@ -192,10 +186,10 @@ class Trainer:
             "dbscan" : self.model_config.dbscan.results.save_data_path,
             "isolation_forest": self.model_config.isolation_forest.results.save_data_path,
             "eif" : self.model_config.eif.results.save_data_path,
-            "lof" : self.model_config.lof.results.save_data_path,
             "rrcf" : self.model_config.rrcf.results.save_data_path,
+            "lof" : self.model_config.lof.results.save_data_path,
             "ocsvm" : self.model_config.ocsvm.results.save_data_path,
-            "copad" : self.model_config.copad.results.save_data_path,
+            "copod" : self.model_config.copod.results.save_data_path,
             "hbos" : self.model_config.hbos.results.save_data_path
             }
 
@@ -241,23 +235,6 @@ class Trainer:
         metrics = self.trainer.evaluate_isolation_forest(results,extended)
     
         return metrics, results
-    
-    def lof_pipeline(self):
-        print("Loading Local Outlier Factor...")
-        self.trainer = LOF(model_config = self.model_config, model_df = self.modelling_data)
-
-        params = self.trainer.make_lof()
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.predict_anomalies()
-
-        self.model_data['lof'] = results
-
-        metrics = self.trainer.evaluate_lof(results)
-    
-        return metrics, results
 
     def rrcf_pipeline(self):
         print("Loading Robust Random Cut Forest...")
@@ -276,53 +253,40 @@ class Trainer:
     
         return metrics, results
     
-    def ocsvm_pipeline(self):
-        print("Loading One-Class SVM...")
-        self.trainer = OneClassSVM(model_config = self.model_config, model_df = self.modelling_data)
+    def lof_pipeline(self):
+        try:
+            print("Loading Local Outlier Factor...")
+            self.trainer = LOF(model_config = self.model_config, model_df = self.modelling_data)
 
-        params = self.trainer.make_ocsvm()
+            params = self.trainer.make_lof()
+
+            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+            self.experiment_params(params)
+
+            results = self.trainer.predict_anomalies()
+
+            self.model_data['lof'] = results
+
+            metrics = self.trainer.evaluate_lof(results)
+        
+            return metrics, results
+        except Exception as e:
+            print(e)
+    
+    def generic_pyod_model_pipeline(self):
+        name_dict = {"ocsvm":"One-Class SVM",
+            "copod":"Copula Based Outlier Detector", "hbos": "Histogram-based Outlier Detection"}
+        print("Loading {}...".format(name_dict[self.model]))
+        self.trainer = PyodModel(model_config = self.model_config, model_df = self.modelling_data)
+        params = self.trainer.make_pyod_model(self.model)
 
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
         results = self.trainer.predict_anomalies()
 
-        self.model_data['ocsvm'] = results
+        self.model_data[self.model] = results
 
-        metrics = self.trainer.evaluate_ocsvm(results)
-    
-        return metrics, results
-    
-    def copad_pipeline(self):
-        print("Loading Copula Based Outlier Detector...")
-        self.trainer = CopulaPOD(model_config = self.model_config, model_df = self.modelling_data)
+        metrics = self.trainer.evaluate_pyod_model(results,name_dict[self.model])
 
-        params = self.trainer.make_copad()
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.predict_anomalies()
-
-        self.model_data['copad'] = results
-
-        metrics = self.trainer.evaluate_copad(results)
-    
-        return metrics, results
-    
-    def hbos_pipeline(self):
-        print("Loading Histogram-based Outlier Detection...")
-        self.trainer = HistoBOS(model_config = self.model_config, model_df = self.modelling_data)
-
-        params = self.trainer.make_hbos()
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.predict_anomalies()
-
-        self.model_data['hbos'] = results
-
-        metrics = self.trainer.evaluate_hbos(results)
-    
         return metrics, results
