@@ -14,7 +14,7 @@ class IsoForest:
         self.model = None
     
     def make_isolation_forest(self,extended):
-        if extended:
+        if extended == "eif":
             print("Performing Extended Isolation Forest...")
             user_ntrees = 100
             user_sample_size = 256
@@ -25,10 +25,11 @@ class IsoForest:
             print("Performing Isolation Forest...")
             self.model = IsolationForest(random_state=self.model_config.isolation_forest.hyperparam_test.random_state).fit(self.model_df)
             params = self.model.get_params()
+        
         return params
     
     def predict_anomalies(self, extended):
-        if extended:
+        if extended == "eif":
             expected_anomaly_ratio = self.model_config.eif.hyperparam_test.expected_anomaly_ratio
         
             # calculate anomaly scores
@@ -46,10 +47,11 @@ class IsoForest:
             results = y_pred
         else:
             results = self.model.fit_predict(self.model_df)
+
         return results 
 
     def evaluate_isolation_forest(self,results, extended):
-        if extended:
+        if extended == "eif":
             print("Evaluating Isolation Forest...")
             total_reviews = len(list(results))
             total_fake_reviews = list(results).count(-1)
@@ -66,5 +68,6 @@ class IsoForest:
             results_var = np.var(results)
 
             metrics = {"results_mean": results_mean, "results_var":results_var, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
+        
         return metrics
         
