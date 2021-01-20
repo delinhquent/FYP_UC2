@@ -33,7 +33,8 @@ Methodology of evaluating the models will be determined at a later stage.
     │       │
     │       ├─ external/                             <- Data from third party sources/inputs.
     │       |   ├─ loreal_brand_list.csv
-    │       |   └─ sample_incentivized_reviews.csv
+    │       |   ├─ sample_incentivized_reviews.csv
+    │       |   └─ glove files (Download link: http://nlp.stanford.edu/data/glove.6B.zip)
     │       |
     │       ├─ interim/                              <- Intermediate data that has been transformed.
     │       |   |
@@ -105,6 +106,6 @@ pip install -r requirements.txt
 ```
 
 ## TODO
-1. Re-visit Extended Isolation Forest and investigate whether there is something wrong with the implementation
-2. Add decision_function for Isolation Forest & Local Outlier Factor
-3. Include Word Embeddings
+1. Update the functions in the respective model classes for prediction & Add decision_function to all models
+2. Integrate with BigQuery when Ryan's done
+
