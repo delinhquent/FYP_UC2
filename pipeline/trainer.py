@@ -81,7 +81,7 @@ class Trainer:
         
         # load the Stanford GloVe model
         print("Loading GloVe model...")
-        glove_model = KeyedVectors.load_word2vec_format(word2vec_output_file, binary=False)
+        glove_model = KeyedVectors.load_word2vec_format(self.model_config.glove.word2vec_output_file, binary=False)
         
         print("Generating Vector with GloVe...")
         glove_reviews_df = self.create_embedding_df(glove_model)
