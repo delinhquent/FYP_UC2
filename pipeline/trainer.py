@@ -59,6 +59,7 @@ class Trainer:
         min_word = 5
         down_sampling = 1e-2
 
+        print("Generating fastText model...")
         ft_model = FastText(temp_new_text(list(self.model_data['cleaned_reviews_text'])),
                       size=embedding_size,
                       window=window_size,
@@ -78,7 +79,8 @@ class Trainer:
             print("Converting .txt file into .word2vec...")
             glove2word2vec(self.model_config.glove.glove_input_file, self.model_config.glove.word2vec_output_file)
         
-        # load the Stanford GloVe model, 
+        # load the Stanford GloVe model
+        print("Loading GloVe model...")
         glove_model = KeyedVectors.load_word2vec_format(word2vec_output_file, binary=False)
         
         print("Generating Vector with GloVe...")
