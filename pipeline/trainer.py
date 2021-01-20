@@ -59,14 +59,19 @@ class Trainer:
         min_word = 5
         down_sampling = 1e-2
 
-        print("Generating fastText model...")
-        ft_model = FastText(temp_new_text(list(self.model_data['cleaned_reviews_text'])),
+        if not os.path.exists(self.model_config.fasttext.model_file):
+            # retrieve glove vector
+            print("Generating fastText model...")
+            ft_model = FastText(temp_new_text(list(self.model_data['cleaned_reviews_text'])),
                       size=embedding_size,
                       window=window_size,
                       min_count=min_word,
                       sample=down_sampling,
                       sg=0, # put 1 if you want to use skip-gram, look into the documentation for other variables
                       iter=100)
+            ft_model.save_model(self.model_config.fasttext.model_file)
+        else:
+            ft_model = fasttext.load_model(self.model_config.fasttext.model_file)
 
         print("Generating Vector with fastText...")
         ft_reviews_df = self.create_embedding_df(ft_model)
@@ -102,9 +107,10 @@ class Trainer:
     
     def get_vector_value(self,word,model):
         try:
-            return np.mean(model.wv[word])
+            vector_value = np.mean(model.wv[word])
         except:
-            return np.zeroes(300)
+            vector_value = np.zeroes(300)
+        return vector_value
 
     def get_modelling_data(self):
         unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','cleaned_reviews_text']
