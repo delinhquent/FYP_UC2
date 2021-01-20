@@ -48,7 +48,7 @@ t distribution with dfc degrees of freedom and ncpc noncentrality parameter
 
 
 class LOFAutoTuner(object):
-    def __init__(self, n_samples = 500, c_max = 50, k_max = 1, data = None):
+    def __init__(self, n_samples = 500, c_max = 0.1, k_max = 50, data = None):
     
         if data is None:
             self.n_samples = n_samples
