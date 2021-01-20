@@ -62,3 +62,4 @@ configs/comet_config.json
 
 # exclude results from models
 models/results/
+models/word_embedding/
