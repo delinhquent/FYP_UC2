@@ -59,9 +59,6 @@ class Trainer:
         min_word = 5
         down_sampling = 1e-2
 
-        print("Generating Vector with fastText...")
-        reviews = temp_new_text(list(self.model_data['cleaned_reviews_text']))
-
         ft_model = FastText(reviews,
                       size=embedding_size,
                       window=window_size,
@@ -69,50 +66,39 @@ class Trainer:
                       sample=down_sampling,
                       sg=0, # put 1 if you want to use skip-gram, look into the documentation for other variables
                       iter=100)
-        
-        vec = CountVectorizer(ngram_range = (1,1))
-        ft_reviews_df = pd.DataFrame(columns=vec.get_feature_names())
-        for i in range(len(reviews)):
-            doc = reviews[i]
-            words = doc.split()
-            for word in words:
-                try:
-                    vector_value = np.mean(ft_model.wv[word])
-                except:
-                    vector_value = np.zeros(embedding_size)
+
+        print("Generating Vector with fastText...")
+        ft_reviews_df = self.create_embedding_df(ft_model)
                     
-                ft_reviews_df.at[i, word] = vector_value
-        
         return ft_reviews_df.fillna(value=0)
     
     def get_glove_vector(self):
-        word2vec_output_file = 'data/uc2/external/glove.6B.300d.txt.word2vec' 
-        if not os.path.exists(word2vec_output_file):
-            # retrieve glove vector
-            glove_input_file = 'data/uc2/external/glove.6B.300d.txt'
-            glove2word2vec(glove_input_file, word2vec_output_file)
-
+        word2vec_output_file = 'data/uc2/external/glove.6B.300d.txt.word2vec'
+        self.check_glove_file_exist()
+        
         # load the Stanford GloVe model, 
         glove_model = KeyedVectors.load_word2vec_format(word2vec_output_file, binary=False)
         
         print("Generating Vector with GloVe...")
-        reviews = temp_new_text(list(self.model_data['cleaned_reviews_text']))
-        
-        vec = CountVectorizer(ngram_range = (1,1))
-        glove_reviews_df = pd.DataFrame(columns=vec.get_feature_names())
-        for i in range(len(reviews)):
-            doc = reviews[i]
-            words = doc.split()
-            for word in words:
-                try:
-                    vector_value = np.mean(glove_model.wv[word])
-                except:
-                    vector_value = np.zeros(300)
-                    
-                glove_reviews_df.at[i, word] = vector_value
+        glove_reviews_df = self.create_embedding_df(glove_model)
         
         return glove_reviews_df.fillna(value=0)
     
+    def create_embedding_df(self, model):
+        reviews = temp_new_text(list(self.model_data['cleaned_reviews_text']))
+        vec = CountVectorizer(ngram_range = (1,1)).fit_transform(reviews)
+        embedding_df = pd.DataFrame(columns=vec.get_feature_names())
+        reviews = [sentence.split() for sentence in reviews]
+        for i in range(len(reviews)):
+            for word in words:
+                try:
+                    vector_value = np.mean(model.wv[word])
+                except:
+                    vector_value = np.zeros(300)
+                    
+                embedding_df.at[i, word] = vector_value
+        return embedding_df.fillna(value=0)
+
     def get_modelling_data(self):
         unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','cleaned_reviews_text']
         modelling_df = self.model_data
@@ -160,10 +146,8 @@ class Trainer:
 
         if self.model == "dbscan":
             metrics, results = self.dbscan_pipeline()
-        elif self.model == "isolation_forest":
-            metrics, results = self.isolation_forest_pipeline(False)
-        elif self.model == "eif":
-            metrics, results = self.isolation_forest_pipeline(True)
+        elif self.model in ["isolation_forest","eif"]:
+            metrics, results = self.isolation_forest_pipeline(self.model)
         elif self.model == "rrcf":
             metrics, results = self.rrcf_pipeline()
         elif self.model == "lof":
@@ -197,6 +181,12 @@ class Trainer:
         self.experiment.log_model(name=self.model,
                         file_or_folder=results_path[self.model])
 
+    def check_glove_file_exist(self):
+        if not os.path.exists(word2vec_output_file):
+            # retrieve glove vector
+            glove_input_file = 'data/uc2/external/glove.6B.300d.txt'
+            glove2word2vec(glove_input_file, word2vec_output_file)
+        
     def dbscan_pipeline(self):
         print("Loading DBScan...")
         self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
