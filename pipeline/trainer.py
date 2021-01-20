@@ -2,8 +2,8 @@ from data_loader.data_loader import DataLoader
 
 from featureselector.featureselector import FeatureSelector
 
-from gensim.models.fasttext import FastText
 from gensim.models import KeyedVectors
+from gensim.models.fasttext import FastText
 from gensim.scripts.glove2word2vec import glove2word2vec
 
 import pandas as pd
@@ -59,7 +59,7 @@ class Trainer:
         min_word = 5
         down_sampling = 1e-2
 
-        ft_model = FastText(reviews,
+        ft_model = FastText(temp_new_text(list(self.model_data['cleaned_reviews_text'])),
                       size=embedding_size,
                       window=window_size,
                       min_count=min_word,
@@ -73,8 +73,10 @@ class Trainer:
         return ft_reviews_df.fillna(value=0)
     
     def get_glove_vector(self):
-        word2vec_output_file = 'data/uc2/external/glove.6B.300d.txt.word2vec'
-        self.check_glove_file_exist()
+        if not os.path.exists(self.model_config.glove.word2vec_output_file):
+            # retrieve glove vector
+            print("Converting .txt file into .word2vec...")
+            glove2word2vec(self.model_config.glove.glove_input_file, self.model_config.glove.word2vec_output_file)
         
         # load the Stanford GloVe model, 
         glove_model = KeyedVectors.load_word2vec_format(word2vec_output_file, binary=False)
@@ -86,18 +88,21 @@ class Trainer:
     
     def create_embedding_df(self, model):
         reviews = temp_new_text(list(self.model_data['cleaned_reviews_text']))
-        vec = CountVectorizer(ngram_range = (1,1)).fit_transform(reviews)
+        vec = CountVectorizer(ngram_range = (1,1))
+        vec.fit_transform(reviews)
         embedding_df = pd.DataFrame(columns=vec.get_feature_names())
         reviews = [sentence.split() for sentence in reviews]
         for i in range(len(reviews)):
-            for word in words:
-                try:
-                    vector_value = np.mean(model.wv[word])
-                except:
-                    vector_value = np.zeros(300)
-                    
-                embedding_df.at[i, word] = vector_value
+            for word in reviews[i]:
+                embedding_df.at[i, word] = self.get_vector_value(word, model)
+
         return embedding_df.fillna(value=0)
+    
+    def get_vector_value(self,word,model):
+        try:
+            return np.mean(model.wv[word])
+        except:
+            return np.zeroes(300)
 
     def get_modelling_data(self):
         unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','cleaned_reviews_text']
@@ -114,14 +119,14 @@ class Trainer:
         if self.normalize == 'y':
             print("Normalizing Data...")
             modelling_df = self.normalize_data()
-
+        
         if self.text_represent == 'tfidf':
             self.text_represent_data = self.get_tfidf_vector()
         elif self.text_represent == 'fasttext':
             self.text_represent_data = self.get_fasttext_vector()
         elif self.text_represent == 'glove':
             self.text_represent_data = self.get_glove_vector()            
-            
+
         print("Combining vectors with dataset...")
         return pd.concat([modelling_df, self.text_represent_data],axis=1)
 
@@ -180,12 +185,6 @@ class Trainer:
         self.model_data.to_csv(results_path[self.model],index=False)
         self.experiment.log_model(name=self.model,
                         file_or_folder=results_path[self.model])
-
-    def check_glove_file_exist(self):
-        if not os.path.exists(word2vec_output_file):
-            # retrieve glove vector
-            glove_input_file = 'data/uc2/external/glove.6B.300d.txt'
-            glove2word2vec(glove_input_file, word2vec_output_file)
         
     def dbscan_pipeline(self):
         print("Loading DBScan...")
