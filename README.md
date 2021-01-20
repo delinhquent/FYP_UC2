@@ -34,7 +34,7 @@ Methodology of evaluating the models will be determined at a later stage.
     │       ├─ external/                             <- Data from third party sources/inputs.
     │       |   ├─ loreal_brand_list.csv
     │       |   ├─ sample_incentivized_reviews.csv
-    │       |   └─ glove files (Download link: http://nlp.stanford.edu/data/glove.6B.zip)
+    │       |   └─ [GloVe files](http://nlp.stanford.edu/data/glove.6B.zip)
     │       |
     │       ├─ interim/                              <- Intermediate data that has been transformed.
     │       |   |
@@ -53,6 +53,8 @@ Methodology of evaluating the models will be determined at a later stage.
     ├── models                                       <- Trained models, predictions & summaries
     │   │
     │   ├── results                                  <- Prediction results from models
+    │   │
+    │   ├── word_embedding                           <- Word Embedding for GloVe & fastText
     │   │
     │   └── saved_models                             <- Saved models
     │
