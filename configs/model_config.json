@@ -29,5 +29,25 @@
         "results" : {
             "save_data_path" : "models/results/lof_results.csv"
         }
+    },
+    "rrcf": {
+        "results" : {
+            "save_data_path" : "models/results/rrcf_results.csv"
+        }
+    },
+    "ocsvm": {
+        "results": {
+            "save_data_path" : "models/results/lmdd_results.csv"
+        }
+    },
+    "copad": {
+        "results" : {
+            "save_data_path" : "models/results/copad_results.csv"
+        }
+    },
+    "hbos": {
+        "results" : {
+            "save_data_path" : "models/results/hbos_results.csv"
+        }
     }
 }
