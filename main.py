@@ -27,7 +27,7 @@ def automate_experiment_name(text_represent, feature_select, normalize, valid_mo
     if normalize in ['y','Y']:
         return experiment_name + feature_name + 'Normalized ' + text_represent_name
     
-    return experiment_name + feature_name + tfidf_name
+    return experiment_name + feature_name + text_represent_name
 
 
 if __name__ == '__main__':
