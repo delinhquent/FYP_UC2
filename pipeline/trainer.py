@@ -149,6 +149,14 @@ class Trainer:
         print("Retrieving necessary columns for modelling...")
         self.modelling_data = self.get_modelling_data()
 
+        metrics, results = self.select_pipeline()
+            
+        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+        print("Saving results...")
+        self.save_results(metrics)
+
+    def select_pipeline(self):
         if self.model == "dbscan":
             metrics, results = self.dbscan_pipeline()
         elif self.model in ["isolation_forest","eif"]:
@@ -159,11 +167,7 @@ class Trainer:
             metrics, results = self.lof_pipeline()
         elif self.model in ["ocsvm","copod", "hbos"]:
             metrics, results = self.generic_pyod_model_pipeline()
-            
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-
-        print("Saving results...")
-        self.save_results(metrics)
+        return metrics, results
 
     def experiment_params(self,params):
         self.experiment.log_parameters(params)
