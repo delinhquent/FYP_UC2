@@ -28,8 +28,8 @@ def get_args():
         '-model', '--model',
         help="The model which you will be using. To be used with -m train_model.\nModel Name | Parse Value:\n1. DBSCAN | dbscan \n2. Isolation Forest | isolation_forest\n3. Extended Isolation Forest | eif")
     argparser.add_argument(
-        '-tfidf', '--tfidf',
-        help='Train model with TFIDF. Accepted values are "y" and "n".')
+        '-text_represent', '--text_represent',
+        help='Train model with Text Representation. 1. tfidf\n2. fasttext\n3.glove.')
     argparser.add_argument(
         '-feature_select', '--feature_select',
         help='Train model with Feature Selection. Accepted values are "y" and "n".')
