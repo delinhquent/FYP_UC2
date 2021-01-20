@@ -1,4 +1,8 @@
-{
+{   
+    "glove":{
+        "word2vec_output_file": "data/uc2/external/glove.6B.300d.txt.word2vec",
+        "glove_input_file": "data/uc2/external/glove.6B.300d.txt"
+    },
     "dbscan": {
         "hyperparam_test": {
             "range_n_clusters" : 10,
