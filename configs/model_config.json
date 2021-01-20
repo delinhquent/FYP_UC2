@@ -40,9 +40,9 @@
             "save_data_path" : "models/results/lmdd_results.csv"
         }
     },
-    "copad": {
+    "copod": {
         "results" : {
-            "save_data_path" : "models/results/copad_results.csv"
+            "save_data_path" : "models/results/copod_results.csv"
         }
     },
     "hbos": {
