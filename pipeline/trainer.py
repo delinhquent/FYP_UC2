@@ -2,17 +2,10 @@ from data_loader.data_loader import DataLoader
 
 from featureselector.featureselector import FeatureSelector
 
-from gensim.models import KeyedVectors
-from gensim.models.fasttext import FastText
-from gensim.scripts.glove2word2vec import glove2word2vec
-
 import pandas as pd
 
 import numpy as np
 
-import os
-
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import normalize, StandardScaler 
 
@@ -22,8 +15,6 @@ from trainers.lof import LOF
 from trainers.rrcf import RRCF
 from trainers.pyodmodel import PyodModel
 
-from utils.engineer_functions import temp_new_text
-
 
 class Trainer:
     def __init__(self, **kwargs):
@@ -32,7 +23,10 @@ class Trainer:
             setattr(self, key, kwargs.get(key))
         self.model_data_loader = DataLoader(self.config.model.save_data_path)
         self.model_data = None
-        self.text_represent_data = None
+        self.tfidf_data = DataLoader(self.config.tfidf.reviews_vector).load_data()
+        self.glove_data = DataLoader(self.config.glove.reviews_vector).load_data()
+        self.fasttext_data = DataLoader(self.config.fasttext.reviews_vector).load_data()
+        self.word2vec_data = DataLoader(self.config.word2vec.reviews_vector).load_data()
         self.modelling_data = None
         self.trainer = None
 
@@ -43,75 +37,6 @@ class Trainer:
         self.model_data_loader.load_data()
         return self.model_data_loader.get_data()
     
-    def get_tfidf_vector(self):
-        print("Generating TFIDF Vector...")
-        vec = TfidfVectorizer (ngram_range = (1,2),min_df=0.1,max_df=0.9)
-        reviews = temp_new_text(list(self.model_data['cleaned_reviews_text']))
-        tfidf_reviews = vec.fit_transform(reviews)
-        tfidf_reviews_df = pd.DataFrame(tfidf_reviews.toarray(), columns=vec.get_feature_names())
-        
-        return tfidf_reviews_df.fillna(value=0)
-
-    def get_fasttext_vector(self):
-        # parameters to train fast text
-        embedding_size = 300
-        window_size = 5
-        min_word = 5
-        down_sampling = 1e-2
-
-        if not os.path.exists(self.model_config.fasttext.model_file):
-            # retrieve glove vector
-            print("Generating fastText model...")
-            ft_model = FastText(temp_new_text(list(self.model_data['cleaned_reviews_text'])),
-                      size=embedding_size,
-                      window=window_size,
-                      min_count=min_word,
-                      sample=down_sampling,
-                      sg=0, # put 1 if you want to use skip-gram, look into the documentation for other variables
-                      iter=100)
-            ft_model.save_model(self.model_config.fasttext.model_file)
-        else:
-            ft_model = fasttext.load_model(self.model_config.fasttext.model_file)
-
-        print("Generating Vector with fastText...")
-        ft_reviews_df = self.create_embedding_df(ft_model)
-                    
-        return ft_reviews_df.fillna(value=0)
-    
-    def get_glove_vector(self):
-        if not os.path.exists(self.model_config.glove.word2vec_output_file):
-            # retrieve glove vector
-            print("Converting .txt file into .word2vec...")
-            glove2word2vec(self.model_config.glove.glove_input_file, self.model_config.glove.word2vec_output_file)
-        
-        # load the Stanford GloVe model
-        print("Loading GloVe model...")
-        glove_model = KeyedVectors.load_word2vec_format(self.model_config.glove.word2vec_output_file, binary=False)
-        
-        print("Generating Vector with GloVe...")
-        glove_reviews_df = self.create_embedding_df(glove_model)
-        
-        return glove_reviews_df.fillna(value=0)
-    
-    def create_embedding_df(self, model):
-        reviews = temp_new_text(list(self.model_data['cleaned_reviews_text']))
-        vec = CountVectorizer(ngram_range = (1,1))
-        vec.fit_transform(reviews)
-        embedding_df = pd.DataFrame(columns=vec.get_feature_names())
-        reviews = [sentence.split() for sentence in reviews]
-        for i in range(len(reviews)):
-            for word in reviews[i]:
-                embedding_df.at[i, word] = self.get_vector_value(word, model)
-
-        return embedding_df.fillna(value=0)
-    
-    def get_vector_value(self,word,model):
-        try:
-            vector_value = np.mean(model.wv[word])
-        except:
-            vector_value = np.zeroes(300)
-        return vector_value
-
     def get_modelling_data(self):
         unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','cleaned_reviews_text']
         modelling_df = self.model_data
@@ -128,15 +53,16 @@ class Trainer:
             print("Normalizing Data...")
             modelling_df = self.normalize_data()
         
-        if self.text_represent == 'tfidf':
-            self.text_represent_data = self.get_tfidf_vector()
-        elif self.text_represent == 'fasttext':
-            self.text_represent_data = self.get_fasttext_vector()
-        elif self.text_represent == 'glove':
-            self.text_represent_data = self.get_glove_vector()            
-
+        
         print("Combining vectors with dataset...")
-        return pd.concat([modelling_df, self.text_represent_data],axis=1)
+        if self.text_represent == 'tfidf':
+            return pd.concat([modelling_df, self.tfidf_data],axis=1)
+        elif self.text_represent == 'fasttext':
+            return pd.concat([modelling_df, self.fasttext_data],axis=1)
+        elif self.text_represent == 'glove':
+            return pd.concat([modelling_df, self.glove_data],axis=1)
+        elif self.text_represent == 'word2vec':
+            return pd.concat([modelling_df, self.word2vec_data],axis=1)             
 
     def normalize_data(self):
         scaler = StandardScaler() 
