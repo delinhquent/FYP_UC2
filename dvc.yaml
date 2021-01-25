@@ -10,6 +10,14 @@ stages:
     - utils/reformat.py
     outs:
     - data/uc2/interim/consolidated_review_activity.csv
+    - models/word_embedding/glove.6B.300d.txt.word2vec
+    - data/uc2/interim/glove_embedding.csv
+    - models/word_embedding/fasttext.model
+    - data/uc2/interim/fasttext_embedding.csv
+    - models/word_embedding/word2vec.model
+    - data/uc2/interim/word2vec_embedding.csv
+    - models/word_embedding/tfidf.pickle
+    - data/uc2/interim/tfidf.csv
   feature_engineering:
     cmd: python main.py -m build_features
     deps:
@@ -23,5 +31,13 @@ stages:
     - utils/clean.py
     - utils/engineer.py
     - utils/engineer_functions.py
+    - models/word_embedding/glove.6B.300d.txt.word2vec
+    - data/uc2/interim/glove_embedding.csv
+    - models/word_embedding/fasttext.model
+    - data/uc2/interim/fasttext_embedding.csv
+    - models/word_embedding/word2vec.model
+    - data/uc2/interim/word2vec_embedding.csv
+    - models/word_embedding/tfidf.pickle
+    - data/uc2/interim/tfidf.csv
     outs:
     - data/uc2/processed/fake_framework_features.csv
