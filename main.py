@@ -23,6 +23,8 @@ def automate_experiment_name(text_represent, feature_select, normalize, valid_mo
         text_represent_name = "with fastText"
     elif text_represent == "glove":
         text_represent_name = "with GloVe"
+    elif text_represent == "word2vec":
+        text_represent_name = "with Word2Vec"
 
     if normalize in ['y','Y']:
         return experiment_name + feature_name + 'Normalized ' + text_represent_name
@@ -61,7 +63,7 @@ if __name__ == '__main__':
                 normalize = str(args.normalize).lower()
 
                 normalize_feature_select_valid_values = ['y','n','Y','N']
-                text_represent_valid_values = ['tfidf','glove','fasttext']
+                text_represent_valid_values = ['tfidf','glove','fasttext','word2vec']
 
                 if text_represent in text_represent_valid_values and feature_select in normalize_feature_select_valid_values and normalize in normalize_feature_select_valid_values:
                     model_config = process_config(args.model_config)
