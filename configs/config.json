@@ -24,5 +24,22 @@
   "user_inputs": {
     "loreal_brand_path": "data/uc2/external/loreal_brand_list.csv",
     "sample_incentivized_path": "data/uc2/external/sample_incentivized_reviews.csv"
+  },
+  "glove": {
+    "word2vec_output_file": "models/word_embedding/glove.6B.300d.txt.word2vec",
+    "glove_input_file": "data/uc2/external/glove.6B.300d.txt",
+    "reviews_vector": "data/uc2/interim/glove_embedding.csv"
+  },
+  "fasttext": {
+      "model_file": "models/word_embedding/fasttext.model",
+      "reviews_vector": "data/uc2/interim/fasttext_embedding.csv"
+  },
+  "word2vec": {
+      "model_file": "models/word_embedding/word2vec.model",
+      "reviews_vector": "data/uc2/interim/word2vec_embedding.csv"
+  },
+  "tfidf": {
+    "model_file": "models/word_embedding/tfidf.pickle",
+    "reviews_vector": "data/uc2/interim/tfidf.csv"
   }
 }
