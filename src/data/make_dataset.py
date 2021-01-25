@@ -19,4 +19,7 @@ def generate(config):
     print("Saving reviewer contributions into a dataset...")
     data_generator.save_review_activity_data()
     
+    print("Embedding words into TFIDF, fastText, Word2Vec & GloVe...")
+    data_generator.embed_words()
+
     print('Generated datasets are saved...')
