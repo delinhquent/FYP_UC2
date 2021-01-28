@@ -11,26 +11,16 @@ from src.models.train_model import train_model
 import utils.common_resources
 
 def automate_experiment_name(text_represent, feature_select, normalize, valid_models):
-    experiment_name = valid_models[str(model.lower())] + " - "
-
     feature_name = "All Features "
     if feature_select in ['y','Y']:
         feature_name = 'Important Features '
-
-    if text_represent == "tfidf":
-        text_represent_name = "with TFIDF"
-    elif text_represent == "fasttext":
-        text_represent_name = "with fastText"
-    elif text_represent == "glove":
-        text_represent_name = "with GloVe"
-    elif text_represent == "word2vec":
-        text_represent_name = "with Word2Vec"
+    
+    text_represent_dict = {"tfidf":"with TFIDF","fasttext":"with fastText","glove":"with GloVe","word2vec":"with Word2Vec"}
 
     if normalize in ['y','Y']:
-        return experiment_name + feature_name + 'Normalized ' + text_represent_name
+        return valid_models[str(model.lower())] + " - " + feature_name + 'Normalized ' + text_represent_dict[text_represent]
     
-    return experiment_name + feature_name + text_represent_name
-
+    return valid_models[str(model.lower())] + " - " + feature_name + text_represent_dict[text_represent]
 
 if __name__ == '__main__':
     try:
