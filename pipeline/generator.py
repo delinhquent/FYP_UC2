@@ -41,37 +41,38 @@ class Generator:
 
     def embed_words(self):
         self.reviews_data = self.get_reviews_data()
-        self.reviews_data['cleaned_text'] = self.reviews_data['cleaned_text'].apply(temp_new_text)
 
         self.tfidf_data = self.get_tfidf_vector()
         print("Saving embeddings into csv...")
         self.tfidf_data.to_csv(self.config.tfidf.reviews_vector, index= False)
 
-        self.fasttext_data = self.get_fasttext_vector()
-        print("Saving embeddings into csv...")
-        self.fasttext_data.to_csv(self.config.fasttext.reviews_vector, index= False)
+        # self.fasttext_data = self.get_fasttext_vector()
+        # print("Saving embeddings into csv...")
+        # self.fasttext_data.to_csv(self.config.fasttext.reviews_vector, index= False)
 
-        self.word2vec_data = self.get_word2vec_vector()
-        print("Saving embeddings into csv...")
-        self.word2vec_data.to_csv(self.config.word2vec.reviews_vector, index= False)
+        # self.word2vec_data = self.get_word2vec_vector()
+        # print("Saving embeddings into csv...")
+        # self.word2vec_data.to_csv(self.config.word2vec.reviews_vector, index= False)
 
-        self.glove_data = self.get_glove_vector()
-        print("Saving embeddings into csv...")
-        self.glove_data.to_csv(self.config.glove.reviews_vector, index= False)
+        # self.glove_data = self.get_glove_vector()
+        # print("Saving embeddings into csv...")
+        # self.glove_data.to_csv(self.config.glove.reviews_vector, index= False)
 
     def preprocess_review_activity(self):
         self.review_activity_data = self.preprocessor.preprocess_review_activity()
 
     def get_tfidf_vector(self):
         print("Generating TFIDF Vector...")
-        vec = TfidfVectorizer (ngram_range = (1,2),min_df=0.1,max_df=0.9)
-        tfidf_reviews = vec.fit_transform(self.reviews_data['cleaned_text'])
+        try:
+            vec = TfidfVectorizer (ngram_range = (1,2),min_df=0.1,max_df=0.9)
+            tfidf_reviews = vec.fit_transform(self.reviews_data['cleaned_text'].astype(str))
 
-        pickle.dump(vec, open(self.config.tfidf.model_file,"wb"))
-        # vec = pickle.load(open(self.config.tfidf.model_file, "rb")) # keeping this code for future development
+            pickle.dump(vec, open(self.config.tfidf.model_file,"wb"))
+            # vec = pickle.load(open(self.config.tfidf.model_file, "rb")) # keeping this code for future development
 
-        tfidf_reviews_df = pd.DataFrame(tfidf_reviews.toarray(), columns=vec.get_feature_names())
-        
+            tfidf_reviews_df = pd.DataFrame(tfidf_reviews.toarray(), columns=vec.get_feature_names())
+        except Exception as e:
+            print(e)
         return tfidf_reviews_df.fillna(value=0)
 
     def get_fasttext_vector(self):
@@ -83,7 +84,7 @@ class Generator:
 
         # retrieve fasttext vector
         print("Generating fastText model...")
-        ft_model = FastText(self.reviews_data['cleaned_text'],
+        ft_model = FastText(self.reviews_data['cleaned_text'].astype(str),
                     size=embedding_size,
                     window=window_size,
                     min_count=min_word,
@@ -98,7 +99,7 @@ class Generator:
         num_features = ft_model.vector_size
         vocab_list = list(ft_model.wv.vocab)
 
-        ft_reviews_df = self.reviews_data['cleaned_text'].str.split().apply(avg_sentence_vector,model=ft_model,num_features = num_features,vocab = vocab_list)
+        ft_reviews_df = self.reviews_data['cleaned_text'].astype(str).str.split().apply(avg_sentence_vector,model=ft_model,num_features = num_features,vocab = vocab_list)
         return ft_reviews_df.fillna(value=0)
     
     def get_word2vec_vector(self):
@@ -110,7 +111,7 @@ class Generator:
 
         # retrieve glove vector
         print("Generating Word2Vec model...")
-        word2vec_model = Word2Vec(self.reviews_data['cleaned_text'],
+        word2vec_model = Word2Vec(self.reviews_data['cleaned_text'].astype(str),
                     size=embedding_size,
                     window=window_size,
                     min_count=min_word,
@@ -125,7 +126,7 @@ class Generator:
         num_features = word2vec_model.vector_size
         vocab_list = list(word2vec_model.wv.vocab)
 
-        word2vec_reviews_df = self.reviews_data['cleaned_text'].str.split().apply(avg_sentence_vector,model=word2vec_model,num_features = num_features,vocab = vocab_list)
+        word2vec_reviews_df = self.reviews_data['cleaned_text'].astype(str).str.split().apply(avg_sentence_vector,model=word2vec_model,num_features = num_features,vocab = vocab_list)
                     
         return word2vec_reviews_df.fillna(value=0)
     
@@ -143,7 +144,7 @@ class Generator:
         num_features = glove_model.vector_size
         vocab_list = list(glove_model.wv.vocab)
 
-        word2vec_reviews_df = self.reviews_data['cleaned_text'].str.split().apply(avg_sentence_vector,model=glove_model,num_features = num_features,vocab = vocab_list)
+        word2vec_reviews_df = self.reviews_data['cleaned_text'].astype(str).str.split().apply(avg_sentence_vector,model=glove_model,num_features = num_features,vocab = vocab_list)
         
         return word2vec_reviews_df.fillna(value=0)
 
