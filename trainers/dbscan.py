@@ -8,8 +8,6 @@ from sklearn.cluster import DBSCAN, KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.neighbors import NearestNeighbors
 
-import tqdm
-
 
 class DBScan:
     def __init__(self, model_config, model_df):
@@ -41,7 +39,8 @@ class DBScan:
         total_fake_reviews = list(results).count(-1)
         total_non_fake_reviews = total_reviews - total_fake_reviews
 
-        metrics = {"silhouette_avg":silhouette_avg,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
+        
+        metrics = {"silhouette_avg":silhouette_avg, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
         return metrics
         
@@ -51,7 +50,7 @@ class DBScan:
         core_samples_mask = np.zeros_like(dbscan_model.labels_,dtype=bool)
         core_samples_mask[dbscan_model.core_sample_indices_] = True
         labels = dbscan_model.labels_
-        
+
         return labels
 
     def find_optimized_cluster(self):
