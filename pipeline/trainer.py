@@ -53,16 +53,8 @@ class Trainer:
             print("Normalizing Data...")
             modelling_df = self.normalize_data()
         
-        
-        print("Combining vectors with dataset...")
-        if self.text_represent == 'tfidf':
-            return pd.concat([modelling_df, self.tfidf_data],axis=1)
-        elif self.text_represent == 'fasttext':
-            return pd.concat([modelling_df, self.fasttext_data],axis=1)
-        elif self.text_represent == 'glove':
-            return pd.concat([modelling_df, self.glove_data],axis=1)
-        elif self.text_represent == 'word2vec':
-            return pd.concat([modelling_df, self.word2vec_data],axis=1)             
+        return self.combine_data(modelling_df)
+                   
 
     def normalize_data(self):
         scaler = StandardScaler() 
@@ -78,6 +70,17 @@ class Trainer:
         X_normalized.columns = self.modelling_data.columns 
         
         return X_normalized
+
+    def combine_data(self,modelling_df):
+        print("Combining vectors with dataset...")
+        if self.text_represent == 'tfidf':
+            return pd.concat([modelling_df, self.tfidf_data],axis=1)
+        elif self.text_represent == 'fasttext':
+            return pd.concat([modelling_df, self.fasttext_data],axis=1)
+        elif self.text_represent == 'glove':
+            return pd.concat([modelling_df, self.glove_data],axis=1)
+        elif self.text_represent == 'word2vec':
+            return pd.concat([modelling_df, self.word2vec_data],axis=1)  
 
     def train_model(self):
         print("Retrieving necessary columns for modelling...")
