@@ -6,6 +6,8 @@ import numpy as np
 
 from sklearn.ensemble import IsolationForest
 
+from utils.em_bench_high import calculate_emmv_score
+
 
 class IsoForest:
     def __init__(self, model_config, model_df):
@@ -45,14 +47,20 @@ class IsoForest:
             y_pred[indices_with_preds] = 1
 
             results = y_pred
+            decisions = [None]*len(results)
+            return results,decisions
+
         else:
             results = self.model.fit_predict(self.model_df)
+            decisions = self.model.decision_function(self.model_df)
 
-        return results 
+            return results, decisions
+
+        
 
     def evaluate_isolation_forest(self,results, extended):
         if extended == "eif":
-            print("Evaluating Isolation Forest...")
+            print("Evaluating Extended Isolation Forest...")
             total_reviews = len(list(results))
             total_fake_reviews = list(results).count(-1)
             total_non_fake_reviews = total_reviews - total_fake_reviews
@@ -67,7 +75,9 @@ class IsoForest:
             results_mean = np.mean(results)
             results_var = np.var(results)
 
-            metrics = {"results_mean": results_mean, "results_var":results_var, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
+            em, mv = calculate_emmv_score(self.model_df, results, self.model, novelty_detection=False,ocsvm_model=False)
+
+            metrics = {"em":em,"mv":mv,"results_mean": results_mean, "results_var":results_var, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
         return metrics
         
