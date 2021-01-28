@@ -18,8 +18,6 @@ class PyodModel:
             self.model =  HBOS()
         elif model == "copod":
             self.model = COPOD()
-        elif model == "ocsvm":
-            self.model = OCSVM()
         return self.model.get_params()
     
     def predict_anomalies(self):
@@ -33,14 +31,10 @@ class PyodModel:
         print("Evaluating {}...".format(model_name))
 
         total_reviews = len(list(results))
-        total_fake_reviews = list(results).count(-1)
+        total_fake_reviews = list(results).count(0)
         total_non_fake_reviews = total_reviews - total_fake_reviews
         
-        if model_name == "One-Class SVM":
-            em, mv = calculate_emmv_score(novelty_detection=False,ocsvm_model=True, X = self.model_df, y = results, model = self.model)
-        else:
-            em, mv = calculate_emmv_score(novelty_detection=False,ocsvm_model=False, X = self.model_df, y = results, model = self.model)
-
+        em, mv = calculate_emmv_score(novelty_detection=False,ocsvm_model=False, X = self.model_df, y = results, model = self.model)
 
         metrics = {"em":em,"mv":mv,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
