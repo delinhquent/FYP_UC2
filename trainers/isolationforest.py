@@ -62,7 +62,7 @@ class IsoForest:
         if extended == "eif":
             print("Evaluating Extended Isolation Forest...")
             total_reviews = len(list(results))
-            total_fake_reviews = list(results).count(-1)
+            total_fake_reviews = list(results).count(0)
             total_non_fake_reviews = total_reviews - total_fake_reviews
 
             metrics = {"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
