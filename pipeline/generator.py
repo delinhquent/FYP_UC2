@@ -46,11 +46,17 @@ class Generator:
         print("Saving embeddings into csv...")
         self.tfidf_data.to_csv(self.config.tfidf.reviews_vector, index= False)
 
-        # self.fasttext_data = self.get_fasttext_vector()
+        params = {
+            "embedding_size": 300,
+            "window_size": 5,
+            "min_word": 5,
+            "down_sampling": 1e-2
+            }
+        # self.fasttext_data = self.get_fasttext_vector(params)
         # print("Saving embeddings into csv...")
         # self.fasttext_data.to_csv(self.config.fasttext.reviews_vector, index= False)
 
-        # self.word2vec_data = self.get_word2vec_vector()
+        # self.word2vec_data = self.get_word2vec_vector(params)
         # print("Saving embeddings into csv...")
         # self.word2vec_data.to_csv(self.config.word2vec.reviews_vector, index= False)
 
@@ -75,20 +81,14 @@ class Generator:
             print(e)
         return tfidf_reviews_df.fillna(value=0)
 
-    def get_fasttext_vector(self):
-        # parameters to train fast text
-        embedding_size = 300
-        window_size = 5
-        min_word = 5
-        down_sampling = 1e-2
-
+    def get_fasttext_vector(self,params):
         # retrieve fasttext vector
         print("Generating fastText model...")
         ft_model = FastText(self.reviews_data['cleaned_text'].astype(str),
-                    size=embedding_size,
-                    window=window_size,
-                    min_count=min_word,
-                    sample=down_sampling,
+                    size=params["embedding_size"],
+                    window=params["window_size"],
+                    min_count=params["min_word"],
+                    sample=params["down_sampling"],
                     sg=0, # put 1 if you want to use skip-gram, look into the documentation for other variables
                     iter=100)
         ft_model.save(self.config.fasttext.model_file)
@@ -102,20 +102,14 @@ class Generator:
         ft_reviews_df = self.reviews_data['cleaned_text'].astype(str).str.split().apply(avg_sentence_vector,model=ft_model,num_features = num_features,vocab = vocab_list)
         return ft_reviews_df.fillna(value=0)
     
-    def get_word2vec_vector(self):
-        # parameters to train fast text
-        embedding_size = 300
-        window_size = 5
-        min_word = 5
-        down_sampling = 1e-2
-
+    def get_word2vec_vector(self,params):
         # retrieve glove vector
         print("Generating Word2Vec model...")
         word2vec_model = Word2Vec(self.reviews_data['cleaned_text'].astype(str),
-                    size=embedding_size,
-                    window=window_size,
-                    min_count=min_word,
-                    sample=down_sampling,
+                    size=params["embedding_size"],
+                    window=params["window_size"],
+                    min_count=params["min_word"],
+                    sample=params["down_sampling"],
                     sg=0, # put 1 if you want to use skip-gram, look into the documentation for other variables
                     iter=100)
         word2vec_model.save(self.config.word2vec.model_file)
