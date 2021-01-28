@@ -93,7 +93,9 @@ Methodology of evaluating the models will be determined at a later stage.
     │   ├── isolationforest.py
     │   ├── extendedisolationforest.py
     │   ├── lof_tuner.py
-    │   └── lof.py
+    │   ├── lof.py
+    │   ├── pyodmodel.py
+    │   └── rrcf.py
     |
     ├── main.py                                      <- Main script file to run application 
     |
@@ -107,7 +109,18 @@ Simply run the following after using a virtual environment.
 pip install -r requirements.txt
 ```
 
+## Troubleshoot
+For those having issues with eif library, please execute the following:
+'''
+pip install eif==1.0.2
+'''
+
 ## TODO
-1. Update the functions in the respective model classes for prediction & Add decision_function to all models
-2. Integrate with BigQuery when Ryan's done
+1. Find out how to tune One-Class SVM
+2. Create a simple impact scoring algorithm
+3. Create a test function where users can parse in new data and evaluate it with current model
+4. Translate this application to a flask app (potentially)
+5. Integrate model with Jiawei's website when ready
+6. Integrate with BigQuery when Ryan's done
+7. Data visualization (PowerBI & website)
 
