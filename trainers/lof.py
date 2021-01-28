@@ -23,9 +23,8 @@ class LOF:
         return params
 
     def make_lof(self):
-        # params = self.hypertune_lof()
-        self.model =  LocalOutlierFactor(novelty=True)
-        # self.model =  LocalOutlierFactor(n_neighbors=params['k'], contamination=params['c'])
+        params = self.hypertune_lof()
+        self.model =  LocalOutlierFactor(n_neighbors=params['k'], contamination=params['c'])
         return self.model.get_params()
     
     def predict_anomalies(self):
