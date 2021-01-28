@@ -37,9 +37,9 @@ class PyodModel:
         total_non_fake_reviews = total_reviews - total_fake_reviews
         
         if model_name == "One-Class SVM":
-            em, mv = calculate_emmv_score(self.model_df, results, self.model, novelty_detection=False,ocsvm_model=True)
+            em, mv = calculate_emmv_score(novelty_detection=False,ocsvm_model=True, X = self.model_df, y = results, model = self.model)
         else:
-            em, mv = calculate_emmv_score(self.model_df, results, self.model, novelty_detection=False,ocsvm_model=False)
+            em, mv = calculate_emmv_score(novelty_detection=False,ocsvm_model=False, X = self.model_df, y = results, model = self.model)
 
 
         metrics = {"em":em,"mv":mv,"total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
