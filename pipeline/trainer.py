@@ -24,9 +24,9 @@ class Trainer:
         self.model_data_loader = DataLoader(self.config.model.save_data_path)
         self.model_data = None
         self.tfidf_data = DataLoader(self.config.tfidf.reviews_vector).load_data()
-        self.glove_data = DataLoader(self.config.glove.reviews_vector).load_data()
-        self.fasttext_data = DataLoader(self.config.fasttext.reviews_vector).load_data()
-        self.word2vec_data = DataLoader(self.config.word2vec.reviews_vector).load_data()
+        # self.glove_data = DataLoader(self.config.glove.reviews_vector).load_data()
+        # self.fasttext_data = DataLoader(self.config.fasttext.reviews_vector).load_data()
+        # self.word2vec_data = DataLoader(self.config.word2vec.reviews_vector).load_data()
         self.modelling_data = None
         self.trainer = None
 
@@ -151,13 +151,10 @@ class Trainer:
 
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
-
-        results = self.trainer.predict_anomalies(extended)
-
-        if extended:
-            self.model_data['eif'] = results
-        else:
-            self.model_data['isolation_forest'] = results
+        
+        results,decisions = self.trainer.predict_anomalies(extended)
+        self.model_data[extended] = results
+        self.model_data[extended+'_decision_function'] = decisions
 
         metrics = self.trainer.evaluate_isolation_forest(results,extended)
     
@@ -190,9 +187,10 @@ class Trainer:
             print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
             self.experiment_params(params)
 
-            results = self.trainer.predict_anomalies()
+            results,decisions = self.trainer.predict_anomalies()
 
             self.model_data['lof'] = results
+            self.model_data['lof_decision_function'] = decisions
 
             metrics = self.trainer.evaluate_lof(results)
         
@@ -210,9 +208,10 @@ class Trainer:
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
-        results = self.trainer.predict_anomalies()
+        results,decisions = self.trainer.predict_anomalies()
 
         self.model_data[self.model] = results
+        self.model_data[self.model+"_decision_function"] = decisions
 
         metrics = self.trainer.evaluate_pyod_model(results,name_dict[self.model])
 
