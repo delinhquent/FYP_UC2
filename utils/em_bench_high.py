@@ -22,7 +22,11 @@ ocsvm_max_train = 10000
 np.random.seed(42)
 
 
-def calculate_emmv_score(X,y, model, novelty_detection=False,ocsvm_model=False):
+def calculate_emmv_score(novelty_detection=False,ocsvm_model=False, **kwargs):
+    X = kwargs['X']
+    y = kwargs['y']
+    model = kwargs['model']
+
     # loading and vectorization
     n_samples, n_features = np.shape(X)
     n_samples_train = n_samples // 2
@@ -67,11 +71,11 @@ def calculate_emmv_score(X,y, model, novelty_detection=False,ocsvm_model=False):
                 model.fit(X_train_)
                 s_X_model = model.decision_function(X_)
                 s_unif_model = model.decision_function(unif)
-            
-            em_model += em(t, t_max, volume_support, s_unif_model,
-                             s_X_model, n_generated)[0]
-            mv_model += mv(axis_alpha, volume_support, s_unif_model,
-                             s_X_model, n_generated)[0]
+
+            em_model += em(t, t_max = t_max, volume_support = volume_support, s_unif = s_unif_model,
+                            s_X = s_X_model, n_generated = n_generated)[0]
+            mv_model += mv(axis_alpha, volume_support = volume_support, s_unif = s_unif_model,
+                             s_X = s_X_model, n_generated = n_generated)[0]
 
     em_model /= averaging
     mv_model /= averaging
