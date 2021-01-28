@@ -75,7 +75,7 @@ class IsoForest:
             results_mean = np.mean(results)
             results_var = np.var(results)
 
-            em, mv = calculate_emmv_score(self.model_df, results, self.model, novelty_detection=False,ocsvm_model=False)
+            em, mv = calculate_emmv_score(novelty_detection=False,ocsvm_model=False, X = self.model_df, y = results, model = self.model)
 
             metrics = {"em":em,"mv":mv,"results_mean": results_mean, "results_var":results_var, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
