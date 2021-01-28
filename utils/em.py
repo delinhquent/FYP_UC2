@@ -6,7 +6,13 @@ import numpy as np
 from sklearn.metrics import auc
 
 
-def em(t, t_max, volume_support, s_unif, s_X, n_generated):
+def em(t, **kwargs):
+    t_max = kwargs['t_max']
+    volume_support = kwargs['volume_support']
+    s_unif = kwargs['s_unif']
+    s_X = kwargs['s_X']
+    n_generated = kwargs['n_generated']
+
     EM_t = np.zeros(t.shape[0])
     n_samples = s_X.shape[0]
     s_X_unique = np.unique(s_X)
@@ -24,7 +30,12 @@ def em(t, t_max, volume_support, s_unif, s_X, n_generated):
     return AUC, EM_t, amax
 
 
-def mv(axis_alpha, volume_support, s_unif, s_X, n_generated):
+def mv(axis_alpha, **kwargs):
+    volume_support = kwargs['volume_support']
+    s_unif = kwargs['s_unif']
+    s_X = kwargs['s_X']
+    n_generated = kwargs['n_generated']
+
     n_samples = s_X.shape[0]
     s_X_argsort = s_X.argsort()
     mass = 0
