@@ -14,6 +14,7 @@ from trainers.isolationforest import IsoForest
 from trainers.lof import LOF
 from trainers.rrcf import RRCF
 from trainers.pyodmodel import PyodModel
+from trainers.ocsvm import OneClassSVM
 
 
 class Trainer:
@@ -87,8 +88,11 @@ class Trainer:
         self.modelling_data = self.get_modelling_data()
 
         metrics, results = self.select_pipeline()
-            
-        self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+
+        if -1 in results:
+            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
+        else:
+            self.model_data['fake_reviews'] = results
 
         print("Saving results...")
         self.save_results(metrics)
@@ -102,8 +106,10 @@ class Trainer:
             metrics, results = self.rrcf_pipeline()
         elif self.model == "lof":
             metrics, results = self.lof_pipeline()
-        elif self.model in ["ocsvm","copod", "hbos"]:
+        elif self.model in ["copod", "hbos"]:
             metrics, results = self.generic_pyod_model_pipeline()
+        elif self.model in ["ocsvm"]:
+            metrics, results = self.ocsvm_pipeline()
         return metrics, results
 
     def experiment_params(self,params):
@@ -181,29 +187,25 @@ class Trainer:
         return metrics, results
     
     def lof_pipeline(self):
-        try:
-            print("Loading Local Outlier Factor...")
-            self.trainer = LOF(model_config = self.model_config, model_df = self.modelling_data)
+        print("Loading Local Outlier Factor...")
+        self.trainer = LOF(model_config = self.model_config, model_df = self.modelling_data)
 
-            params = self.trainer.make_lof()
+        params = self.trainer.make_lof()
 
-            print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-            self.experiment_params(params)
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
 
-            results,decisions = self.trainer.predict_anomalies()
+        results,decisions = self.trainer.predict_anomalies()
 
-            self.model_data['lof'] = results
-            self.model_data['lof_decision_function'] = decisions
+        self.model_data['lof'] = results
+        self.model_data['lof_decision_function'] = decisions
 
-            metrics = self.trainer.evaluate_lof(results)
-        
-            return metrics, results
-        except Exception as e:
-            print(e)
+        metrics = self.trainer.evaluate_lof(results)
+    
+        return metrics, results
     
     def generic_pyod_model_pipeline(self):
-        name_dict = {"ocsvm":"One-Class SVM",
-            "copod":"Copula Based Outlier Detector", "hbos": "Histogram-based Outlier Detection"}
+        name_dict = {"copod":"Copula Based Outlier Detector", "hbos": "Histogram-based Outlier Detection"}
         print("Loading {}...".format(name_dict[self.model]))
         self.trainer = PyodModel(model_config = self.model_config, model_df = self.modelling_data)
         params = self.trainer.make_pyod_model(self.model)
@@ -211,11 +213,31 @@ class Trainer:
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
-        results,decisions = self.trainer.predict_anomalies()
+        results, decisions = self.trainer.predict_anomalies()
 
         self.model_data[self.model] = results
         self.model_data[self.model+"_decision_function"] = decisions
 
         metrics = self.trainer.evaluate_pyod_model(results,name_dict[self.model])
+
+        return metrics, results
+    
+    def ocsvm_pipeline(self):
+        print("Loading One-Class SVM...")
+        self.trainer = OneClassSVM(model_config = self.model_config, model_df = self.modelling_data)
+        self.trainer.make_ocsvm()
+
+        results, decisions = self.trainer.predict_anomalies()
+
+        params = self.trainer.hypertune_ocsvm(results)
+        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
+        self.experiment_params(params)
+
+        results, decisions = self.trainer.predict_anomalies()
+
+        self.model_data[self.model] = results
+        self.model_data[self.model+"_decision_function"] = decisions
+
+        metrics = self.trainer.evaluate_ocsvm(results)
 
         return metrics, results
