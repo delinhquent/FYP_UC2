@@ -37,7 +37,7 @@
     },
     "ocsvm": {
         "results": {
-            "save_data_path" : "models/results/lmdd_results.csv"
+            "save_data_path" : "models/results/ocsvm_results.csv"
         }
     },
     "copod": {
