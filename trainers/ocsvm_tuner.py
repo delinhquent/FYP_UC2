@@ -33,8 +33,8 @@ def find_best_ocsvm(X,y):
     pseudo_outlier_y = -np.ones(len(pseudo_outlier_X))
     pseudo_target_y = np.ones(len(pseudo_target_X))
 
-    gamma_candidates = [1e-4, 1e-3, 1e-2, 1e-1, 1e-0, 1e+1, 1e+2, 1e+3, 1/np.size(target_X, -1)]
-    nu_candidates = [0.005, 0.01, 0.05, 0.1, 0.5]
+    gamma_candidates = [1e-2, 1e-1, 1e-0, 1e+1, 1e+2, 1/np.size(target_X, -1)]
+    nu_candidates = [0.01, 0.1, 0.5]
 
     best_err = 1.0
     best_gamma, best_nu = 1/np.size(target_X, -1), 0.5
