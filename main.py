@@ -39,7 +39,8 @@ if __name__ == '__main__':
             model = args.model
             
             valid_models = {'dbscan': "DBSCAN",'isolation_forest': "Isolation Forest",'eif':"EIF", "lof": "LOF", "rrcf":"Robust Random Cut Forest",
-                            "ocsvm":"One-Class SVM", "copod":"Copula Based Outlier Detector", "hbos":"Histogram-based Outlier Detection"}
+                            "ocsvm":"One-Class SVM", "copod":"Copula Based Outlier Detector", "hbos":"Histogram-based Outlier Detection",'pyod_isolation_forest': "PYOD Isolation Forest",
+                            "pyod_lof": "PYOD LOF"}
 
             if model == None:
                 print("Please parse the model's names using -model respectively...")
@@ -72,7 +73,8 @@ if __name__ == '__main__':
                     experiment.set_name(experiment_name)
 
                     configs = [config, comet_config, model_config]
-                    train_model(configs, experiment, model, text_represent)
+                    user_config = [text_represent, feature_select, normalize]
+                    train_model(configs, experiment, model, user_config)
                 else:
                     print("Please input y or n for -feature_select/-normalize & tfidf/glove/fasttext for -text_represent...")                  
         else:
