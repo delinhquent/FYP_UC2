@@ -17,8 +17,8 @@ class FeatureSelector:
 
         print("Selecting Important Features using Variance Threshold...")
         current_features = self.variance()
-        print("Proceeding with Feature Selection using Dispersion Ratio...")
-        current_features = self.dispersion_ratio()
+        # print("Proceeding with Feature Selection using Dispersion Ratio...")
+        # current_features = self.dispersion_ratio()
 
         return current_features
 
@@ -38,20 +38,18 @@ class FeatureSelector:
         return current_features
     
     def dispersion_ratio(self):
-        self.df = self.df + 1 #avoid 0 division
-
-        aritmeticMean = np.mean(self.df, axis =0 )
-        geometricMean = np.power(np.prod(self.df, axis =0 ),1/self.df.shape[0])
+        df_values = self.df.values + 1
+        aritmeticMean = np.mean(df_values, axis =0 )
+        geometricMean = np.power(np.prod(df_values, axis =0 ),1/df_values.shape[0])
         R = aritmeticMean/geometricMean
         
         current_features = []
         for i in range(len(R)):
             dispersion_value = R[i]
-            if dispersion_value >= 0.5:
+            if dispersion_value >= 1:
                 current_features.append(self.df.columns[i])
         
         print("Number of important features by dispersion ratio: {}".format(len(current_features)))
-        print("Final Features are", ', '.join(current_features)[:-2])
 
         return current_features
         
