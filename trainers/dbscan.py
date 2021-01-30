@@ -8,6 +8,8 @@ from sklearn.cluster import DBSCAN, KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.neighbors import NearestNeighbors
 
+import tqdm
+
 
 class DBScan:
     def __init__(self, model_config, model_df):
