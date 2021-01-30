@@ -9,9 +9,12 @@ import numpy as np
 from sklearn.utils import shuffle as sh
 from utils.em import em, mv
 
+from collections import Counter
+
+import json
 
 # parameters of the algorithm:
-averaging = 50
+averaging = 30
 max_features = 5
 n_generated = 100000
 alpha_min = 0.9
@@ -21,11 +24,12 @@ ocsvm_max_train = 10000
 
 np.random.seed(42)
 
-
 def calculate_emmv_score(novelty_detection=False,ocsvm_model=False, **kwargs):
+    feature_importance = []
     X = kwargs['X']
     y = kwargs['y']
     model = kwargs['model']
+    model_name = kwargs['model_name']
 
     # loading and vectorization
     n_samples, n_features = np.shape(X)
@@ -57,11 +61,14 @@ def calculate_emmv_score(novelty_detection=False,ocsvm_model=False, **kwargs):
         lim_sup = X_.max(axis=0)
         volume_support = (lim_sup - lim_inf).prod()
         if volume_support > 0:
+            important_features = list(X_train_.columns)
+            feature_importance += important_features
             nb_exp += 1
+            print("Current: {}/{}\nFeatures: {}\n".format(nb_exp,averaging,important_features))
             t = np.arange(0, 100 / volume_support, 0.001 / volume_support)
             axis_alpha = np.arange(alpha_min, alpha_max, 0.001)
             unif = np.random.uniform(lim_inf, lim_sup,
-                                     size=(n_generated, max_features))
+                                    size=(n_generated, max_features))
 
             if ocsvm_model:
                 model.fit(X_train_[:min(ocsvm_max_train, n_samples_train - 1)])
@@ -75,7 +82,11 @@ def calculate_emmv_score(novelty_detection=False,ocsvm_model=False, **kwargs):
             em_model += em(t, t_max = t_max, volume_support = volume_support, s_unif = s_unif_model,
                             s_X = s_X_model, n_generated = n_generated)[0]
             mv_model += mv(axis_alpha, volume_support = volume_support, s_unif = s_unif_model,
-                             s_X = s_X_model, n_generated = n_generated)[0]
+                            s_X = s_X_model, n_generated = n_generated)[0]
+            
+            
+    feature_importance_dict = dict(Counter(feature_importance))
+    json.dump( feature_importance_dict, open( "models/results/" + model_name + "_feature_importance.json", 'w' ) )
 
     em_model /= averaging
     mv_model /= averaging
