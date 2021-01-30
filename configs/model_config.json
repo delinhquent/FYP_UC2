@@ -17,6 +17,14 @@
             "save_data_path" : "models/results/isolation_forest_results.csv"
         }
     },
+    "pyod_isolation_forest": {
+        "hyperparam_test": {
+            "random_state": 42
+        },
+        "results": {
+            "save_data_path" : "models/results/pyod_isolation_forest_results.csv"
+        }
+    },
     "eif": {
         "hyperparam_test": {
             "expected_anomaly_ratio" : 0.35
@@ -48,6 +56,11 @@
     "hbos": {
         "results" : {
             "save_data_path" : "models/results/hbos_results.csv"
+        }
+    },
+    "pyod_lof": {
+        "results" : {
+            "save_data_path" : "models/results/pyod_lof_results.csv"
         }
     }
 }
