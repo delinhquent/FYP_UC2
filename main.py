@@ -15,7 +15,7 @@ def automate_experiment_name(text_represent, feature_select, normalize, valid_mo
     if feature_select in ['y','Y']:
         feature_name = 'Important Features '
     
-    text_represent_dict = {"tfidf":"with TFIDF","fasttext":"with fastText","glove":"with GloVe","word2vec":"with Word2Vec"}
+    text_represent_dict = {"tfidf":"with TFIDF","fasttext":"with fastText","glove":"with GloVe","word2vec":"with Word2Vec", "doc2vec":"with Doc2Vec"}
 
     if normalize in ['y','Y']:
         return valid_models[str(model.lower())] + " - " + feature_name + 'Normalized ' + text_represent_dict[text_represent]
@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 normalize = str(args.normalize).lower()
 
                 normalize_feature_select_valid_values = ['y','n','Y','N']
-                text_represent_valid_values = ['tfidf','glove','fasttext','word2vec']
+                text_represent_valid_values = ['tfidf','glove','fasttext','word2vec','doc2vec']
 
                 if text_represent in text_represent_valid_values and feature_select in normalize_feature_select_valid_values and normalize in normalize_feature_select_valid_values:
                     model_config = process_config(args.model_config)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
                     user_config = [text_represent, feature_select, normalize]
                     train_model(configs, experiment, model, user_config)
                 else:
-                    print("Please input y or n for -feature_select/-normalize & tfidf/glove/fasttext for -text_represent...")                  
+                    print("Please input y or n for -feature_select/-normalize & tfidf/glove/fasttext for -text_represent...")    
         else:
             print("There is no such mode yet...")
             exit(0)
