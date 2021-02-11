@@ -27,5 +27,6 @@ def train_model(configs, experiment, model, user_config):
 
     print("Loading trainer...")
     train_model.train_model()
-
+    
+    
     
