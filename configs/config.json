@@ -1,7 +1,8 @@
 {
   "reviews" : {
     "raw_data_path" : "data/raw/consolidated_products.csv",
-    "base_data_path": "data/base/consolidated_products.csv"
+    "base_data_path": "data/base/consolidated_products.csv",
+    "interim_data_path": "data/uc2/interim/consolidated_products_labelled.csv"
   },
   "products": {
     "raw_data_path" : "data/raw/consolidated_product_info.csv",
@@ -41,5 +42,9 @@
   "tfidf": {
     "model_file": "models/word_embedding/tfidf.pickle",
     "reviews_vector": "data/uc2/interim/tfidf.csv"
+  },
+  "doc2vec": {
+      "model_file": "models/word_embedding/doc2vec.model",
+      "reviews_vector": "data/uc2/interim/doc2vec_embedding.csv"
   }
 }
