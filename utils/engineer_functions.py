@@ -110,6 +110,16 @@ def cosine_similarity(df, products_df):
 
     return df
 
+def convert_datetime(date):
+    dates = date.split()
+    months = {"January":1, "February":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"September":9,
+                "October":10,"November":11,"December":12}
+    
+    day = int(re.sub("\D", "", dates[1]))
+    month = months[dates[0]]
+    year = int(dates[2].strip())
+    return datetime(year,month,day)
+
 def deleted_reviews(df, review_activity_df,column):
     total_deleted_reviews_df = review_activity_df.groupby([column]).agg({'cleaned_deleted_review':np.sum}).reset_index()
     total_deleted_reviews_df = total_deleted_reviews_df.rename(columns={'cleaned_deleted_review':'cleaned_total_deleted_reviews'})
