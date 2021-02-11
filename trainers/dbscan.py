@@ -5,7 +5,7 @@ import numpy as np
 from kneed import KneeLocator
 
 from sklearn.cluster import DBSCAN, KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, f1_score, recall_score, precision_score, confusion_matrix
 from sklearn.neighbors import NearestNeighbors
 
 import tqdm
@@ -15,19 +15,20 @@ class DBScan:
     def __init__(self, model_config, model_df):
         self.model_config = model_config
         self.model_df = model_df
+        interested_columns = [column for column in self.model_df.columns if column != "manual_label"]
+        self.modelling_data = self.model_df[interested_columns].values
 
     def hypertune_dbscan_params(self):
         print("Finding optimal epsilon and min_sample value for DBScan Model...")
 
         print("Finding no. clusters by KMeans...")
         cluster = self.find_optimized_cluster()
-        # cluster = 3
 
         print("Finding optimzied epsilon value...")
         eps = self.find_optimized_eps(cluster)
 
         print("Finding optimzied min_sample value...")
-        min_sample = 2*len(self.model_df.columns)
+        min_sample = 2*len(self.modelling_data.columns)
 
         params = {"eps":eps,"min_samples":min_sample}
 
@@ -35,20 +36,33 @@ class DBScan:
 
     def evaluate_dbscan(self, results):
         print("Evaluating DBScan...")
-        silhouette_avg = silhouette_score(self.model_df, results)
+        silhouette_avg = silhouette_score(self.modelling_data, results)
 
         total_reviews = len(list(results))
         total_fake_reviews = list(results).count(-1)
         total_non_fake_reviews = total_reviews - total_fake_reviews
 
-        
-        metrics = {"silhouette_avg":silhouette_avg, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
+        if -1 in results:
+            results = [1 if x == -1 else 0 for x in results]
+        else:
+            results = results
+
+        self.model_df['results'] = results
+        evaluate_df = self.model_df[self.model_df['manual_label'].isin([0,1])]
+
+        y_test = evaluate_df['manual_label']
+        pred = evaluate_df['results']
+        f1Score = f1_score(y_test, pred)
+        recallScore = recall_score(y_test, pred)
+        precScore = precision_score(y_test, pred)        
+
+        metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"silhouette_avg":silhouette_avg, "total_fake_reviews": total_fake_reviews,"percentage_fake_reviews": (total_fake_reviews/total_reviews),"total_non_fake_reviews":total_non_fake_reviews,"percentage_non_fake_reviews":total_non_fake_reviews/total_reviews}
         
         return metrics
         
     def dbscan_cluster(self,params):
         print("Performing DBScan...")
-        dbscan_model = DBSCAN(eps=params['eps'],min_samples=params['min_samples']).fit(self.model_df)
+        dbscan_model = DBSCAN(eps=params['eps'],min_samples=params['min_samples']).fit(self.modelling_data)
         core_samples_mask = np.zeros_like(dbscan_model.labels_,dtype=bool)
         core_samples_mask[dbscan_model.core_sample_indices_] = True
         labels = dbscan_model.labels_
@@ -64,9 +78,9 @@ class DBScan:
 
         for n_clusters in tqdm.tqdm(range_n_clusters):
             clusterer = KMeans(n_clusters=n_clusters, random_state = selected_random_state)
-            cluster_labels = clusterer.fit_predict(self.model_df)
+            cluster_labels = clusterer.fit_predict(self.modelling_data)
 
-            silhouette_avg = silhouette_score(self.model_df, cluster_labels)
+            silhouette_avg = silhouette_score(self.modelling_data, cluster_labels)
             kmeans_silhouette_results[n_clusters] = silhouette_avg
             print("For n_clusters = {}, the average silhouette_score is : {}".format(n_clusters, silhouette_avg))
 
@@ -76,8 +90,8 @@ class DBScan:
     
     def find_optimized_eps(self, cluster):
         nearest_neighbors = NearestNeighbors(n_neighbors=cluster)
-        neighbors = nearest_neighbors.fit(self.model_df)
-        distances, indices = neighbors.kneighbors(self.model_df)
+        neighbors = nearest_neighbors.fit(self.modelling_data)
+        distances, indices = neighbors.kneighbors(self.modelling_data)
 
         distances = np.sort(distances[:,cluster-1], axis=0)
 
