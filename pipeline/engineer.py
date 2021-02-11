@@ -7,7 +7,7 @@ from utils.clean import clean_text
 class Engineer:
     def __init__(self, config):
         self.config = config
-        self.reviews_data_loader = DataLoader(config.reviews.base_data_path)
+        self.reviews_data_loader = DataLoader(config.reviews.interim_data_path)
         self.profiles_data_loader = DataLoader(config.profiles.base_data_path)
         self.products_data_loader = DataLoader(config.products.base_data_path)
         self.review_activity_data_loader = DataLoader(config.review_activity.base_data_path)
