@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 import tqdm
 
+import numpy as np
+
 def create_embedding_df(reviews, model):
     vec = CountVectorizer(ngram_range = (1,1))
     vec.fit_transform(reviews)
