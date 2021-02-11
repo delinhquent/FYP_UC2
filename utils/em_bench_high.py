@@ -14,7 +14,7 @@ from collections import Counter
 import json
 
 # parameters of the algorithm:
-averaging = 30
+averaging = 50
 max_features = 5
 n_generated = 100000
 alpha_min = 0.9
