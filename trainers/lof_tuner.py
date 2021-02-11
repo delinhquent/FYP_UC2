@@ -48,7 +48,7 @@ t distribution with dfc degrees of freedom and ncpc noncentrality parameter
 
 
 class LOFAutoTuner(object):
-    def __init__(self, n_samples = 500, c_max = 0.1, k_max = 50, data = None):
+    def __init__(self, n_samples = 500, c_max = 0.1, k_max = 10, data = None): #original params for k_max was 50
     
         if data is None:
             self.n_samples = n_samples
@@ -60,10 +60,12 @@ class LOFAutoTuner(object):
         self.eps = 1e-8
         self.c_max = c_max
         self.k_max = k_max
-        self.c_steps = 100
-        self.k_grid = np.arange(1,self.k_max + 1) #neighbors
-        self.c_grid = np.linspace(0.005, self.c_max, self.c_steps) #contamination
-    
+        # self.c_steps = 100 # original configuration
+        self.c_steps = 0.005
+        self.k_grid = np.arange(3,self.k_max + 1) #neighbors
+        # self.c_grid = np.linspace(0.005, self.c_max, self.c_steps) #contamination, original configuration
+        self.c_grid = np.arange(0.05, self.c_max, self.c_steps)
+
     def run(self):
         self.collector = []
         #main op
@@ -73,6 +75,7 @@ class LOFAutoTuner(object):
             #init running metrics
             running_metrics = defaultdict(list)
             for k in self.k_grid:
+                print("Current contamination: {}\nCurrent neighbours: {}".format(contamination,k))
                 clf = LocalOutlierFactor(n_neighbors=k, contamination=contamination)
                 clf.fit_predict(self.data)
                 X_scores = np.log(- clf.negative_outlier_factor_)
