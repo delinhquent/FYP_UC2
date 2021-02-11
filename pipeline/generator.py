@@ -7,6 +7,7 @@ from preprocess.preprocessor import Preprocessor
 from gensim.models import KeyedVectors
 from gensim.models.fasttext import FastText
 from gensim.models import Word2Vec
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.scripts.glove2word2vec import glove2word2vec
 from gensim.test.utils import get_tmpfile
 
@@ -14,10 +15,12 @@ import pickle
 
 import os
 
+import numpy as np
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from utils.engineer_functions import temp_new_text
-from utils.embedding import create_embedding_df
+from utils.embedding import create_embedding_df, avg_sentence_vector
 
 
 class Generator:
@@ -34,6 +37,7 @@ class Generator:
         self.glove_data = None
         self.fasttext_data = None
         self.word2vec_data = None
+        self.doc2vec_data = None
 
     def load_preprocessor(self):
         self.profiles_data = self.get_profiles_data()
@@ -42,9 +46,9 @@ class Generator:
     def embed_words(self):
         self.reviews_data = self.get_reviews_data()
 
-        self.tfidf_data = self.get_tfidf_vector()
-        print("Saving embeddings into csv...")
-        self.tfidf_data.to_csv(self.config.tfidf.reviews_vector, index= False)
+        # self.tfidf_data = self.get_tfidf_vector()
+        # print("Saving embeddings into csv...")
+        # self.tfidf_data.to_csv(self.config.tfidf.reviews_vector, index= False)
 
         params = {
             "embedding_size": 300,
@@ -64,21 +68,24 @@ class Generator:
         # print("Saving embeddings into csv...")
         # self.glove_data.to_csv(self.config.glove.reviews_vector, index= False)
 
+        self.doc2vec_data = self.get_doc2vec_vector()
+        print("Saving embeddings into csv...")
+        self.doc2vec_data.to_csv(self.config.doc2vec.reviews_vector, index= False)
+
     def preprocess_review_activity(self):
         self.review_activity_data = self.preprocessor.preprocess_review_activity()
 
     def get_tfidf_vector(self):
         print("Generating TFIDF Vector...")
-        try:
-            vec = TfidfVectorizer (ngram_range = (1,2),min_df=0.1,max_df=0.9)
-            tfidf_reviews = vec.fit_transform(self.reviews_data['cleaned_text'].astype(str))
+        
+        vec = TfidfVectorizer (ngram_range = (1,2),min_df=0.1, max_df =0.9)
+        tfidf_reviews = vec.fit_transform(self.reviews_data['cleaned_text'].astype(str))
 
-            pickle.dump(vec, open(self.config.tfidf.model_file,"wb"))
-            # vec = pickle.load(open(self.config.tfidf.model_file, "rb")) # keeping this code for future development
+        pickle.dump(vec, open(self.config.tfidf.model_file,"wb"))
+        # vec = pickle.load(open(self.config.tfidf.model_file, "rb")) # keeping this code for future development
 
-            tfidf_reviews_df = pd.DataFrame(tfidf_reviews.toarray(), columns=vec.get_feature_names())
-        except Exception as e:
-            print(e)
+        tfidf_reviews_df = pd.DataFrame(tfidf_reviews.toarray(), columns=vec.get_feature_names())
+            
         return tfidf_reviews_df.fillna(value=0)
 
     def get_fasttext_vector(self,params):
@@ -123,6 +130,30 @@ class Generator:
         word2vec_reviews_df = self.reviews_data['cleaned_text'].astype(str).str.split().apply(avg_sentence_vector,model=word2vec_model,num_features = num_features,vocab = vocab_list)
                     
         return word2vec_reviews_df.fillna(value=0)
+
+    def get_doc2vec_vector(self):
+        # retrieve glove vector
+        print("Generating Doc2Vec model...")
+        documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(self.reviews_data['cleaned_text'].astype(str).str.split())]
+        doc2vec_model = Doc2Vec(documents,window=5, min_count=3, workers=2,dm = 1,alpha=0.025, min_alpha=0.001)
+        
+        doc2vec_model.train(documents, total_examples=doc2vec_model.corpus_count, epochs=30, start_alpha=0.002, end_alpha=-0.016)
+
+        print("Generating Vector with Doc2Vec...")
+        doc2vec_values = self.reviews_data['cleaned_text'].astype(str).str.split().apply(doc2vec_model.infer_vector,steps=20, alpha=0.025)
+
+        rows = doc2vec_values.shape[0]
+        columns = doc2vec_values[0].shape[0]
+        
+        doc2vec_reviews_df = pd.DataFrame(columns = ['doc2vec_feature'+str(i) for i in range(1,columns+1)])
+        for index, value in enumerate(doc2vec_values):
+            print("Adding doc2vec vector @ index {}".format(index))
+            doc2vec_reviews_df = doc2vec_reviews_df.append(dict(zip(doc2vec_reviews_df.columns, value)), ignore_index=True)
+
+        print("Saving Doc2Vec model...")
+        doc2vec_model.save(self.config.doc2vec.model_file)
+
+        return doc2vec_reviews_df
     
     def get_glove_vector(self):
         if not os.path.exists(self.config.glove.word2vec_output_file):
