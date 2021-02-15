@@ -5,8 +5,8 @@ generate_review_activity_dataset:
     md5: b8eafe5ddb1e825f768aebd706a53e60
     size: 1609255550
   - path: pipeline/generator.py
-    md5: 989b57e7554ffbd80de1f044fc19c982
-    size: 1138
+    md5: ed43414c1f6e23c5914eacbad518c7b8
+    size: 8487
   - path: preprocess/preprocessor.py
     md5: f6dc6fc933a7150dc4c7bed54ac6efd1
     size: 704
@@ -23,27 +23,39 @@ generate_review_activity_dataset:
   - path: data/uc2/interim/consolidated_review_activity.csv
     md5: 91c3841ebf9c61efa6aa69b4db458cf5
     size: 360603185
+  - path: data/uc2/interim/doc2vec_embedding.csv
+    md5: c2a2800e9eb2f41cb744ce08e4d319f6
+    size: 186122880
+  - path: models/word_embedding/doc2vec.model
+    md5: e568e2b3cc419a7e81e5f06858142bc6
+    size: 62336384
 feature_engineering:
   cmd: python main.py -m build_features
   deps:
   - path: data/base/consolidated_product_info.csv
     md5: a1a131e3274424f81927a76aeb22cb8b
     size: 87831
-  - path: data/base/consolidated_products.csv
-    md5: 5b3d820ee2da231c8bdf9a2632ad34f7
-    size: 109549672
   - path: data/base/consolidated_profiles.csv
     md5: b8eafe5ddb1e825f768aebd706a53e60
     size: 1609255550
+  - path: data/uc2/interim/consolidated_products_labelled.csv
+    md5: 3f4245c6cbe1cdc0e11d7c46adea1569
+    size: 109303624
   - path: data/uc2/interim/consolidated_review_activity.csv
     md5: 91c3841ebf9c61efa6aa69b4db458cf5
     size: 360603185
+  - path: data/uc2/interim/doc2vec_embedding.csv
+    md5: c2a2800e9eb2f41cb744ce08e4d319f6
+    size: 186122880
   - path: engineer/engineer.py
     md5: 09434526e333274a2370ade2d42b9062
     size: 1249
+  - path: models/word_embedding/doc2vec.model
+    md5: e568e2b3cc419a7e81e5f06858142bc6
+    size: 62336384
   - path: pipeline/engineer.py
-    md5: bacc29c06f945005cbca1683f56aa973
-    size: 3501
+    md5: 3aa783bf2be8343261d31b48a90269a5
+    size: 3504
   - path: src/features/build_features.py
     md5: 8d5066f9d33c2cdcc17ef4988e6ef0c7
     size: 1725
@@ -51,12 +63,12 @@ feature_engineering:
     md5: b6e0812677d5a22d054209532e05f58e
     size: 5248
   - path: utils/engineer.py
-    md5: 11c7627982bebb7236a355707c46d096
-    size: 7470
+    md5: feeb93acecadf96a302ddc8eb9e96e2e
+    size: 7740
   - path: utils/engineer_functions.py
-    md5: 7c21e6f89713bbc9e690992e320ab203
-    size: 12968
+    md5: 8b828fc800d4ccb36f34b82925209d80
+    size: 13389
   outs:
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: b28c0bb90e6e8c5031e539b6a3ee533b
-    size: 43961796
+    md5: 89001f0bdfcc3ee11816e81d428e5b8a
+    size: 56196074

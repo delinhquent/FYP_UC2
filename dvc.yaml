@@ -10,19 +10,13 @@ stages:
     - utils/reformat.py
     outs:
     - data/uc2/interim/consolidated_review_activity.csv
-    - models/word_embedding/glove.6B.300d.txt.word2vec
-    - data/uc2/interim/glove_embedding.csv
-    - models/word_embedding/fasttext.model
-    - data/uc2/interim/fasttext_embedding.csv
-    - models/word_embedding/word2vec.model
-    - data/uc2/interim/word2vec_embedding.csv
-    - models/word_embedding/tfidf.pickle
-    - data/uc2/interim/tfidf.csv
+    - models/word_embedding/doc2vec.model
+    - data/uc2/interim/doc2vec_embedding.csv
   feature_engineering:
     cmd: python main.py -m build_features
     deps:
     - data/base/consolidated_profiles.csv
-    - data/base/consolidated_products.csv
+    - data/uc2/interim/consolidated_products_labelled.csv
     - data/base/consolidated_product_info.csv
     - data/uc2/interim/consolidated_review_activity.csv
     - src/features/build_features.py
@@ -31,13 +25,25 @@ stages:
     - utils/clean.py
     - utils/engineer.py
     - utils/engineer_functions.py
-    - models/word_embedding/glove.6B.300d.txt.word2vec
-    - data/uc2/interim/glove_embedding.csv
-    - models/word_embedding/fasttext.model
-    - data/uc2/interim/fasttext_embedding.csv
-    - models/word_embedding/word2vec.model
-    - data/uc2/interim/word2vec_embedding.csv
-    - models/word_embedding/tfidf.pickle
-    - data/uc2/interim/tfidf.csv
+    - models/word_embedding/doc2vec.model
+    - data/uc2/interim/doc2vec_embedding.csv
     outs:
     - data/uc2/processed/fake_framework_features.csv
+  train_model:
+    cmd: python main.py -m train_model -model ocsvm -feature_select y -normalize y -text_represent doc2vec
+    deps:
+    - data/uc2/processed/fake_framework_features.csv
+    - data/uc2/interim/doc2vec_embedding.csv
+    - src/models/train_model.py
+    - impactscorer/impactscorer.py
+    - pipeline/trainer.py
+    - featureselector/featureselector.py
+    - trainers/pyodmodel.py
+    - trainers/ocsvm_tuner.py
+    - trainers/ocsvm_datashift_algorithm.py
+    - utils/em_bench_high.py
+    - utils/em.py
+    outs:
+    - models/results/ocsvm_results.csv
+    - models/results/ocsvm_feature_importance.json
+    - models/ocsvm.joblib
