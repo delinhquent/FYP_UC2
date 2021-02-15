@@ -23,15 +23,18 @@ class PyodModel:
         self.modelling_data = self.model_df[interested_columns]
 
     def hypertune_ocsvm(self, results):
-        print("Finding optimal nu and gamma value for One-Class Support Vector Machine...")
+    # def hypertune_ocsvm(self):
+        print("Finding optimal kernel, nu and gamma value for One-Class Support Vector Machine...")
         
-        evaluate_df = self.model_df[self.model_df['manual_label'].isin([0,1])]
-        X = evaluate_df.values
-        y = evalaute_df['manual_label'].values
+        # evaluate_df = self.model_df[self.model_df['manual_label'].isin([0,1])]
+        # X = evaluate_df.values
+        # y = evaluate_df['manual_label'].values
+        # print("Using labelled dataset of {}...\n".format(X.shape))
+        # self.model = find_best_ocsvm(X, y)
+        
+        print("Using model's output of {}...\n".format(results.shape))
+        self.model = find_best_ocsvm(self.modelling_data.values, results)
 
-        # self.model = find_best_ocsvm(self.model_df.values, results)
-        self.model = find_best_ocsvm(X, y)
-        
         return self.model.get_params()
     
     def make_pyod_model(self,model):
