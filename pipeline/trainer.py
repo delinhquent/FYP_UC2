@@ -124,6 +124,8 @@ class Trainer:
         # print("Assessing impact...")
         # assessor = ImpactScorer(self.model_data)
 
+        # self.model_data = assessor.assess_impact()
+
         print("Saving results...")
         self.save_results(metrics)
 
@@ -247,6 +249,7 @@ class Trainer:
             "copod":"Copula Based Outlier Detector", "hbos": "Histogram-based Outlier Detection"}
         print("Loading {}...".format(name_dict[self.model]))
         self.trainer = PyodModel(model_config = self.model_config, model_df = self.modelling_data)
+
         params = self.trainer.make_pyod_model(self.model)
 
         if self.model == "ocsvm":
