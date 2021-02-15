@@ -16,6 +16,7 @@ from utils.em_bench_high import calculate_emmv_score
 
 
 def find_best_ocsvm(X,y):
+    print("Tuning One-Class SVM...")
     y_value = np.unique(y)
 
     f_index = np.where(y == y_value[0])[0]
@@ -33,21 +34,27 @@ def find_best_ocsvm(X,y):
     pseudo_outlier_y = -np.ones(len(pseudo_outlier_X))
     pseudo_target_y = np.ones(len(pseudo_target_X))
 
-    gamma_candidates = [1e-2, 1e-1, 1e-0, 1e+1, 1e+2, 1/np.size(target_X, -1)]
-    nu_candidates = [0.01, 0.1, 0.5]
+    kernel_candidates = ['linear', 'poly', 'rbf', 'sigmoid']
+    gamma_candidates = [1e-4, 1e-3, 1e-2, 1e-1, 1e-0, 1e+1, 1e+2, 1e+3, 1/np.size(target_X, -1)]
+    nu_candidates = [0.005, 0.01, 0.05, 0.1, 0.5]
 
-    best_err = 1.0
-    best_gamma, best_nu = 1/np.size(target_X, -1), 0.5
-    for gamma in tqdm(gamma_candidates):
-        for nu in tqdm(nu_candidates):
-            model = OCSVM(gamma=gamma, nu=nu).fit(target_X_train)
-            err_o = 1 - np.mean(model.predict(pseudo_outlier_X) == pseudo_outlier_y)
-            err_t = 1 - np.mean(model.predict(pseudo_target_X) == pseudo_target_y)
-            err = float((err_o + err_t) / 2)
-            if err < best_err:
-                best_err = err
-                best_gamma = gamma
-                best_nu = nu
+    try:
+        best_err = 1.0
+        best_gamma, best_nu,best_kernel = 1/np.size(target_X, -1), 0.5,'rbf'
+        for kernel in tqdm(kernel_candidates):
+            for gamma in tqdm(gamma_candidates):
+                for nu in tqdm(nu_candidates):
+                    model = OCSVM(kernel=kernel,gamma=gamma, nu=nu).fit(target_X_train)
+                    err_o = 1 - np.mean(model.predict(pseudo_outlier_X) == pseudo_outlier_y)
+                    err_t = 1 - np.mean(model.predict(pseudo_target_X) == pseudo_target_y)
+                    err = float((err_o + err_t) / 2)
+                    if err < best_err:
+                        best_err = err
+                        best_gamma = gamma
+                        best_nu = nu
+                        best_kernel = kernel
+    except Exception as e:
+        print(e)
 
-    best_model = OCSVM(kernel='rbf', gamma=best_gamma, nu=best_nu)
+    best_model = OCSVM(kernel=best_kernel, gamma=best_gamma, nu=best_nu)
     return best_model
