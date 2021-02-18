@@ -10,7 +10,9 @@
   },
   "profiles": {
     "raw_data_path" : "data/raw/consolidated_profiles.csv",
-    "base_data_path": "data/base/consolidated_profiles.csv"
+    "base_data_path": "data/base/consolidated_profiles.csv",
+    "interim_data_path": "data/uc2/interim/consolidated_profiles.csv",
+    "save_data_path": "data/uc2/processed/suspicious_reviewers_metrics.csv"
   },
   "review_activity": {
     "base_data_path" : "data/uc2/interim/consolidated_review_activity.csv"
