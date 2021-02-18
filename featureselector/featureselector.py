@@ -26,7 +26,7 @@ class FeatureSelector:
         # current_features = list(d.keys())
         max_value = max(d.values())
         d = {k: v / max_value for k, v in d.items()}
-        current_features = [k for k, v in d.items() if v >= 0.5]
+        current_features = [k for k, v in d.items() if v >= 0.25]
         return current_features
 
     def variance(self):
