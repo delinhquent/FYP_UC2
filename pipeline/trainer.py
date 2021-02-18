@@ -28,6 +28,8 @@ class Trainer:
             setattr(self, key, kwargs.get(key))
         self.model_data_loader = DataLoader(self.config.model.save_data_path)
         self.model_data = None
+        self.profile_data_loader = DataLoader(self.config.profiles.interim_data_path)
+        self.profile_data = None
         self.tfidf_data_loader = DataLoader(self.config.tfidf.reviews_vector)
         self.tfidf_data = None
         self.doc2vec_data_loader = DataLoader(self.config.doc2vec.reviews_vector)
@@ -38,6 +40,7 @@ class Trainer:
     def load_data(self):
         self.model_data = self.get_model_data()
         self.doc2vec_data = self.get_dov2vec_data()
+        self.profile_data = self.get_profile_data()
 
     def get_model_data(self):
         self.model_data_loader.load_data()
@@ -50,6 +53,10 @@ class Trainer:
     def get_dov2vec_data(self):
         self.doc2vec_data_loader.load_data()
         return self.doc2vec_data_loader.get_data()
+
+    def get_profile_data(self):
+        self.profile_data_loader.load_data()
+        return self.profile_data_loader.get_data()
     
     def get_modelling_data(self):
         self.model_data = self.model_data[self.model_data['asin'].notnull()]
@@ -121,13 +128,15 @@ class Trainer:
         else:
             self.model_data['fake_reviews'] = results
 
-        # print("Assessing impact...")
-        # assessor = ImpactScorer(self.model_data)
+        print("Assessing impact...")
+        assessor = ImpactScorer(self.model_data,self.profile_data)
 
-        # self.model_data = assessor.assess_impact()
+        self.model_data, self.profile_data = assessor.assess_impact()
 
         print("Saving results...")
         self.save_results(metrics)
+        interested_columns = ['acc_num','proportion_fake_reviews','suspicious_reviewer_score']
+        self.profile_data[interested_columns].to_csv(self.config.profiles.save_data_path,index=False)
 
     def select_pipeline(self):
         if self.model == "dbscan":
