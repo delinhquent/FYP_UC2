@@ -54,21 +54,71 @@ feature_engineering:
     md5: e568e2b3cc419a7e81e5f06858142bc6
     size: 62336384
   - path: pipeline/engineer.py
-    md5: 3aa783bf2be8343261d31b48a90269a5
-    size: 3504
+    md5: 1f2cf37653b9b358e528631a98e624cf
+    size: 3628
   - path: src/features/build_features.py
-    md5: 8d5066f9d33c2cdcc17ef4988e6ef0c7
-    size: 1725
+    md5: 8ff7539f3a948d7b9cc5291290b9ac01
+    size: 1811
   - path: utils/clean.py
     md5: b6e0812677d5a22d054209532e05f58e
     size: 5248
   - path: utils/engineer.py
-    md5: feeb93acecadf96a302ddc8eb9e96e2e
-    size: 7740
+    md5: 11ef74140cf7eff886843929cfd0c527
+    size: 7833
   - path: utils/engineer_functions.py
     md5: 8b828fc800d4ccb36f34b82925209d80
     size: 13389
   outs:
+  - path: data/uc2/interim/consolidated_profiles.csv
+    md5: 9eb131a2a027cee685e6d65f45056ce6
+    size: 1615971247
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: 89001f0bdfcc3ee11816e81d428e5b8a
-    size: 56196074
+    md5: a90d06d1d8cf1e2e189377f1a9edc896
+    size: 56188769
+train_model:
+  cmd: python main.py -m train_model -model ocsvm -feature_select y -normalize y -text_represent
+    doc2vec
+  deps:
+  - path: data/uc2/interim/doc2vec_embedding.csv
+    md5: c2a2800e9eb2f41cb744ce08e4d319f6
+    size: 186122880
+  - path: data/uc2/processed/fake_framework_features.csv
+    md5: a90d06d1d8cf1e2e189377f1a9edc896
+    size: 56188769
+  - path: featureselector/featureselector.py
+    md5: 3cf015c7f96a0dc91687ff0c8afb3809
+    size: 2249
+  - path: impactscorer/impactscorer.py
+    md5: 2212d5426bab85bb0270169cdb25e388
+    size: 5050
+  - path: pipeline/trainer.py
+    md5: ce8bc0d2335ba4899f57dd5375bceece
+    size: 11903
+  - path: src/models/train_model.py
+    md5: eef7dd15b602d5c176dea3e0f4f8378f
+    size: 950
+  - path: trainers/ocsvm_datashift_algorithm.py
+    md5: 10e6c3123811ad3d659956fc362b026c
+    size: 3329
+  - path: trainers/ocsvm_tuner.py
+    md5: 63d9aa4f871a7ef8b531b4b980f1674c
+    size: 2583
+  - path: trainers/pyodmodel.py
+    md5: a8a9a2e4d65508bca3857b67990c2586
+    size: 3552
+  - path: utils/em.py
+    md5: f642809fe956ddedfd432482251c2df2
+    size: 1576
+  - path: utils/em_bench_high.py
+    md5: 222bd29f87a508df519149c080c85133
+    size: 3286
+  outs:
+  - path: models/ocsvm.joblib
+    md5: 37d5ecc9c05a7a1116796c18de9dd457
+    size: 421738
+  - path: models/results/ocsvm_feature_importance.json
+    md5: 5279d7f08e4062c9d6cc31d0fdf5b806
+    size: 2249
+  - path: models/results/ocsvm_results.csv
+    md5: 2533afdcf4881a6a042958dc877029b9
+    size: 1962452404
