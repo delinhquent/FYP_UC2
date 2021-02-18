@@ -71,6 +71,9 @@ class Engineer:
 
     def generate_modelling_dataset(self):
         self.model_data = self.engineer.generate_modelling_dataset()
+    
+    def save_profiles(self):
+        self.profiles_data.to_csv(self.config.profiles.interim_data_path, index=False)
 
     def save_modelling_data(self):
         self.model_data.to_csv(self.config.model.save_data_path, index=False)
