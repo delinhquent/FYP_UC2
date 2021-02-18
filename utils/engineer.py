@@ -106,7 +106,10 @@ def engineer_profiles(df, review_activity_df):
 
     # clean deleted status column
     df.loc[df.cleaned_deleted_status == True, 'cleaned_deleted_status'] = 1
-    df.loc[df.cleaned_deleted_status == False, 'cleaned_deleted_status'] = 0
+    df.loc[df.cleaned_deleted_status == False, 'cleaned_deleted_status'] = 0   
+
+    # remove duplicates
+    df = df.drop_duplicates(subset=['acc_num'], keep='first')
 
     # return dataframe
     return df
