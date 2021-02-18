@@ -39,6 +39,9 @@ def engineer_profiles_only(data_engineer):
     print("Engineering features for profiles dataset...")
     data_engineer.engineer_profiles()
 
+    print("Saving interim profiles dataset...")
+    data_engineer.save_profiles()
+
 def engineer_products_only(data_engineer):
     print("Engineering features for products dataset...")
     data_engineer.engineer_products()
