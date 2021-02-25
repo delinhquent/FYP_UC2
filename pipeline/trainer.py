@@ -62,7 +62,7 @@ class Trainer:
         self.model_data = self.model_data[self.model_data['asin'].notnull()]
         self.model_data = self.model_data[self.model_data['acc_num'].notnull()]
         print("Current dataset size after dropping null values: {}".format(self.model_data.shape))
-        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','cleaned_reviews_text','cleaned_reviews_date_posted','manual_label']
+        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','locale','manual_label']
         self.modelling_data = self.model_data
         manual_labels = self.modelling_data['manual_label']
         self.modelling_data = self.modelling_data.drop(columns=unnessary_columns)
@@ -261,9 +261,9 @@ class Trainer:
 
         params = self.trainer.make_pyod_model(self.model)
 
-        if self.model == "ocsvm":
-            results, decisions = self.trainer.predict_anomalies()
-            params = self.trainer.hypertune_ocsvm(results)
+        # if self.model == "ocsvm":
+        #     results, decisions = self.trainer.predict_anomalies()
+        #     params = self.trainer.hypertune_ocsvm(results)
 
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
