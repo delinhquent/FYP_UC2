@@ -56,7 +56,7 @@ class ImpactScorer:
         print("Creating heuristics for users...")
         self.create_profile_heuristics()
 
-        self.model_df = pd.merge(self.model_df,self.profiles_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
+        self.model_df = pd.merge(self.model_df,self.profiles_df[['acc_num','suspicious_reviewer_score','proportion_fake_reviews']],left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
 
         print("Evaluating recency of reviews...")
         self.create_time_scores()
