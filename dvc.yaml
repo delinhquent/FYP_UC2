@@ -31,7 +31,7 @@ stages:
     - data/uc2/processed/fake_framework_features.csv
     - data/uc2/interim/consolidated_profiles.csv
   train_model:
-    cmd: python main.py -m train_model -model ocsvm -feature_select y -normalize y -text_represent doc2vec
+    cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent doc2vec
     deps:
     - data/uc2/processed/fake_framework_features.csv
     - data/uc2/interim/doc2vec_embedding.csv

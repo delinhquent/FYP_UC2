@@ -63,8 +63,8 @@ feature_engineering:
     md5: b6e0812677d5a22d054209532e05f58e
     size: 5248
   - path: utils/engineer.py
-    md5: 11ef74140cf7eff886843929cfd0c527
-    size: 7833
+    md5: da66406c4477c625adf2efaccfc08567
+    size: 7870
   - path: utils/engineer_functions.py
     md5: 8b828fc800d4ccb36f34b82925209d80
     size: 13389
@@ -73,27 +73,27 @@ feature_engineering:
     md5: 9eb131a2a027cee685e6d65f45056ce6
     size: 1615971247
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: a90d06d1d8cf1e2e189377f1a9edc896
-    size: 56188769
+    md5: 0327388b0917c4e69708fa98d0b355db
+    size: 74497311
 train_model:
-  cmd: python main.py -m train_model -model ocsvm -feature_select y -normalize y -text_represent
+  cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent
     doc2vec
   deps:
   - path: data/uc2/interim/doc2vec_embedding.csv
     md5: c2a2800e9eb2f41cb744ce08e4d319f6
     size: 186122880
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: a90d06d1d8cf1e2e189377f1a9edc896
-    size: 56188769
+    md5: 0327388b0917c4e69708fa98d0b355db
+    size: 74497311
   - path: featureselector/featureselector.py
     md5: 3cf015c7f96a0dc91687ff0c8afb3809
     size: 2249
   - path: impactscorer/impactscorer.py
-    md5: 2212d5426bab85bb0270169cdb25e388
-    size: 5050
+    md5: 3e73f777469c0fd7a53a0011f8f2dcc9
+    size: 5117
   - path: pipeline/trainer.py
-    md5: ce8bc0d2335ba4899f57dd5375bceece
-    size: 11903
+    md5: f65da6c4d1d65d5241bccd02eeaafdaa
+    size: 11930
   - path: src/models/train_model.py
     md5: eef7dd15b602d5c176dea3e0f4f8378f
     size: 950
@@ -114,11 +114,11 @@ train_model:
     size: 3286
   outs:
   - path: models/ocsvm.joblib
-    md5: 37d5ecc9c05a7a1116796c18de9dd457
-    size: 421738
+    md5: 64985c1bde1ed9562e078de0e9f9a3ca
+    size: 421678
   - path: models/results/ocsvm_feature_importance.json
-    md5: 5279d7f08e4062c9d6cc31d0fdf5b806
-    size: 2249
+    md5: 58fc9d3738a1224e894baccf418d6f09
+    size: 3913
   - path: models/results/ocsvm_results.csv
-    md5: 2533afdcf4881a6a042958dc877029b9
-    size: 1962452404
+    md5: 8ddb81374ff5b67bed8a14a3276757a8
+    size: 77158441
