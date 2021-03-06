@@ -38,9 +38,10 @@ if __name__ == '__main__':
         elif mode == 'train_model':
             model = args.model
             
-            valid_models = {'dbscan': "DBSCAN",'isolation_forest': "Isolation Forest",'eif':"EIF", "lof": "LOF", "rrcf":"Robust Random Cut Forest",
-                            "ocsvm":"One-Class SVM", "copod":"Copula Based Outlier Detector", "hbos":"Histogram-based Outlier Detection",'pyod_isolation_forest': "PYOD Isolation Forest",
-                            "pyod_lof": "PYOD LOF"}
+            # valid_models = {'dbscan': "DBSCAN",'isolation_forest': "Isolation Forest",'eif':"EIF", "lof": "LOF", "rrcf":"Robust Random Cut Forest",
+            #                 "ocsvm":"One-Class SVM", "copod":"Copula Based Outlier Detector", "hbos":"Histogram-based Outlier Detection",'pyod_isolation_forest': "PYOD Isolation Forest",
+            #                 "pyod_lof": "PYOD LOF"}
+            valid_models = {"ocsvm":"One-Class SVM"}
 
             if model == None:
                 print("Please parse the model's names using -model respectively...")
@@ -54,7 +55,8 @@ if __name__ == '__main__':
                 normalize = str(args.normalize).lower()
 
                 normalize_feature_select_valid_values = ['y','n','Y','N']
-                text_represent_valid_values = ['tfidf','glove','fasttext','word2vec','doc2vec']
+                # text_represent_valid_values = ['tfidf','glove','fasttext','word2vec','doc2vec']
+                text_represent_valid_values = ['doc2vec']
 
                 if text_represent in text_represent_valid_values and feature_select in normalize_feature_select_valid_values and normalize in normalize_feature_select_valid_values:
                     model_config = process_config(args.model_config)
