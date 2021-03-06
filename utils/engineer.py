@@ -36,6 +36,7 @@ def engineer_reviews(df, sample_incentivized_list, products_df):
     # engineer sentiment analysis for decoded and cleaned text
     sid = SentimentIntensityAnalyzer()
     df['cleaned_sentiment'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
+    df['cleaned_sentiment'] = df['cleaned_sentiment'].fillna(value=0)
 
     # tfidf
     df = cosine_similarity(df, products_df)
@@ -76,6 +77,8 @@ def engineer_profiles(df, review_activity_df):
     # engineer reviewer ease and helpful Votes feature
     df = calculate_average(df, review_activity_df, 'cleaned_ratings', 'cleaned_reviewer_ease_score')
     df = calculate_average(df, review_activity_df, 'helpfulVotes', 'cleaned_average_helpfulVotes')
+    df['cleaned_average_helpfulVotes'] = df['cleaned_average_helpfulVotes'].fillna(value=0)
+    df['cleaned_reviewer_ease_score'] = df['cleaned_reviewer_ease_score'].fillna(value=0)
 
     # engineer total reviews posted
     df = calculate_total_reviews(df, review_activity_df, 'acc_num')
@@ -168,8 +171,6 @@ def generate_modelling_dataset(reviews_df, profiles_df, products_df):
     df = pd.merge(df,profiles_df,left_on=['acc_num'], right_on = ['acc_num'], how = 'left')
 
     print("Size of Modelling Dataset after merging: {}...".format(df.shape))
-    
-    print("Size of Modelling Dataset after dropping null asin: {}...".format(df.shape))
-    
-    return df.fillna(0)
+
+    return df
 
