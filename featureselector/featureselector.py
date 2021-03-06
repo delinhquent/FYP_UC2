@@ -17,16 +17,8 @@ class FeatureSelector:
         total_features = len(self.df.columns)
         print("Total Features to proceed with Feature Selection: {}...".format(total_features))
 
-        # print("Selecting Important Features using Variance Threshold...")
-        # current_features = self.variance()
-        # print("Proceeding with Feature Selection using Dispersion Ratio...")
-        # current_features = self.dispersion_ratio()
-        f = open('models/results/baseline_ocsvm_feature_importance.json',)
-        d = json.load(f)
-        # current_features = list(d.keys())
-        max_value = max(d.values())
-        d = {k: v / max_value for k, v in d.items()}
-        current_features = [k for k, v in d.items() if v >= 0.25]
+        print("Selecting Important Features using Variance Threshold...")
+        current_features = self.variance()
         return current_features
 
     def variance(self):
