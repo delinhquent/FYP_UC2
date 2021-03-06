@@ -11,7 +11,7 @@ import numpy as np
 from impactscorer.impactscorer import ImpactScorer
 
 from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import normalize, StandardScaler 
+from sklearn.preprocessing import normalize, StandardScaler
 
 from trainers.dbscan import DBScan
 from trainers.isolationforest import IsoForest
@@ -30,8 +30,6 @@ class Trainer:
         self.model_data = None
         self.profile_data_loader = DataLoader(self.config.profiles.interim_data_path)
         self.profile_data = None
-        self.tfidf_data_loader = DataLoader(self.config.tfidf.reviews_vector)
-        self.tfidf_data = None
         self.doc2vec_data_loader = DataLoader(self.config.doc2vec.reviews_vector)
         self.doc2vec_data = None
         self.modelling_data = None
@@ -59,16 +57,7 @@ class Trainer:
         return self.profile_data_loader.get_data()
     
     def get_modelling_data(self):
-        self.model_data = self.model_data[self.model_data['asin'].notnull()]
-        self.model_data = self.model_data[self.model_data['acc_num'].notnull()]
-        print("Current dataset size after dropping null values: {}".format(self.model_data.shape))
-        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','locale','manual_label']
         self.modelling_data = self.model_data
-        manual_labels = self.modelling_data['manual_label']
-        self.modelling_data = self.modelling_data.drop(columns=unnessary_columns)
-        self.modelling_data = self.modelling_data.fillna(value=0)
-        
-        print(self.modelling_data.shape)
         
         print("Combining vectors with dataset...")
         if self.text_represent == 'tfidf':
@@ -82,27 +71,43 @@ class Trainer:
         elif self.text_represent == 'doc2vec':
             self.modelling_data = pd.merge(self.modelling_data, self.doc2vec_data, left_index=True, right_index=True)
 
+        self.modelling_data = self.modelling_data[self.modelling_data['asin'].notnull()]
+        self.modelling_data = self.modelling_data[self.modelling_data['acc_num'].notnull()]
+        self.modelling_data = self.modelling_data[self.modelling_data['cleaned_reviews_text'].notnull()]
+        self.modelling_data['index'] = self.modelling_data.index
+        print("Current dataset size after dropping null values: {}".format(self.modelling_data.shape))
+
+        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','locale','manual_label']
+        unnecessary_df = self.modelling_data[['index'] + unnessary_columns]
+
+        modelling_df = self.modelling_data
+        modelling_df = modelling_df.drop(columns=unnessary_columns)
+        modelling_df = modelling_df.fillna(0)
+        print("Dataset for feature selection and (or) normalization: {}".format(modelling_df.shape))
+
 
         if self.feature_select == 'y':
             print("Proceeding with Feature Selection...")
-            feature_selector = FeatureSelector(self.modelling_data)
+            feature_selector = FeatureSelector(modelling_df)
             important_features = feature_selector.select_features()
 
-            exist_important_features = [feature for feature in important_features if feature in self.model_data]
-            self.model_data = self.model_data[unnessary_columns+exist_important_features]
-
-            self.modelling_data = self.modelling_data[important_features]
+            modelling_df = modelling_df[important_features]
         
         if self.normalize == 'y':
             print("Normalizing Data...")
-            self.modelling_data = self.normalize_data(self.modelling_data)
+            index = list(modelling_df['index'])
+            modelling_df = self.normalize_data(modelling_df.drop(columns='index'))
+            modelling_df['index'] = index
         
-        self.modelling_data['manual_label'] = manual_labels      
+        self.modelling_data = pd.merge(unnecessary_df,modelling_df,left_on=['index'], right_on = ['index'], how = 'left')
+        self.modelling_data = self.modelling_data.drop(columns='index')
+        print(self.modelling_data.shape)
+
 
     def normalize_data(self,modelling_df):
         scaler = StandardScaler() 
         X_scaled = scaler.fit_transform(modelling_df) 
-        pickle.dump(X_scaled, open('models/normalizer/feature_normalizer.pkl','wb'))
+        pickle.dump(X_scaled, open('models/normalizer/feature_normalizer_standard.pkl','wb'))
         # sc = pickle.load(open('file/path/scaler.pkl','rb')) # keeping this here for future development
         
         # Normalizing the data so that the data, approximately follows a Gaussian distribution 
@@ -113,20 +118,14 @@ class Trainer:
         
         # Renaming the columns 
         X_normalized.columns = modelling_df.columns 
-        
+
         return X_normalized
 
     def train_model(self):
         print("Retrieving necessary columns for modelling...")
         self.get_modelling_data()
-        print(self.modelling_data.shape)
 
-        metrics, results = self.select_pipeline()
-        
-        if -1 in results:
-            self.model_data['fake_reviews'] = [1 if x == -1 else 0 for x in results]
-        else:
-            self.model_data['fake_reviews'] = results
+        metrics, self.model_data = self.select_pipeline()
 
         print("Assessing impact...")
         assessor = ImpactScorer(self.model_data,self.profile_data)
@@ -137,6 +136,8 @@ class Trainer:
         self.save_results(metrics)
         interested_columns = ['acc_num','proportion_fake_reviews','suspicious_reviewer_score']
         self.profile_data[interested_columns].to_csv(self.config.profiles.save_data_path,index=False)
+
+        print("Training of Model Completed...")
 
     def select_pipeline(self):
         if self.model == "dbscan":
@@ -261,18 +262,11 @@ class Trainer:
 
         params = self.trainer.make_pyod_model(self.model)
 
-        # if self.model == "ocsvm":
-        #     results, decisions = self.trainer.predict_anomalies()
-        #     params = self.trainer.hypertune_ocsvm(results)
-
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
-        results, decisions = self.trainer.predict_anomalies()
+        self.trainer.predict_anomalies()
 
-        self.model_data["model_output"] = results
-        self.model_data["decision_function"] = decisions
-
-        metrics = self.trainer.evaluate_pyod_model(results,name_dict[self.model],self.model)
+        metrics, self.model_data = self.trainer.evaluate_pyod_model(name_dict[self.model],self.model)
         
-        return metrics, results
+        return metrics, self.model_data
