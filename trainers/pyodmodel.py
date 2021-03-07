@@ -31,7 +31,7 @@ class PyodModel:
         y = original_train_df['manual_label']
         X = original_train_df.drop(columns='manual_label')
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
         original_train_df = pd.merge(X_train, y_train, left_index=True, right_index=True)
 
@@ -80,11 +80,11 @@ class PyodModel:
         X_train = self.train_df.drop(columns='manual_label')
 
         # self.model.fit(X_train)
-        sample_size = 60000 
+        sample_size = 50000 
 
         sm = SMOTE(sampling_strategy={0: sample_size,1: sample_size}, random_state=0)
         augmented_y_train= y_train
-        augmented_y_train[:6] = 1
+        augmented_y_train[:len(X_train)//2] = 1
         X_train_res, y_train_res = sm.fit_sample(X_train, augmented_y_train)
         print("Fitting Train Dataset with Dataset Size {}...".format(X_train_res.shape))
         self.model.fit(X_train_res)
@@ -117,8 +117,7 @@ class PyodModel:
         else:
             em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=False, X = X_test, y = results, model = self.model, model_name = model)
 
-        # metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"em":em,"mv":mv}
-        metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore}
+        metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"em":em,"mv":mv}
 
         final_df = self.original_train_df.append(self.original_test_df, ignore_index=True)
 
