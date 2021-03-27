@@ -65,3 +65,6 @@ models/results/
 models/word_embedding/
 *.joblib
 *.pkl
+*.csv
+*.png
+*.jpg
