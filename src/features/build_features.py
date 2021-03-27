@@ -46,6 +46,9 @@ def engineer_products_only(data_engineer):
     print("Engineering features for products dataset...")
     data_engineer.engineer_products()
 
+    print("Saving interim products dataset...")
+    data_engineer.save_products()
+
 def generate_modelling_dataset(data_engineer):
     print("Combining features to generate dataset for modelling...")
     data_engineer.generate_modelling_dataset()
