@@ -14,6 +14,7 @@ from sklearn.metrics import f1_score, recall_score, precision_score, confusion_m
 import pandas as pd
 
 from joblib import dump, load
+import pickle
 
 from imblearn.over_sampling import SMOTE
 
@@ -21,7 +22,8 @@ from imblearn.over_sampling import SMOTE
 class PyodModel:
     def __init__(self, model_config, model_df):
         self.model_config = model_config
-        self.original_train_df, self.original_test_df, self.train_df, self.test_df = self.generate_train_test(model_df)
+        self.model_df = model_df
+        self.original_train_df, self.original_test_df, self.train_df, self.test_df, self.train_index, self.test_index = self.generate_train_test(model_df)
         self.model = None
 
     def generate_train_test(self, model_df):
@@ -38,16 +40,17 @@ class PyodModel:
         temp_test_df = pd.merge(X_test, y_test, left_index=True, right_index=True)
         original_test_df = original_test_df.append(temp_test_df, ignore_index=True)
 
-        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','locale']
-
+        unnessary_columns = ['index','asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','cleaned_reviews_location','locale']
+    
         train_df = original_train_df.copy()
+        train_index = train_df['index']
         train_df = train_df.drop(columns=unnessary_columns).fillna(0)
 
-        
         test_df = original_test_df.copy()
+        test_index = test_df['index']
         test_df = test_df.drop(columns=unnessary_columns).fillna(0)
 
-        return original_train_df, original_test_df, train_df, test_df
+        return original_train_df, original_test_df, train_df, test_df, train_index, test_index
 
     def hypertune_ocsvm(self):
     # def hypertune_ocsvm(self):
@@ -74,13 +77,13 @@ class PyodModel:
             # self.model = self.hypertune_ocsvm()
         return self.model.get_params()
     
-    def predict_anomalies(self):
+    def train_model(self):
         print("Identifying outliers...")
         y_train = self.train_df['manual_label']
         X_train = self.train_df.drop(columns='manual_label')
 
         # self.model.fit(X_train)
-        sample_size = 50000 
+        sample_size = 10000 
 
         sm = SMOTE(sampling_strategy={0: sample_size,1: sample_size}, random_state=0)
         augmented_y_train= y_train
@@ -88,8 +91,10 @@ class PyodModel:
         X_train_res, y_train_res = sm.fit_sample(X_train, augmented_y_train)
         print("Fitting Train Dataset with Dataset Size {}...".format(X_train_res.shape))
         self.model.fit(X_train_res)
+        print("Saving model...")
+        pickle.dump(self.model, open('models/ocsvm.pkl','wb'))
         self.original_train_df['fake_reviews'] = y_train
-        self.original_train_df['decision_function'] = max(self.model.decision_function(X_train_res))
+        self.original_train_df['index'] = self.train_index
 
     def evaluate_pyod_model(self, model_name, model):
         print("Evaluating {}...".format(model_name))
@@ -97,9 +102,11 @@ class PyodModel:
         
         print("Predicting Test Dataset with Dataset Size {}...".format(X_test.shape))
         results = self.model.predict(X_test)
-        
+
         self.original_test_df['fake_reviews'] = results
         self.original_test_df['decision_function'] = self.model.decision_function(X_test)
+        self.original_test_df['index'] = self.test_index
+        self.original_train_df['decision_function'] = max(self.original_test_df['decision_function'])
 
         evaluate_df = self.original_test_df[self.original_test_df['manual_label'].notnull()]
         y_test = evaluate_df['manual_label']
@@ -110,15 +117,14 @@ class PyodModel:
         precScore = precision_score(y_test, pred)
 
         if model_name == "One-Class SVM":
-            em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=True, X = X_test, y = results, model = self.model, model_name = model)
-            print("Saving model...")
-            dump(self.model, "models/" + str(model) + ".joblib")
-        
+            em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=True, X = X_test, y = results, model = self.model, model_name = model)    
         else:
             em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=False, X = X_test, y = results, model = self.model, model_name = model)
-
+        
         metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"em":em,"mv":mv}
 
         final_df = self.original_train_df.append(self.original_test_df, ignore_index=True)
-
+        final_df = final_df.sort_values(by=['index'])
+        final_df = final_df.drop(columns='index')
+        
         return metrics, final_df
