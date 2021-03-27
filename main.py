@@ -8,7 +8,6 @@ from utils.utils import get_args
 from src.data.make_dataset import generate
 from src.features.build_features import build_features
 from src.models.train_model import train_model
-import utils.common_resources
 
 def automate_experiment_name(text_represent, feature_select, normalize, valid_models):
     feature_name = "All Features "
