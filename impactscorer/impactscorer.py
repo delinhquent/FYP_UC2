@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import re
 
-from utils.engineer_functions import convert_datetime
-
 class ImpactScorer:
     def __init__(self, model_df,profiles_df):
         self.model_df = model_df
@@ -18,9 +16,7 @@ class ImpactScorer:
     def create_profile_heuristics(self):
         self.profiles_df['proportion_fake_reviews'] = self.profiles_df['total_fake_reviews']/self.profiles_df['cleaned_total_reviews_posted']
         # Normalizing the data so that the data, approximately follows a Gaussian distribution 
-        helpful_votes = self.profiles_df['cleaned_average_helpfulVotes']
-        max_helpful_votes = max(helpful_votes)
-        self.profiles_df['cleaned_average_helpfulVotes'] = [float(i)/max_helpful_votes for i in helpful_votes]
+
         self.profiles_df['cleaned_not_brand_monogamist'] = 1- self.profiles_df['cleaned_brand_monogamist']
         self.profiles_df['cleaned_not_brand_loyalist'] = 1- self.profiles_df['cleaned_brand_loyalist']
         self.profiles_df['cleaned_not_brand_repeater'] = 1- self.profiles_df['cleaned_brand_repeater']
@@ -29,8 +25,7 @@ class ImpactScorer:
         self.profiles_df.loc[self.profiles_df.proportion_fake_reviews > 1, 'proportion_fake_reviews'] = 1
 
     def create_time_scores(self):
-        self.model_df['cleaned_reviews_date_posted'] = self.model_df['cleaned_reviews_date_posted'].apply(convert_datetime)
-        self.model_df['diff_days'] = datetime.now() - self.model_df['cleaned_reviews_date_posted']
+        self.model_df['diff_days'] = datetime.now() - pd.to_datetime(self.model_df['cleaned_reviews_date_posted'], infer_datetime_format=True) 
         self.model_df['diff_days'] = self.model_df['diff_days'] // np.timedelta64(1,'D')  
 
         self.model_df['time_score'] = -1
@@ -68,15 +63,22 @@ class ImpactScorer:
         max_decision_function = max(decision_function)
         min_decision_function = min(decision_function)
         self.model_df['decision_function'] = [(float(i) - min_decision_function)/(max_decision_function - min_decision_function) for i in decision_function]
+        
+        helpful_votes = self.model_df['cleaned_reviews_voting']
+        max_helpful_votes = max(helpful_votes)
+        min_helpful_votes = min(helpful_votes)
+        self.model_df['normalized_voting'] = [(float(i) - min_helpful_votes)/(max_helpful_votes - min_helpful_votes) for i in self.model_df['cleaned_reviews_voting']]
 
-        self.model_df['impact_score'] = 0.1 * self.model_df.time_score + (0.4 * (self.model_df.fake_reviews) * (self.model_df.decision_function)) + 0.25 * self.model_df.proportion_fake_reviews + 0.25 * self.model_df.suspicious_reviewer_score
+        self.model_df['impact_score'] = self.model_df.time_score + self.model_df.normalized_voting + ((self.model_df.fake_reviews) * (self.model_df.decision_function)) + self.model_df.proportion_fake_reviews + self.model_df.suspicious_reviewer_score
+        self.model_df['impact_score'] /= 5
+        self.model_df['impact_score'] = self.model_df['impact_score'].fillna(0)
         self.model_df['rank'] = self.model_df['impact_score'].rank(method='first')
         self.model_df['impact'] = pd.qcut(self.model_df['rank'].values, 3,).codes
         self.model_df = self.model_df.replace({"impact": bin_labels}) 
 
         self.model_df = self.model_df.sort_values(by='impact_score', ascending=False)
 
-        self.model_df = self.model_df.drop(columns=['diff_days','time_score','rank'])
+        self.model_df = self.model_df.drop(columns=['diff_days','time_score','rank','suspicious_reviewer_score','proportion_fake_reviews','normalized_voting'])
         return self.model_df, self.profiles_df
         
 
