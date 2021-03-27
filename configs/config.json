@@ -6,7 +6,8 @@
   },
   "products": {
     "raw_data_path" : "data/raw/consolidated_product_info.csv",
-    "base_data_path": "data/base/consolidated_product_info.csv"
+    "base_data_path": "data/base/consolidated_product_info.csv",
+    "interim_data_path": "data/uc2/interim/consolidated_product_info.csv"
   },
   "profiles": {
     "raw_data_path" : "data/raw/consolidated_profiles.csv",
