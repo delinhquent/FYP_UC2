@@ -57,6 +57,7 @@ class Trainer:
         return self.profile_data_loader.get_data()
     
     def get_modelling_data(self):
+        self.model_data = self.model_data[(self.model_data['acc_num'].notnull()) & (self.model_data['cleaned_reviews_text'].notnull())]
         self.modelling_data = self.model_data
         
         print("Combining vectors with dataset...")
@@ -77,7 +78,7 @@ class Trainer:
         self.modelling_data['index'] = self.modelling_data.index
         print("Current dataset size after dropping null values: {}".format(self.modelling_data.shape))
 
-        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','locale','manual_label']
+        unnessary_columns = ['asin','acc_num','cleaned_reviews_profile_link','decoded_comment','cleaned_reviews_text','cleaned_reviews_date_posted','cleaned_reviews_location','locale','manual_label']
         unnecessary_df = self.modelling_data[['index'] + unnessary_columns]
 
         modelling_df = self.modelling_data
@@ -100,14 +101,13 @@ class Trainer:
             modelling_df['index'] = index
         
         self.modelling_data = pd.merge(unnecessary_df,modelling_df,left_on=['index'], right_on = ['index'], how = 'left')
-        self.modelling_data = self.modelling_data.drop(columns='index')
         print(self.modelling_data.shape)
 
 
     def normalize_data(self,modelling_df):
         scaler = StandardScaler() 
         X_scaled = scaler.fit_transform(modelling_df) 
-        pickle.dump(X_scaled, open('models/normalizer/feature_normalizer_standard.pkl','wb'))
+        pickle.dump(scaler, open('models/normalizer/feature_normalizer_standard.pkl','wb'))
         # sc = pickle.load(open('file/path/scaler.pkl','rb')) # keeping this here for future development
         
         # Normalizing the data so that the data, approximately follows a Gaussian distribution 
@@ -125,7 +125,9 @@ class Trainer:
         print("Retrieving necessary columns for modelling...")
         self.get_modelling_data()
 
-        metrics, self.model_data = self.select_pipeline()
+        metrics, self.modelling_data = self.select_pipeline()
+        self.model_data['fake_reviews'] = self.modelling_data['fake_reviews']
+        self.model_data['decision_function'] = self.modelling_data['decision_function']
 
         print("Assessing impact...")
         assessor = ImpactScorer(self.model_data,self.profile_data)
@@ -134,8 +136,7 @@ class Trainer:
 
         print("Saving results...")
         self.save_results(metrics)
-        interested_columns = ['acc_num','proportion_fake_reviews','suspicious_reviewer_score']
-        self.profile_data[interested_columns].to_csv(self.config.profiles.save_data_path,index=False)
+        self.profile_data.to_csv(self.config.profiles.save_data_path,index=False)
 
         print("Training of Model Completed...")
 
@@ -148,8 +149,6 @@ class Trainer:
             metrics, results = self.rrcf_pipeline()
         elif self.model in ["lof","pyod_lof"]:
             metrics, results = self.lof_pipeline(self.model)
-        elif self.model in ["copod", "hbos"]:
-            metrics, results = self.generic_pyod_model_pipeline()
         elif self.model in ["ocsvm","copod", "hbos"]:
             metrics, results = self.generic_pyod_model_pipeline()
         return metrics, results
@@ -265,8 +264,8 @@ class Trainer:
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
-        self.trainer.predict_anomalies()
+        self.trainer.train_model()
 
-        metrics, self.model_data = self.trainer.evaluate_pyod_model(name_dict[self.model],self.model)
+        metrics, self.modelling_data = self.trainer.evaluate_pyod_model(name_dict[self.model],self.model)
         
-        return metrics, self.model_data
+        return metrics, self.modelling_data
