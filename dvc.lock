@@ -33,8 +33,8 @@ feature_engineering:
   cmd: python main.py -m build_features
   deps:
   - path: data/base/consolidated_product_info.csv
-    md5: a1a131e3274424f81927a76aeb22cb8b
-    size: 87831
+    md5: 1d2c3976a871b3ca3d01a9242b8e2fd3
+    size: 100159
   - path: data/base/consolidated_profiles.csv
     md5: b8eafe5ddb1e825f768aebd706a53e60
     size: 1609255550
@@ -54,27 +54,27 @@ feature_engineering:
     md5: e568e2b3cc419a7e81e5f06858142bc6
     size: 62336384
   - path: pipeline/engineer.py
-    md5: 1f2cf37653b9b358e528631a98e624cf
-    size: 3628
+    md5: 0d5a62c16f5da949599591ccfb55b650
+    size: 3748
   - path: src/features/build_features.py
-    md5: 8ff7539f3a948d7b9cc5291290b9ac01
-    size: 1811
+    md5: 23424fb53b1285976944e92aab6f1477
+    size: 1897
   - path: utils/clean.py
     md5: b6e0812677d5a22d054209532e05f58e
     size: 5248
   - path: utils/engineer.py
-    md5: 4cc7239c1a407b26733aea98a474ec01
-    size: 8016
+    md5: aef260b2638749bcf58a83609e48de9e
+    size: 8190
   - path: utils/engineer_functions.py
-    md5: 8b828fc800d4ccb36f34b82925209d80
-    size: 13389
+    md5: e7255d9ea75d1d1e0f6752a05e8d6392
+    size: 13435
   outs:
   - path: data/uc2/interim/consolidated_profiles.csv
     md5: 9eb131a2a027cee685e6d65f45056ce6
     size: 1615971247
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: c42506f8ac426e513734f43fde48a59b
-    size: 73160917
+    md5: a3d3ff360593b4e3d4a27cd32e712e35
+    size: 73047413
 train_model:
   cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent
     doc2vec
@@ -83,17 +83,17 @@ train_model:
     md5: c2a2800e9eb2f41cb744ce08e4d319f6
     size: 186122880
   - path: data/uc2/processed/fake_framework_features.csv
-    md5: c42506f8ac426e513734f43fde48a59b
-    size: 73160917
+    md5: a3d3ff360593b4e3d4a27cd32e712e35
+    size: 73047413
   - path: featureselector/featureselector.py
     md5: b3bda1a4f043387f59770056ff9a66cb
     size: 1806
   - path: impactscorer/impactscorer.py
-    md5: 3e73f777469c0fd7a53a0011f8f2dcc9
-    size: 5117
+    md5: 6c1554ff153fc7ae0a327bf89e6d56ec
+    size: 5294
   - path: pipeline/trainer.py
-    md5: 423c4878a36a35cc1c9b47e5caf6453a
-    size: 11685
+    md5: 27dd4987781875ee88813ff781975a23
+    size: 11718
   - path: src/models/train_model.py
     md5: eef7dd15b602d5c176dea3e0f4f8378f
     size: 950
@@ -104,8 +104,8 @@ train_model:
     md5: 0ec82986936f3b1efd49ab5718301d72
     size: 4683
   - path: trainers/pyodmodel.py
-    md5: 601118fda51083b3065651231e0ab85b
-    size: 5332
+    md5: 754a18ad1766578c49f08839fe2b9254
+    size: 5665
   - path: utils/em.py
     md5: f642809fe956ddedfd432482251c2df2
     size: 1576
@@ -113,12 +113,12 @@ train_model:
     md5: 222bd29f87a508df519149c080c85133
     size: 3286
   outs:
-  - path: models/ocsvm.joblib
-    md5: 473b65abecf332587d3f009ab8c62d1a
-    size: 421738
+  - path: models/ocsvm.pkl
+    md5: f477846cd93a44458c20e560dab83c7c
+    size: 13566944
   - path: models/results/ocsvm_feature_importance.json
     md5: 58fc9d3738a1224e894baccf418d6f09
     size: 3913
   - path: models/results/ocsvm_results.csv
-    md5: 088bff8b919344780107639c4f0b0c7e
-    size: 292135253
+    md5: ebe653c53ef948c68e6dd0a292abc584
+    size: 70993697

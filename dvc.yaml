@@ -47,4 +47,4 @@ stages:
     outs:
     - models/results/ocsvm_results.csv
     - models/results/ocsvm_feature_importance.json
-    - models/ocsvm.joblib
+    - models/ocsvm.pkl
