@@ -38,6 +38,9 @@ def engineer_reviews(df, sample_incentivized_list, products_df):
     df['cleaned_sentiment'] = sentiment_analysis(sid, list(df['decoded_comment'].astype(str)))
     df['cleaned_sentiment'] = df['cleaned_sentiment'].fillna(value=0)
 
+    
+    df['cleaned_date_posted'] = df['cleaned_date_posted'].apply(convert_datetime)
+    df['cleaned_date_posted'] = pd.to_datetime(df['cleaned_date_posted'], infer_datetime_format=True) 
     # tfidf
     df = cosine_similarity(df, products_df)
 
@@ -143,7 +146,7 @@ def engineer_products(df,profiles_df,reviews_df):
 
 def generate_modelling_dataset(reviews_df, profiles_df, products_df):
     print("Extracting columns from Reviews Dataset...")
-    reviews_uninterested_columns = ['cleaned_location','cleaned_title']
+    reviews_uninterested_columns = ['cleaned_title']
     reviews_interested_columns = retrieve_interested_columns(reviews_df, reviews_uninterested_columns)
     reviews_df = reviews_df[['ASIN','acc_num','decoded_comment'] + reviews_interested_columns + ['manual_label']]
     reviews_df = reviews_df.rename(columns={'ASIN':"asin"})
