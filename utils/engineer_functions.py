@@ -7,6 +7,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import numpy as np
 
 import pandas as pd
+import pickle
 import re
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -88,6 +89,7 @@ def cosine_similarity(df, products_df):
     print("Conducting TFIDF...")
     vec = TfidfVectorizer (ngram_range = (1,2), max_features = 100)
     vec.fit(df['cleaned_text'])
+    pickle.dump(vec, open('models/normalizer/cosine_similarity_tfidf.pkl','wb'))
 
     print("Saving TFIDF vector")
     tfidf = vec.transform(df['cleaned_text'])
@@ -99,7 +101,6 @@ def cosine_similarity(df, products_df):
     temp_df = temp_df.rename(columns={'cleaned_text':'cleaned_product_text'})
 
     print("Conducting Cosine Similarity...")
-    review_text = temp_df['cleaned_reviews_text']
     product_detail_results = []
     for index, row in temp_df.iterrows():
         print("Cosine Similarity at {} of {}...".format(index+1, len(temp_df)))
