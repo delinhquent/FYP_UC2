@@ -160,11 +160,9 @@ The scope of the use case is to develop a model to sift out reviews that see
 
 --------
 
-## Usage
+## Installation (Either follow Step 1 or Step 2 before using the application)
 
-Either follow Step 1 or Step 2.
-
-### 1) Activate virtual environment from yml file
+### 1) Activate Virtual Environment from yml File
 Create virtual environment from yml file:
 ```
 conda env create -f environment.yml
@@ -175,8 +173,22 @@ Activate virtual environment.
 conda activate usecase2
 ```
 
-### 2) Pip install files after creating a virtual environment
+### 2) Pip Install Files after Creating a Virtual Environment
 Simply run the following after using a virtual environment.
 ```
 pip install -r requirements.txt
+```
+
+--------
+
+## Usage
+
+### Run Application to Train Model
+```
+dvc repro
+```
+
+### Run Demo Application
+```
+streamlit run app.py
 ```
