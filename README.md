@@ -1,10 +1,9 @@
-# Fake Reviews Detector
+# Unnatural Reviews Detector
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability)
+<!-- [![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability) -->
 
-The scope of the use case is to develop a model to sift out reviews that seem unnatural, and then use a scoring algorithm to assign each review an impact score. The anomaly detection are experimented using white box models such as Dbscan (Density Based Spatial Clustering of Applications with Noise) and Isolation Forests.This provides transparency and provides an understanding of the influencing variables, which ensures accountability to the end users.
+The scope of the use case is to develop a model to sift out reviews that seem unnatural, and then use a scoring algorithm to assign each review an impact score. The anomaly detection are experimented with models such as One-Class Support Vector Machine and Isolation Forests. Evaluation of the models are done mainly using F1, Recall & Precision. We also included Excess Mass & Mass Volumes.
 
-Methodology of evaluating the models will be determined at a later stage.
 
 ## Project Organization
 ------------
@@ -162,6 +161,8 @@ Methodology of evaluating the models will be determined at a later stage.
 --------
 
 ## Usage
+
+Either follow Step 1 or Step 2.
 
 ### 1) Activate virtual environment from yml file
 Create virtual environment from yml file:
