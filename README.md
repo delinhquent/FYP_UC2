@@ -1,6 +1,6 @@
 # Unnatural Reviews Detector
 <!-- [![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability) -->
-![Placehoder for image](https://dl.dropboxusercontent.com/s/gu64aavt4jh5o8h/fake_fact.jpg?dl=0)
+![Placehoder for image](https://dl.dropboxusercontent.com/s/tv5wtmzpfug5u2p/fake_fact.jpg?dl=0)
 
 ## Description
 
