@@ -7,7 +7,7 @@ The scope of the use case is to develop a model to sift out reviews that see
 ------------
 
 ## Demo Video
-[This is a demo application for L'Oréal(https://i9.ytimg.com/vi_webp/ZGmNutrkZAM/mqdefault.webp?time=1617005100000&sqp=CKyUhoMG&rs=AOn4CLDmn3ro9Au56tQZAfahEI4dAiKp6w)](https://youtu.be/ZGmNutrkZAM)
+[![This is a demo application for L'Oréal](https://img.youtube.com/vi/ZGmNutrkZAM/0.jpg)](https://www.youtube.com/watch?v=ZGmNutrkZAM)
 
 ------------
 
