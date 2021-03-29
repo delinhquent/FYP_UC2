@@ -1,5 +1,6 @@
 # Unnatural Reviews Detector
 <!-- [![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability) -->
+![Placehoder for image](https://internationalsales.lexisnexis.com/__data/assets/image/0009/775665/fake-or-fact-letter-blocks.jpg)
 
 ## Description
 
