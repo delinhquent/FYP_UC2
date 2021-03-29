@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from datetime import datetime
 
 from SessionState import SessionState
 from utils import common_resources
@@ -80,11 +80,13 @@ if session_state.logged_in:
     with st.beta_container():
         review_col1, review_col2 = st.beta_columns(2)
         with review_col1:
-            review_rating = st.slider('Please provide a rating...', 1, 5, 1)
+            min_date = datetime.datetime.today().date() - datetime.timedelta(days=(5*365)) 
+            review_date = st.date_input('Please choose a date...', min_value=min_date, max_value=datetime.datetime.today().date())
+            review_votes = st.number_input("Number of Helpful Votes?",0, max(reviews_data['cleaned_reviews_voting']))
         
         with review_col2:
+            review_rating = st.slider('Please provide a rating...', 1, 5, 1)
             review_verified = st.checkbox("Verified Purchase?")
-            review_votes = st.number_input("Number of Helpful Votes?",0, max(reviews_data['cleaned_reviews_voting']))
 
         review_text = st.text_area("Enter your review...")
 
@@ -92,6 +94,8 @@ if session_state.logged_in:
             if review_text.strip() == '':
                 st.error("Please enter a review")
             else:
+                diff_days = datetime.datetime.today().date()  - review_date
+                diff_days = diff_days.days
                 test_df = combine_product_profile_df(current_product_df, current_profile_df)
                 test_df, cleaned_text = custom_feature_engineering(test_df, review_rating, review_verified, review_votes, review_text,tfidf_normalizer)
 
@@ -110,7 +114,7 @@ if session_state.logged_in:
 
                 with st.spinner("Predicting results...Please wait.."):
                     result, result_text, model_confidence = predict_custom_inputs(unnatural_reviewer_model, X_normalized, min(reviews_data['decision_function']), max(reviews_data['decision_function']))
-                    impact_score, impact_text = evaluate_business_impact(max(reviews_data['cleaned_reviews_voting']), min(reviews_data['cleaned_reviews_voting']), review_votes, result, model_confidence, current_profile_df['suspicious_reviewer_score'].values[0], current_profile_df['proportion_fake_reviews'].values[0])
+                    impact_score, impact_text = evaluate_business_impact(max(reviews_data['cleaned_reviews_voting']), min(reviews_data['cleaned_reviews_voting']), review_votes, result, model_confidence, current_profile_df['suspicious_reviewer_score'].values[0], current_profile_df['proportion_fake_reviews'].values[0],diff_days)
 
                 # st.success("Model Ran Successfully...")
                 st.info("The review is **{}**. The model is ** {}% ** confident. The severity to the business is ** {} ({}%)**.".format(result_text,model_confidence*100, impact_text,round(impact_score,5)*100))
