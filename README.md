@@ -1,13 +1,14 @@
 # Unnatural Reviews Detector
-
 <!-- [![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability) -->
+
+## Description
 
 The scope of the use case is to develop a model to sift out reviews that seem unnatural for L'Oréal based on their products. A scoring algorithm is then used to assign each review an impact score. The anomaly detection are experimented with models such as One-Class Support Vector Machine and Isolation Forests. Evaluation of the models are done mainly using F1, Recall & Precision. We also included Excess Mass & Mass Volumes.
 
 ## Click to View Demo
+
 [![This is a demo application for L'Oréal](https://img.youtube.com/vi/ZGmNutrkZAM/0.jpg)](https://www.youtube.com/watch?v=ZGmNutrkZAM)
 
-------------
 
 ## Project Organization
 ------------
@@ -183,7 +184,6 @@ Simply run the following after using a virtual environment.
 pip install -r requirements.txt
 ```
 
---------
 
 ## Usage
 
