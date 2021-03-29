@@ -2,8 +2,10 @@
 
 <!-- [![Maintainability](https://api.codeclimate.com/v1/badges/e05270ae8c4746b5227c/maintainability)](https://codeclimate.com/github/delinhquent/FYP_UC2/maintainability) -->
 
-The scope of the use case is to develop a model to sift out reviews that seem unnatural, and then use a scoring algorithm to assign each review an impact score. The anomaly detection are experimented with models such as One-Class Support Vector Machine and Isolation Forests. Evaluation of the models are done mainly using F1, Recall & Precision. We also included Excess Mass & Mass Volumes.
+The scope of the use case is to develop a model to sift out reviews that seem unnatural for L'Oréal based on their products. A scoring algorithm is then used to assign each review an impact score. The anomaly detection are experimented with models such as One-Class Support Vector Machine and Isolation Forests. Evaluation of the models are done mainly using F1, Recall & Precision. We also included Excess Mass & Mass Volumes.
 
+## Demo Video
+![This is a demo application for L'Oréal](https://youtu.be/ZGmNutrkZAM)
 
 ## Project Organization
 ------------
