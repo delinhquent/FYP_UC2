@@ -176,10 +176,25 @@ def predict_custom_inputs(unnatural_reviewer_model, X_normalized, min_decision_f
     
     return result, result_text, round(model_confidence,5)
 
-def evaluate_business_impact(max_helpful_votes, min_helpful_votes, review_votes, result, model_confidence, suspicious_reviewer_score, proportion_fake_reviews):
+def evaluate_timescore(diff_days):
+    if diff_days <= 30:
+        return 1
+    elif diff_days <= 90:
+        return 0.8
+    elif diff_days <= 180:
+        return 0.6
+    elif diff_days <= 360:
+        return 0.4
+    elif diff_days <= 720:
+        return 0.2
+    elif diff_days > 720:
+        return 0
+
+def evaluate_business_impact(max_helpful_votes, min_helpful_votes, review_votes, result, model_confidence, suspicious_reviewer_score, proportion_fake_reviews,diff_days):
+    time_score = evaluate_timescore(diff_days)
     normalized_voting = (review_votes - min_helpful_votes)/(max_helpful_votes - min_helpful_votes)
 
-    impact_score = (1 + normalized_voting + (result*model_confidence) + suspicious_reviewer_score + proportion_fake_reviews)/5
+    impact_score = (time_score + normalized_voting + (result*model_confidence) + suspicious_reviewer_score + proportion_fake_reviews)/5
     
     if impact_score >= 0.7:
         impact_text = "very severe"
