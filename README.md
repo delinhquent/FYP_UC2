@@ -4,9 +4,9 @@
 
 ## Description
 
-The scope of the use case is to develop a model to sift out reviews that seem unnatural for L'Oréal based on their products. Anomaly Detection models such as One-Class Support Vector Machine and Isolation Forests are experimented. Evaluation of the models are done mainly using F1, Recall & Precision. We also included Excess Mass & Mass Volumes.
+The scope of the use case is to develop a model to sift out reviews that seem unnatural for L'Oréal based on their products. Anomaly Detection models such as One-Class Support Vector Machine and Isolation Forests are experimented. Evaluation of the models are done mainly using F1, Recall & Precision. Excess Mass & Mass Volumes are also included as part of the evaluation metrics.
 
-A scoring algorithm is then used to assign each review an impact score. The aim of such a scoring algorithm is to help users to quickly prioritize which reviews should they investigate or take actions against based on its severity (could be in terms of money or brand).
+A scoring algorithm is then used to assign each review an impact score. The aim of such a scoring algorithm is to help users quickly prioritize which reviews they should investigate or take actions against based on its severity (could be in terms of money or brand).
 
 ## Read more about the project
 
