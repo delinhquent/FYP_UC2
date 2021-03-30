@@ -8,6 +8,10 @@ The scope of the use case is to develop a model to sift out reviews that see
 
 A scoring algorithm is then used to assign each review an impact score. The aim of such a scoring algorithm is to help users to quickly prioritize which reviews should they investigate or take actions against based on its severity (could be in terms of money or brand).
 
+## Read more about the project
+
+[Click here to read more about the project](https://github.com/delinhquent/unnatural-reviews-detector/wiki)   
+
 ## Click to View Demo
 
 [![This is a demo application for L'Oréal](https://img.youtube.com/vi/ZGmNutrkZAM/0.jpg)](https://www.youtube.com/watch?v=ZGmNutrkZAM)
