@@ -46,7 +46,6 @@ A scoring algorithm is then used to assign each review an impact score. The 
     │   |   └─ consolidated_product_info.csv
     |   |
     │   └── uc2/                                     <- Workspace folder in remote server
-    │       │
     │       ├─ external/                             <- Data from third party sources/inputs.
     │       |   ├─ loreal_brand_list.csv
     │       |   ├─ sample_incentivized_reviews.csv
@@ -106,7 +105,6 @@ A scoring algorithm is then used to assign each review an impact score. The 
     |
     |
     ├── src                                          <- Source code for use in this project.
-    │   │
     │   ├── data                                     <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
@@ -119,15 +117,13 @@ A scoring algorithm is then used to assign each review an impact score. The 
     |
     |
     ├── src                                          <- Source code for use in this project.
-    │   │
     │   ├── data                                     <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
     │   ├── features                                 <- Scripts to turn data into features for modeling
     │   │   └── build_features.py
     │   │
-    │   └── models                                   <- Scripts to train models to make predictions
-    │       ├── predict_model.py
+    │   └── models                                   <- Scripts to train models
     │       └── train_model.py
     |
     |
@@ -167,6 +163,7 @@ A scoring algorithm is then used to assign each review an impact score. The 
     |
     |
     ├── requirements.txt                             <- The requirements file for environment
+    |
     |
     └── SessionState.py                              <- Script to add per-session state for Streamlit's authentication
 
