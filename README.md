@@ -224,12 +224,13 @@ dvc repro
 ```
 
 ### Run Script to Train Model via Anaconda Prompt
-To run the script via Anaconda Prompt, the sequence, commands and file dependencies can be found in the `dvc.yaml` file.
+The sequence, commands and file dependencies can be found in the `dvc.yaml` file.
 
-Simply ensure that the file dependencies are present before executing the commands. Please also run the commands in sequence for your initial run as there are some file dependencies which are generated from the previous stage.
+Simply ensure that the file dependencies are present before executing the commands. Please run the commands in sequence for your **initial** run as there are some file dependencies which are generated from the previous stage.
 
 
 ### Run Demo Application
+The following command is  to run the demo application.
 ```
 streamlit run app.py
 ```
