@@ -30,6 +30,7 @@ stages:
     outs:
     - data/uc2/processed/fake_framework_features.csv
     - data/uc2/interim/consolidated_profiles.csv
+    - models/normalizer/cosine_similarity_tfidf.pkl
   train_model:
     cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent doc2vec
     deps:
@@ -40,11 +41,8 @@ stages:
     - pipeline/trainer.py
     - featureselector/featureselector.py
     - trainers/pyodmodel.py
-    - trainers/ocsvm_tuner.py
-    - trainers/ocsvm_datashift_algorithm.py
-    - utils/em_bench_high.py
-    - utils/em.py
     outs:
     - models/results/ocsvm_results.csv
-    - models/results/ocsvm_feature_importance.json
+    - data/uc2/processed/suspicious_reviewers_metrics.csv
+    - models/normalizer/feature_normalizer_standard.pkl
     - models/ocsvm.pkl

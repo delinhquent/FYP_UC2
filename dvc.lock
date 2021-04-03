@@ -75,6 +75,9 @@ feature_engineering:
   - path: data/uc2/processed/fake_framework_features.csv
     md5: a3d3ff360593b4e3d4a27cd32e712e35
     size: 73047413
+  - path: models/normalizer/cosine_similarity_tfidf.pkl
+    md5: 51905176ed76d67818a7c17f8753c2bb
+    size: 9272989
 train_model:
   cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent
     doc2vec
@@ -97,28 +100,19 @@ train_model:
   - path: src/models/train_model.py
     md5: eef7dd15b602d5c176dea3e0f4f8378f
     size: 950
-  - path: trainers/ocsvm_datashift_algorithm.py
-    md5: 10e6c3123811ad3d659956fc362b026c
-    size: 3329
-  - path: trainers/ocsvm_tuner.py
-    md5: 0ec82986936f3b1efd49ab5718301d72
-    size: 4683
   - path: trainers/pyodmodel.py
-    md5: 754a18ad1766578c49f08839fe2b9254
-    size: 5665
-  - path: utils/em.py
-    md5: f642809fe956ddedfd432482251c2df2
-    size: 1576
-  - path: utils/em_bench_high.py
-    md5: 222bd29f87a508df519149c080c85133
-    size: 3286
+    md5: 09b0608e91e98c750fbdcefe2a6ef3b3
+    size: 6801
   outs:
+  - path: data/uc2/processed/suspicious_reviewers_metrics.csv
+    md5: a5feb26dfdef1bd4d2ae18cc853c56ec
+    size: 1617135531
+  - path: models/normalizer/feature_normalizer_standard.pkl
+    md5: 01f9f06b979a35d6caa8dc62b9ab0bde
+    size: 4482
   - path: models/ocsvm.pkl
     md5: f477846cd93a44458c20e560dab83c7c
     size: 13566944
-  - path: models/results/ocsvm_feature_importance.json
-    md5: 58fc9d3738a1224e894baccf418d6f09
-    size: 3913
   - path: models/results/ocsvm_results.csv
-    md5: ebe653c53ef948c68e6dd0a292abc584
-    size: 70993697
+    md5: 508b712ba165df1904384373be395d8c
+    size: 70993670
