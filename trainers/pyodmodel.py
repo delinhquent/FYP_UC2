@@ -10,6 +10,7 @@ from utils.em_bench_high import calculate_emmv_score
 from trainers.ocsvm_tuner import *
 
 from sklearn.metrics import f1_score, recall_score, precision_score, confusion_matrix
+from sklearn.ensemble import ExtraTreesClassifier
 
 import pandas as pd
 
@@ -17,6 +18,8 @@ from joblib import dump, load
 import pickle
 
 from imblearn.over_sampling import SMOTE
+import operator
+import json
 
 
 class PyodModel:
@@ -107,6 +110,8 @@ class PyodModel:
         self.original_test_df['decision_function'] = self.model.decision_function(X_test)
         self.original_test_df['index'] = self.test_index
         self.original_train_df['decision_function'] = max(self.original_test_df['decision_function'])
+        self.train_df['fake_reviews'] = 0
+        self.test_df['fake_reviews'] = results
 
         evaluate_df = self.original_test_df[self.original_test_df['manual_label'].notnull()]
         y_test = evaluate_df['manual_label']
@@ -116,15 +121,33 @@ class PyodModel:
         recallScore = recall_score(y_test, pred)
         precScore = precision_score(y_test, pred)
 
-        if model_name == "One-Class SVM":
-            em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=True, X = X_test, y = results, model = self.model, model_name = model)    
-        else:
-            em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=False, X = X_test, y = results, model = self.model, model_name = model)
+        # if model_name == "One-Class SVM":
+            # em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=True, X = X_test, y = results, model = self.model, model_name = model)    
+        # else:
+            # em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=False, X = X_test, y = results, model = self.model, model_name = model)
         
-        metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"em":em,"mv":mv}
+        # metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"em":em,"mv":mv}
+        metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore}
 
         final_df = self.original_train_df.append(self.original_test_df, ignore_index=True)
         final_df = final_df.sort_values(by=['index'])
         final_df = final_df.drop(columns='index')
+        final_df['decision_function'] = final_df['decision_function'].fillna(max(self.original_test_df['decision_function']))
+        final_df['fake_reviews'] = final_df['fake_reviews'].fillna(0)
+
+        print("Conducting feature importance...")
+        rf_df = self.train_df.append(self.test_df, ignore_index=True)
+        rf = ExtraTreesClassifier(n_estimators=250,
+                              random_state=0)
+        y = rf_df['fake_reviews']
+        X = rf_df.drop(columns='fake_reviews')
+        rf.fit(X, y)
+
+        importances = rf.feature_importances_
+
+        importance_dict = dict(zip(X.columns, importances))
+        new_importance_dict = dict( sorted(importance_dict.items(), key=operator.itemgetter(1),reverse=True))
+        with open('models/results/ocsvm_feature_importance.json', 'w') as fp:
+            json.dump(new_importance_dict, fp)
         
-        return metrics, final_df
+        return metrics, final_df.fillna(0)
