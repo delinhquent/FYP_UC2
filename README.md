@@ -54,7 +54,8 @@ A scoring algorithm is then used to assign each review an impact score. The 
     │       |
     │       ├─ interim/                              <- Intermediate data that has been transformed.
     │       |   ├─ consolidated_product_info.csv     <- Products dataset with new features engineered
-    │       |   ├─ consolidated_products_labelled.csv  <- Review Activity Dataset with labels (to train & evaluate model)
+    │       |   ├─ consolidated_products_labelled.csv  <- Review Dataset with labels (to train & evaluate model) 
+    |       |   |                                           - labels are under `manual_label`
     │       |   ├─ consolidated_profiles.csv         <- Profiles dataset with new features engineered
     │       |   ├─ consolidated_review_activity.csv  <- Review Activity Dataset from `reviewer_contribution` column in Profiles Dataset
     │       |   └─ doc2vec_embedding.csv             <- Doc2Vec Embedded Values from reviews' text
@@ -193,11 +194,43 @@ pip install -r requirements.txt
 
 
 ## Usage
+### Run Application to Train Model via Data Version Control
+To keep track of changes to the data in the remote server's working directory, Data Version Control (DVC) was used. This is similar to how GitHub tracks code changes, but DVC is meant for data.
 
-### Run Application to Train Model
+1) Ensure DVC has been installed
+```
+pip install dvc
+```
+2) After installing dvc and initializing git, we will need to initialize dvc
+```
+# Initialize dvc
+dvc init
+# commit changes (.dvc folders)
+git commit -m "Initialize DVC"
+```
+
+3) Track the folders which are of interest (in this case, its the `/data/raw` and `/data/base folders`)
+```
+dvc add data/raw data/base
+git add data/raw.dvc data/base.dvc
+git commit -m "added data folders"
+```
+
+4) Add the remote storage
+```
+dvc remote add -f -d remote ssh://<remote storage>
+```
+
+5) As the data pipeline has already been defined in the `dvc.yaml` file, only a single command is needed to execute the entire process. It will only run the necessary commands if they find any changes in the dependencies file.
 ```
 dvc repro
 ```
+
+### Run Script to Train Model via Anaconda Prompt
+To run the script via Anaconda Prompt, the sequence, commands and file dependencies can be found in the `dvc.yaml` file.
+
+Simply ensure that the file dependencies are present before executing the commands. Please also run the commands in sequence for your initial run as there are some file dependencies which are generated from the previous stage.
+
 
 ### Run Demo Application
 ```
