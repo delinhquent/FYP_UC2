@@ -213,7 +213,7 @@ git add data/raw.dvc data/base.dvc
 git commit -m "added data folders"
 ```
 
-4) Add the remote storage
+4) Add the remote storage. Replace `<remote storage>` to your own remote storage server where the files can be found.
 ```
 dvc remote add -f -d remote ssh://<remote storage>
 ```
