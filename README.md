@@ -4,7 +4,7 @@
 
 ## Description
 
-The scope of the use case is to develop a model to sift out reviews that seem unnatural for L'Oréal based on their products. Anomaly Detection models such as One-Class Support Vector Machine and Isolation Forests are experimented. Evaluation of the models are done mainly using F1, Recall & Precision. Excess Mass & Mass Volumes are also included as part of the evaluation metrics.
+The scope of the use case is to develop a model to sift out reviews that seem unnatural for L'Oréal based on their products. Anomaly Detection models such as One-Class Support Vector Machine and Isolation Forests are experimented. Evaluation of the models are done mainly using F1, Recall & Precision.
 
 A scoring algorithm is then used to assign each review an impact score. The aim of such a scoring algorithm is to help users quickly prioritize which reviews they should investigate or take actions against based on its severity (could be in terms of money or brand).
 
@@ -46,7 +46,6 @@ A scoring algorithm is then used to assign each review an impact score. The 
     │   |   └─ consolidated_product_info.csv
     |   |
     │   └── uc2/                                     <- Workspace folder in remote server
-    │       │
     │       ├─ external/                             <- Data from third party sources/inputs.
     │       |   ├─ loreal_brand_list.csv
     │       |   ├─ sample_incentivized_reviews.csv
@@ -107,7 +106,6 @@ A scoring algorithm is then used to assign each review an impact score. The 
     |
     |
     ├── src                                          <- Source code for use in this project.
-    │   │
     │   ├── data                                     <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
@@ -120,15 +118,13 @@ A scoring algorithm is then used to assign each review an impact score. The 
     |
     |
     ├── src                                          <- Source code for use in this project.
-    │   │
     │   ├── data                                     <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
     │   ├── features                                 <- Scripts to turn data into features for modeling
     │   │   └── build_features.py
     │   │
-    │   └── models                                   <- Scripts to train models to make predictions
-    │       ├── predict_model.py
+    │   └── models                                   <- Scripts to train models
     │       └── train_model.py
     |
     |
@@ -168,6 +164,7 @@ A scoring algorithm is then used to assign each review an impact score. The 
     |
     |
     ├── requirements.txt                             <- The requirements file for environment
+    |
     |
     └── SessionState.py                              <- Script to add per-session state for Streamlit's authentication
 
