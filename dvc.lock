@@ -101,8 +101,8 @@ train_model:
     md5: eef7dd15b602d5c176dea3e0f4f8378f
     size: 950
   - path: trainers/pyodmodel.py
-    md5: 09b0608e91e98c750fbdcefe2a6ef3b3
-    size: 6801
+    md5: f44308de92cb1343d313f7847d48ca55
+    size: 6811
   outs:
   - path: data/uc2/processed/suspicious_reviewers_metrics.csv
     md5: a5feb26dfdef1bd4d2ae18cc853c56ec
