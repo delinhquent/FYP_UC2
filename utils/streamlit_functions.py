@@ -13,6 +13,7 @@ from sklearn.metrics import pairwise_kernels
 from sklearn.preprocessing import normalize
 
 import streamlit as st
+import json
 
 
 def make_hashes(password):
@@ -76,7 +77,19 @@ def load_all_relevant_data():
 
     results_data = results_data[ (results_data['acc_num'].notnull()) & (results_data['cleaned_reviews_text'].notnull())]
 
-    return products_data, suspicious_profiles_data, results_data, doc2vec_data
+    temp_authentic_test_df = results_data.copy()
+    authentic_test_df = pd.merge(temp_authentic_test_df, doc2vec_data, left_index=True, right_index=True)
+    authentic_test_df = authentic_test_df[authentic_test_df['manual_label'].notnull()]
+    current_uninterested_columns = ['asin', 'description', 'price', 'rating', 'availability', 'decoded_comment', 'cleaned_products_text', 'name', 'url', 'json_data', 'acc_num', 'name', 'occupation', 'location', 'description', 'badges', 'ranking', 'reviewer_contributions', 'marketplace_id', 'locale', 'total_fake_reviews', 'proportion_fake_reviews', 'cleaned_profiles_not_brand_monogamist', 'cleaned_profiles_not_brand_loyalist', 'cleaned_profiles_not_brand_repeater', 'suspicious_reviewer_score']
+    for column in current_uninterested_columns + ['asin', 'acc_num', 'decoded_comment', 'cleaned_reviews_profile_link', 'cleaned_reviews_location', 'cleaned_reviews_date_posted', 'cleaned_reviews_text', 'manual_label', 'locale', 'fake_reviews', 'decision_function', 'impact_score', 'impact']:
+        if column in authentic_test_df.columns:
+            authentic_test_df = authentic_test_df.drop(columns=column)
+    authentic_test_df = authentic_test_df.fillna(0)
+
+    with open('models/results/ocsvm_feature_importance.json') as f:
+        top10_features = json.load(f)
+
+    return products_data, suspicious_profiles_data, results_data, doc2vec_data, authentic_test_df, dict(top10_features)
 
 @st.cache(allow_output_mutation=True)
 def load_all_relevant_models():
@@ -106,14 +119,12 @@ def generate_profile_options(profiles_data):
                 temp_df = current_df[(current_df['quantile'] == unique_bin) & (current_df['cleaned_total_reviews_posted'] >= 8)][:5]
                 for suspicious_reviewer_score, proportion_fake_reviews, name in zip(temp_df['suspicious_reviewer_score'],temp_df['proportion_fake_reviews'],temp_df['name']):
                     new_score = str(suspicious_reviewer_score*100)
-                    new_proportion_fake_reviews = str(proportion_fake_reviews*100)
-                    profile_options.append("{} ({}% Suspicious - Posted {}% Unnatural Reviews)".format(name, new_score,new_proportion_fake_reviews))
+                    profile_options.append("{} ({}% Suspicious)".format(name, new_score))
         except:
             temp_df = current_df[:5]
             for suspicious_reviewer_score, proportion_fake_reviews, name in zip(temp_df['suspicious_reviewer_score'],temp_df['proportion_fake_reviews'],temp_df['name']):
                 new_score = str(suspicious_reviewer_score*100)
-                new_proportion_fake_reviews = str(proportion_fake_reviews*100)
-                profile_options.append("{} ({}% Suspicious - Posted {}% Unnatural Reviews)".format(name, new_score,new_proportion_fake_reviews))
+                profile_options.append("{} ({}% Suspicious)".format(name, new_score))
 
     return profile_options
 
@@ -196,6 +207,8 @@ def evaluate_business_impact(max_helpful_votes, min_helpful_votes, review_votes,
 
     impact_score = (time_score + normalized_voting + (result*model_confidence) + suspicious_reviewer_score + proportion_fake_reviews)/5
     
+    impact_score_dict = {"Recency of Review":time_score, "Number of Helpful Votes":normalized_voting, "Model’s Confidence of Review's Label": (result*model_confidence), "Suspicious Score of Reviewer": suspicious_reviewer_score, "Number of Unnatural Reviews Detected over Total Reviews Posted":proportion_fake_reviews}
+    
     if impact_score >= 0.7:
         impact_text = "very severe"
     elif impact_score >=0.5:
@@ -203,4 +216,4 @@ def evaluate_business_impact(max_helpful_votes, min_helpful_votes, review_votes,
     else:
         impact_text = "not severe"
     
-    return impact_score, impact_text
+    return impact_score, impact_text, impact_score_dict
