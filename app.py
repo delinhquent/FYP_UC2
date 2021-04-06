@@ -146,6 +146,7 @@ if session_state.logged_in:
                             else:
                                 st.success("Pass...")
                             
+                            st.write("This feature contributed **`{}%`** to the model's output.".format(round(top10_features[column]*100,5)))
                             st.write(first_text)
                             st.write(second_text)
                             st.write("")
@@ -172,7 +173,7 @@ if session_state.logged_in:
                                 st.warning("Warning...")
                             else:
                                 st.success("Pass...")
-                            
+                            st.write("This feature contributed **`{}%`** to the model's output.".format(round(top10_features[column]*100,5)))
                             st.write(first_text)
                             st.write(second_text)
                             st.write("")
