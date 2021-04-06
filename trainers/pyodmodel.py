@@ -140,13 +140,13 @@ class PyodModel:
         rf = ExtraTreesClassifier(n_estimators=250,
                               random_state=0)
         y = rf_df['fake_reviews']
-        X = rf_df.drop(columns='fake_reviews')
+        X = rf_df.drop(columns=['fake_reviews','manual_label'])
         rf.fit(X, y)
 
         importances = rf.feature_importances_
 
         importance_dict = dict(zip(X.columns, importances))
-        new_importance_dict = dict( sorted(importance_dict.items(), key=operator.itemgetter(1),reverse=True))
+        new_importance_dict = dict( sorted(importance_dict.items(), key=operator.itemgetter(1),reverse=True)[:10])
         with open('models/results/ocsvm_feature_importance.json', 'w') as fp:
             json.dump(new_importance_dict, fp)
         
