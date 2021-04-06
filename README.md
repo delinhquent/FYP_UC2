@@ -14,9 +14,9 @@ A scoring algorithm is then used to assign each review an impact score. The 
 
 ## Click to View Demo
 
-[![This is a demo application for L'Oréal](https://img.youtube.com/vi/ZGmNutrkZAM/0.jpg)](https://www.youtube.com/watch?v=ZGmNutrkZAM)
+[![This is a demo application for L'Oréal](https://img.youtube.com/vi/u_SJMD0vTbo/0.jpg)](https://www.youtube.com/watch?v=u_SJMD0vTbo)
 
-
+https://youtu.be/u_SJMD0vTbo
 ## Project Organization
 ------------
 
@@ -228,7 +228,61 @@ The sequence, commands and file dependencies can be found in the `dvc.yaml` file
 
 Simply ensure that the file dependencies are present before executing the commands. Please run the commands in sequence for your **initial** run as there are some file dependencies which are generated from the previous stage.
 
+1) Generate Review Activit Dataset
+```
+    cmd: python main.py -m dataset
+    deps:
+    - data/base/consolidated_profiles.csv
+    - pipeline/generator.py
+    - preprocess/preprocessor.py
+    - utils/clean.py
+    - utils/extract.py
+    - utils/reformat.py
+    outs:
+    - data/uc2/interim/consolidated_review_activity.csv
+    - models/word_embedding/doc2vec.model
+    - data/uc2/interim/doc2vec_embedding.csv
+```
 
+2) Feature Engineering
+```
+    cmd: python main.py -m build_features
+    deps:
+    - data/base/consolidated_profiles.csv
+    - data/uc2/interim/consolidated_products_labelled.csv
+    - data/base/consolidated_product_info.csv
+    - data/uc2/interim/consolidated_review_activity.csv
+    - src/features/build_features.py
+    - engineer/engineer.py
+    - pipeline/engineer.py
+    - utils/clean.py
+    - utils/engineer.py
+    - utils/engineer_functions.py
+    - models/word_embedding/doc2vec.model
+    - data/uc2/interim/doc2vec_embedding.csv
+    outs:
+    - data/uc2/processed/fake_framework_features.csv
+    - data/uc2/interim/consolidated_profiles.csv
+    - models/normalizer/cosine_similarity_tfidf.pkl
+```
+
+3) Train Model
+```
+    cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent doc2vec
+    deps:
+    - data/uc2/processed/fake_framework_features.csv
+    - data/uc2/interim/doc2vec_embedding.csv
+    - src/models/train_model.py
+    - impactscorer/impactscorer.py
+    - pipeline/trainer.py
+    - featureselector/featureselector.py
+    - trainers/pyodmodel.py
+    outs:
+    - models/results/ocsvm_results.csv
+    - data/uc2/processed/suspicious_reviewers_metrics.csv
+    - models/normalizer/feature_normalizer_standard.pkl
+    - models/ocsvm.pkl
+```
 ### Run Demo Application
 The following command is  to run the demo application.
 ```
