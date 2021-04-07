@@ -14,9 +14,8 @@ A scoring algorithm is then used to assign each review an impact score. The 
 
 ## Click to View Demo
 
-[![This is a demo application for L'Oréal](https://img.youtube.com/vi/u_SJMD0vTbo/0.jpg)](https://www.youtube.com/watch?v=u_SJMD0vTbo)
+[![This is a demo application for L'Oréal](https://img.youtube.com/vi/eAxgFKdQDNE/0.jpg)](https://www.youtube.com/watch?v=eAxgFKdQDNE)
 
-https://youtu.be/u_SJMD0vTbo
 ## Project Organization
 ------------
 
