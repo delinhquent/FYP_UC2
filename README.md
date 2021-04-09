@@ -227,7 +227,7 @@ The sequence, commands and file dependencies can be found in the `dvc.yaml` file
 
 Simply ensure that the file dependencies are present before executing the commands. Please run the commands in sequence for your **initial** run as there are some file dependencies which are generated from the previous stage.
 
-1) Generate Review Activit Dataset
+1) Generate Review Activity Dataset
 ```
     cmd: python main.py -m dataset
     deps:
