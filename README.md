@@ -276,13 +276,27 @@ Simply ensure that the file dependencies are present before executing the comman
     - impactscorer/impactscorer.py
     - pipeline/trainer.py
     - featureselector/featureselector.py
-    - trainers/pyodmodel.py
+    - trainers/models.py
     outs:
-    - models/results/ocsvm_results.csv
     - data/uc2/processed/suspicious_reviewers_metrics.csv
     - models/normalizer/feature_normalizer_standard.pkl
     - models/ocsvm.pkl
 ```
+You can also change the parameters for `-feature_select`, `-normalize` and `-model`.
+
+For `-feature_select` and `-normalize`, they would only accept values of ["Y","N", "y","n"].
+
+For `-model`, you can choose the models which you would like to use and train.
+| Model  | Library | Parameter Code |
+| ------------- | ------------- | ------------- | ------------- |
+| Isolation Forest  | sklearn  | isolation_Forest |
+| Isolation Forest  | PYoD  | pyod_isolation_Forest |
+| One-Class Support Vector Machine  | PYoD  | ocsvm |
+| Local Outlier Factor  | sklearn  | lof |
+| Local Outlier Factor  | PYoD  | pyod_lof |
+| Copula Based Outlier Detector  | PYoD  | copod |
+| Histogram-based Outlier Detection  | PYoD  | hbos |
+
 ### Run Demo Application
 The following command is  to run the demo application.
 ```
