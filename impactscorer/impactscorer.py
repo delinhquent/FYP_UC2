@@ -2,6 +2,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 import re
+import math
 
 class ImpactScorer:
     def __init__(self, model_df,profiles_df):
@@ -42,6 +43,24 @@ class ImpactScorer:
         # more than 24 mth
         self.model_df.loc[ (self.model_df.diff_days > 720) & (self.model_df.time_score == -1), 'time_score'] = 0
 
+    def re_evaluate_results(self):
+        new_decision_function = []
+        new_results = []
+
+        for index, row in self.model_df.iterrows():
+            if math.isnan(row['fake_reviews']):
+                new_decision_function.append(0)
+                new_results.append(0)
+            elif row['fake_reviews'] == 1 and row['decision_function'] < 0.75:
+                new_decision_function.append(row['decision_function'])
+                new_results.append(0)
+            else:
+                new_decision_function.append(row['decision_function'])
+                new_results.append(row['fake_reviews'])
+        
+        self.model_df['fake_reviews'] = new_results
+        self.model_df['decision_function'] = new_decision_function
+
     def assess_impact(self):
         print("Retrieving total fake reviews for each user...")
         fake_reviews_df = self.get_total_fake_reviews()
@@ -63,7 +82,9 @@ class ImpactScorer:
         max_decision_function = max(decision_function)
         min_decision_function = min(decision_function)
         self.model_df['decision_function'] = [(float(i) - min_decision_function)/(max_decision_function - min_decision_function) for i in decision_function]
-        
+        self.re_evaluate_results()
+
+
         helpful_votes = self.model_df['cleaned_reviews_voting']
         max_helpful_votes = max(helpful_votes)
         min_helpful_votes = min(helpful_votes)
