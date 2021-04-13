@@ -283,7 +283,7 @@ Simply ensure that the file dependencies are present before executing the comman
 ```
 You can also change the parameters for `-feature_select`, `-normalize` and `-model`.
 
-For `-feature_select` and `-normalize`, they would only accept values of ["Y","N", "y","n"].
+For `-feature_select` and `-normalize`, they would only accept values of `["Y","N", "y","n"]`.
 
 For `-model`, you can choose the models which you would like to use and train.
 | Model  | Library | Parameter Code |
