@@ -287,7 +287,7 @@ For `-feature_select` and `-normalize`, they would only accept values of ["Y","N
 
 For `-model`, you can choose the models which you would like to use and train.
 | Model  | Library | Parameter Code |
-| ------------- | ------------- | ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | Isolation Forest  | sklearn  | isolation_Forest |
 | Isolation Forest  | PYoD  | pyod_isolation_Forest |
 | One-Class Support Vector Machine  | PYoD  | ocsvm |
