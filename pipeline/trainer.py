@@ -1,25 +1,15 @@
 from data_loader.data_loader import DataLoader
-
 from featureselector.featureselector import FeatureSelector
+from impactscorer.impactscorer import ImpactScorer
+from trainers.models import Model
 
 import pandas as pd
 import pickle
-
-
 import numpy as np
-
-from impactscorer.impactscorer import ImpactScorer
-
-from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import normalize, StandardScaler
-
-from trainers.dbscan import DBScan
-from trainers.isolationforest import IsoForest
-from trainers.lof import LocalOF
-from trainers.rrcf import RRCF
-from trainers.pyodmodel import PyodModel
-
 from gensim.models.doc2vec import Doc2Vec
+
+
 
 class Trainer:
     def __init__(self, **kwargs):
@@ -125,7 +115,7 @@ class Trainer:
         print("Retrieving necessary columns for modelling...")
         self.get_modelling_data()
 
-        metrics, self.modelling_data = self.select_pipeline()
+        metrics, self.modelling_data = self.model_pipeline()
         self.model_data['fake_reviews'] = self.modelling_data['fake_reviews']
         self.model_data['decision_function'] = self.modelling_data['decision_function']
 
@@ -139,19 +129,6 @@ class Trainer:
         self.profile_data.to_csv(self.config.profiles.save_data_path,index=False)
 
         print("Training of Model Completed...")
-
-    def select_pipeline(self):
-        if self.model == "dbscan":
-            metrics, results = self.dbscan_pipeline()
-        elif self.model in ["isolation_forest","eif","pyod_isolation_forest"]:
-            metrics, results = self.isolation_forest_pipeline(self.model)
-        elif self.model == "rrcf":
-            metrics, results = self.rrcf_pipeline()
-        elif self.model in ["lof","pyod_lof"]:
-            metrics, results = self.lof_pipeline(self.model)
-        elif self.model in ["ocsvm","copod", "hbos"]:
-            metrics, results = self.generic_pyod_model_pipeline()
-        return metrics, results
 
     def experiment_params(self,params):
         self.experiment.log_parameters(params)
@@ -175,97 +152,23 @@ class Trainer:
         self.model_data.to_csv(results_path[self.model],index=False)
         self.experiment.log_model(name=self.model,
                         file_or_folder=results_path[self.model])
-        
-    def dbscan_pipeline(self):
-        print("Loading DBScan...")
-        self.trainer = DBScan(model_config = self.model_config, model_df = self.modelling_data)
-        params = self.trainer.hypertune_dbscan_params()
+                        
 
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results = self.trainer.dbscan_cluster(params)
-        
-        self.model_data['model_output'] = results
-
-        metrics = self.trainer.evaluate_dbscan(results)
-        
-        return metrics, results
-    
-    def isolation_forest_pipeline(self, model):
-        if model == "eif":
-            print("Loading Extended Isolation Forest...")
-        elif model == "pyod_isolation_forest":
-            print("Loading PYOD Isolation Forest...")
-        else:
-            print("Loading Isolation Forest...")
-        self.trainer = IsoForest(model_config = self.model_config, model_df = self.modelling_data)
-
-        params = self.trainer.make_isolation_forest(model)
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-        
-        results,decisions = self.trainer.predict_anomalies(model)
-        
-        self.model_data["model_output"] = results
-        self.model_data['decision_function'] = decisions
-
-        metrics = self.trainer.evaluate_isolation_forest(results,model)
-    
-        return metrics, results
-
-    def rrcf_pipeline(self):
-        print("Loading Robust Random Cut Forest...")
-        self.trainer = RRCF(model_config = self.model_config, model_df = self.modelling_data)
-
-        params = self.trainer.make_rrcf()
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        codisp_results, results = self.trainer.predict_anomalies()
-
-        self.model_data['model_output'] = codisp_results
-
-        metrics = self.trainer.evaluate_rrcf(results)
-    
-        return metrics, results
-    
-    def lof_pipeline(self,model):
-        if model == "lof":
-            print("Loading Local Outlier Factor...")
-        else:
-            print("Loading PYOD Local Outlier Factor...")
-        self.trainer = LocalOF(model_config = self.model_config, model_df = self.modelling_data)
-
-        params = self.trainer.make_lof(model)
-
-        print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
-        self.experiment_params(params)
-
-        results,decisions = self.trainer.predict_anomalies()
-        
-        self.model_data['model_output'] = results
-        self.model_data['decision_function'] = decisions
-
-
-        metrics = self.trainer.evaluate_lof(results,model)
-        return metrics, results
-    
-    def generic_pyod_model_pipeline(self):
+    def model_pipeline(self):
         name_dict = {"ocsvm":"One-Class SVM",
-            "copod":"Copula Based Outlier Detector", "hbos": "Histogram-based Outlier Detection"}
+            "copod":"Copula Based Outlier Detector", "hbos": "Histogram-based Outlier Detection",
+            "pyod_isolation_forest": "Isolation Forest (PYoD)", "isolation_forest": "Isolation Forest",
+            "pyod_lof": "Local Outlier Factor (PYoD)", "lof": "Local Outlier Factor"}
         print("Loading {}...".format(name_dict[self.model]))
-        self.trainer = PyodModel(model_config = self.model_config, model_df = self.modelling_data)
+        self.trainer = Model(model_config = self.model_config, model_df = self.modelling_data)
 
-        params = self.trainer.make_pyod_model(self.model)
+        params = self.trainer.make_model(self.model)
 
         print("Parsing parameters to Experiment...\nTesting parameters: {}".format(params))
         self.experiment_params(params)
 
         self.trainer.train_model()
 
-        metrics, self.modelling_data = self.trainer.evaluate_pyod_model(name_dict[self.model],self.model)
+        metrics, self.modelling_data = self.trainer.evaluate_model(name_dict[self.model],self.model)
         
         return metrics, self.modelling_data
