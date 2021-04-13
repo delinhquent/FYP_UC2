@@ -5,6 +5,10 @@ import numpy as np
 from pyod.models.hbos import HBOS
 from pyod.models.copod import COPOD
 from pyod.models.ocsvm import OCSVM
+from sklearn.ensemble import IsolationForest
+from pyod.models.iforest import IForest
+from sklearn.neighbors import LocalOutlierFactor
+from pyod.models.lof import LOF
 
 from utils.em_bench_high import calculate_emmv_score
 from trainers.ocsvm_tuner import *
@@ -22,7 +26,7 @@ import operator
 import json
 
 
-class PyodModel:
+class Model:
     def __init__(self, model_config, model_df):
         self.model_config = model_config
         self.model_df = model_df
@@ -70,14 +74,21 @@ class PyodModel:
         self.original_train_df['decision_function'] = self.model.decision_function(X_train)
         return self.model
 
-    def make_pyod_model(self,model):
+    def make_model(self,model):
         if model == "hbos":
             self.model =  HBOS()
         elif model == "copod":
             self.model = COPOD()
         elif model == "ocsvm":
             self.model = OCSVM()
-            # self.model = self.hypertune_ocsvm()
+        elif model == "pyod_isolation_forest":
+            self.model = IForest()
+        elif model == "isolation_forest":
+            self.model = IsolationForest()
+        elif model == "lof":
+            self.model =  LocalOutlierFactor(novelty=True)
+        elif model == "pyod_lof":
+            self.model = LOF()
         return self.model.get_params()
     
     def train_model(self):
@@ -99,12 +110,16 @@ class PyodModel:
         self.original_train_df['fake_reviews'] = y_train
         self.original_train_df['index'] = self.train_index
 
-    def evaluate_pyod_model(self, model_name, model):
+    def evaluate_model(self, model_name, model):
         print("Evaluating {}...".format(model_name))
         X_test = self.test_df.drop(columns='manual_label')
         
         print("Predicting Test Dataset with Dataset Size {}...".format(X_test.shape))
         results = self.model.predict(X_test)
+        if -1 in results:
+            results = [1 if x == -1 else 0 for x in results]
+        else:
+            results = results
 
         self.original_test_df['fake_reviews'] = results
         self.original_test_df['decision_function'] = self.model.decision_function(X_test)
@@ -120,13 +135,7 @@ class PyodModel:
         f1Score = f1_score(y_test, pred)
         recallScore = recall_score(y_test, pred)
         precScore = precision_score(y_test, pred)
-
-        # if model_name == "One-Class SVM":
-            # em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=True, X = X_test, y = results, model = self.model, model_name = model)    
-        # else:
-            # em, mv = calculate_emmv_score(novelty_detection=False, ocsvm_model=False, X = X_test, y = results, model = self.model, model_name = model)
         
-        # metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore,"em":em,"mv":mv}
         metrics = {"f1":f1Score,"precision":precScore,"recall":recallScore}
 
         final_df = self.original_train_df.append(self.original_test_df, ignore_index=True)
@@ -138,16 +147,18 @@ class PyodModel:
         print("Conducting feature importance...")
         rf_df = self.train_df.append(self.test_df, ignore_index=True)
         rf = ExtraTreesClassifier(n_estimators=250,
-                              random_state=0)
+                            random_state=0)
         y = rf_df['fake_reviews']
         X = rf_df.drop(columns=['fake_reviews','manual_label'])
         rf.fit(X, y)
+        pickle.dump(rf, open('models/rf.pkl','wb'))
 
         importances = rf.feature_importances_
 
         importance_dict = dict(zip(X.columns, importances))
         new_importance_dict = dict( sorted(importance_dict.items(), key=operator.itemgetter(1),reverse=True)[:10])
-        with open('models/results/ocsvm_feature_importance.json', 'w') as fp:
+        filename = "models/results/{}_feature_importance.json".format(model)
+        with open(filename, 'w') as fp:
             json.dump(new_importance_dict, fp)
         
         return metrics, final_df.fillna(0)
