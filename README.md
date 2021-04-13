@@ -279,6 +279,7 @@ Simply ensure that the file dependencies are present before executing the comman
     outs:
     - data/uc2/processed/suspicious_reviewers_metrics.csv
     - models/normalizer/feature_normalizer_standard.pkl
+    - models/results/ocsvm_results.csv
     - models/ocsvm.pkl
 ```
 You can also change the parameters for `-feature_select`, `-normalize` and `-model`.
@@ -295,6 +296,8 @@ For `-model`, you can choose the models which you would like to use and train.
 | Local Outlier Factor  | PYoD  | pyod_lof |
 | Copula Based Outlier Detector  | PYoD  | copod |
 | Histogram-based Outlier Detection  | PYoD  | hbos |
+
+**Note**: For the last 2 files, your output files will be `models/results/<parameter code of model>_result.csv` and `models/<parameter code of model>.pkl`
 
 ### Run Demo Application
 The following command is  to run the demo application.
