@@ -37,10 +37,10 @@ if __name__ == '__main__':
         elif mode == 'train_model':
             model = args.model
             
-            # valid_models = {'dbscan': "DBSCAN",'isolation_forest': "Isolation Forest",'eif':"EIF", "lof": "LOF", "rrcf":"Robust Random Cut Forest",
-            #                 "ocsvm":"One-Class SVM", "copod":"Copula Based Outlier Detector", "hbos":"Histogram-based Outlier Detection",'pyod_isolation_forest': "PYOD Isolation Forest",
-            #                 "pyod_lof": "PYOD LOF"}
-            valid_models = {"ocsvm":"One-Class SVM"}
+            valid_models = {'isolation_forest': "Isolation Forest", "lof": "LOF",
+                            "ocsvm":"One-Class SVM", "copod":"Copula Based Outlier Detector", "hbos":"Histogram-based Outlier Detection",'pyod_isolation_forest': "PYOD Isolation Forest",
+                            "pyod_lof": "PYOD LOF"}
+            # valid_models = {"ocsvm":"One-Class SVM"}
 
             if model == None:
                 print("Please parse the model's names using -model respectively...")
@@ -77,7 +77,7 @@ if __name__ == '__main__':
                     user_config = [text_represent, feature_select, normalize]
                     train_model(configs, experiment, model, user_config)
                 else:
-                    print("Please input y or n for -feature_select/-normalize & tfidf/glove/fasttext for -text_represent...")    
+                    print("Please input y or n for -feature_select/-normalize & doc2vec for -text_represent...")    
         else:
             print("There is no such mode yet...")
             exit(0)
