@@ -266,6 +266,15 @@ Simply ensure that the file dependencies are present before executing the comman
 ```
 
 3) Train Model
+
+You can also change the parameters for `-feature_select`, `-normalize` and `-model`.
+
+For `-feature_select` and `-normalize`, they would only accept values of `["Y","N", "y","n"]`.
+
+For `-model`, you can choose the models which you would like to use and train. Look at the bottom table for the full comprehensive list.
+
+**Note**: For the last 2 files, your output files will be `models/results/<parameter code of model>_result.csv` and `models/<parameter code of model>.pkl`. Please adjust the file names accordingly in your `dvc.yaml` file.
+
 ```
     cmd: python main.py -m train_model -model ocsvm -feature_select n -normalize y -text_represent doc2vec
     deps:
@@ -282,11 +291,7 @@ Simply ensure that the file dependencies are present before executing the comman
     - models/results/ocsvm_results.csv
     - models/ocsvm.pkl
 ```
-You can also change the parameters for `-feature_select`, `-normalize` and `-model`.
 
-For `-feature_select` and `-normalize`, they would only accept values of `["Y","N", "y","n"]`.
-
-For `-model`, you can choose the models which you would like to use and train.
 | Model  | Library | Parameter Code |
 | ------------- | ------------- | ------------- |
 | Isolation Forest  | sklearn  | isolation_Forest |
@@ -297,7 +302,7 @@ For `-model`, you can choose the models which you would like to use and train.
 | Copula Based Outlier Detector  | PYoD  | copod |
 | Histogram-based Outlier Detection  | PYoD  | hbos |
 
-**Note**: For the last 2 files, your output files will be `models/results/<parameter code of model>_result.csv` and `models/<parameter code of model>.pkl`
+
 
 ### Run Demo Application
 The following command is  to run the demo application.
