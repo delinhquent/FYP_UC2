@@ -114,6 +114,13 @@ if session_state.logged_in:
 
                 # st.success("Model Ran Successfully...")
                 st.info("The review is **{}**. The model is ** {}% ** confident. The severity to the business is ** {} ({}%)**.".format(result_text,model_confidence*100, impact_text,round(impact_score,5)*100))
+                with st.beta_expander("Visualization of Top 10 Most Important Features"):
+                    reformatted_values = [value*100 for value in top10_features.values()]
+                    new_features = {"features":top10_features.keys(),"values":reformatted_values}
+
+                    fig = px.bar(new_features, x='features', y='values', title="Top 10 Most Important Features", labels={"values": "% Contribution", "features":"Features"})
+                    st.plotly_chart(fig) 
+                    
                 with st.beta_expander("Breakdown of Model's Result (Top 10 Features)..."):
                     st.warning("The following breakdown is not the full list of features which was trained by the model...")
                     top10_features_mapping = {"cleaned_reviews_word_count":"Number of Words in Review", "cleaned_reviews_voting": "Number of Helpful Votes in Review", "cleaned_profiles_average_review_length": "Average Number of Words Written by Reviewer",
