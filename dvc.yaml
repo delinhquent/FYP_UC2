@@ -40,9 +40,9 @@ stages:
     - impactscorer/impactscorer.py
     - pipeline/trainer.py
     - featureselector/featureselector.py
-    - trainers/pyodmodel.py
+    - trainers/models.py
     outs:
-    - models/results/ocsvm_results.csv
     - data/uc2/processed/suspicious_reviewers_metrics.csv
     - models/normalizer/feature_normalizer_standard.pkl
+    - models/results/ocsvm_results.csv
     - models/ocsvm.pkl
