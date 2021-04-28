@@ -14,7 +14,7 @@ from utils.em_bench_high import calculate_emmv_score
 from trainers.ocsvm_tuner import *
 
 from sklearn.metrics import f1_score, recall_score, precision_score, confusion_matrix
-from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.ensemble import RandomForestRegressor
 
 import pandas as pd
 
@@ -146,8 +146,13 @@ class Model:
 
         print("Conducting feature importance...")
         rf_df = self.train_df.append(self.test_df, ignore_index=True)
-        rf = ExtraTreesClassifier(n_estimators=250,
-                            random_state=0)
+        rf = RandomForestRegressor(n_estimators = 100,
+                           n_jobs = -1,
+                           oob_score = True,
+                           bootstrap = True,
+                           random_state = 0,
+                              min_samples_split=0.1, max_depth=10)
+
         y = rf_df['fake_reviews']
         X = rf_df.drop(columns=['fake_reviews','manual_label'])
         rf.fit(X, y)
